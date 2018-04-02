@@ -1,0 +1,81 @@
+/*
+ * Copyright (c) 2018.
+ * Created by Josua Lengwenath
+ */
+
+package com.dertyp7214.apkmirror;
+
+import android.app.Activity;
+import android.app.ActivityOptions;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import java.util.List;
+
+public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHolder> {
+
+    private List<AppListItem> itemList;
+    private Activity context;
+
+    public class MyViewHolder extends RecyclerView.ViewHolder {
+        public TextView title, publisher;
+        public ImageView icon;
+        public CardView card;
+
+        public MyViewHolder(View view) {
+            super(view);
+            title = view.findViewById(R.id.txt_title);
+            publisher = view.findViewById(R.id.txt_publisher);
+            icon = view.findViewById(R.id.img_icon);
+            card = view.findViewById(R.id.card);
+        }
+    }
+
+
+    public AppListAdapter(List<AppListItem> itemList, Activity context) {
+        this.itemList = itemList;
+        this.context = context;
+    }
+
+    @NonNull
+    @Override
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.app_list_item, parent, false);
+
+        return new MyViewHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
+        final AppListItem listItem = itemList.get(position);
+        holder.title.setText(listItem.getTitle());
+        holder.publisher.setText(listItem.getPublisher());
+        holder.icon.setImageBitmap(listItem.getIcon());
+        holder.card.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Home.progressDialog = new ProgressDialog(context);
+                Home.progressDialog.setMessage("Loading "+listItem.getTitle()+"...");
+                Home.progressDialog.setCancelable(false);
+                Home.progressDialog.show();
+                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(context, holder.icon, "icon");
+                context.startActivity(new Intent(context, MainActivity.class).putExtra("url", listItem.getUrl()).putExtra("icon", listItem.getIcon()), options.toBundle());
+            }
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return itemList.size();
+    }
+}

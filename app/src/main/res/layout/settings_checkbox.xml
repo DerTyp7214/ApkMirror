@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2018.
+  ~ Created by Josua Lengwenath
+  -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="55dp"
+    android:paddingLeft="20dp"
+    android:paddingTop="7dp"
+    android:id="@+id/box"
+    android:background="?android:attr/selectableItemBackground"
+    android:paddingEnd="20dp"
+    android:paddingBottom="7dp">
+
+    <CheckBox
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="32dp"
+        android:button="@null"
+        android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
+        android:minLines="1"
+        android:text="CheckBox"
+        android:textAlignment="viewStart"
+        android:textSize="18sp" />
+</RelativeLayout>
