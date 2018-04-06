@@ -6,6 +6,7 @@
 package com.dertyp7214.apkmirror;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -21,13 +22,13 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class Download {
-    private Context context;
+    private Activity context;
     private App app;
     private App.Listener listener;
     private static List<Thread> threads = new ArrayList<>();
     private static List<App.Listener> listeners = new ArrayList<>();
 
-    public Download(App app, Context context, App.Listener listener) {
+    public Download(App app, Activity context, App.Listener listener) {
         this.context = context;
         this.app = app;
         this.listener = listener;
@@ -69,13 +70,13 @@ public class Download {
                         Intent intent = new Intent(Intent.ACTION_VIEW).setDataAndType(downloaded_apk,
                                 "application/vnd.android.package-archive");
                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        context.startActivity(intent);
+                        context.startActivityForResult(intent, 1);
                     } else {
                         Intent intent = new Intent(Intent.ACTION_VIEW);
                         intent.setDataAndType(Uri.fromFile(file),
                                 "application/vnd.android.package-archive");
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        context.startActivity(intent);
+                        context.startActivityForResult(intent, 1);
                     }
                 }
             }

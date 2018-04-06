@@ -9,10 +9,15 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.text.Layout;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.widget.RelativeLayout;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -179,5 +184,117 @@ public class Utils {
 
         // "RECREATE" THE NEW BITMAP
         return Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
+    }
+
+    public static void SlideToAbove(final RelativeLayout footer) {
+        Animation slide = null;
+        slide = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
+                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+                0.0f, Animation.RELATIVE_TO_SELF, -5.0f);
+
+        slide.setDuration(400);
+        slide.setFillAfter(true);
+        slide.setFillEnabled(true);
+        footer.startAnimation(slide);
+
+        slide.setAnimationListener(new Animation.AnimationListener() {
+
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+                footer.clearAnimation();
+
+                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                        footer.getWidth(), footer.getHeight());
+                // lp.setMargins(0, 0, 0, 0);
+                lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                footer.setLayoutParams(lp);
+
+            }
+
+        });
+
+    }
+
+    public static void SlideToDown(final RelativeLayout footer) {
+        Animation slide = null;
+        slide = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
+                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+                0.0f, Animation.RELATIVE_TO_SELF, 5.2f);
+
+        slide.setDuration(400);
+        slide.setFillAfter(true);
+        slide.setFillEnabled(true);
+        footer.startAnimation(slide);
+
+        slide.setAnimationListener(new Animation.AnimationListener() {
+
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+                footer.clearAnimation();
+
+                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                        footer.getWidth(), footer.getHeight());
+                lp.setMargins(0, footer.getWidth(), 0, 0);
+                lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                footer.setLayoutParams(lp);
+
+            }
+
+        });
+
+    }
+
+    public static boolean isColorDark(int color){
+        double darkness = 1-(0.299* Color.red(color) + 0.587*Color.green(color) + 0.114*Color.blue(color))/255;
+        if(darkness<0.5){
+            return false; // It's a light color
+        }else{
+            return true; // It's a dark color
+        }
+    }
+
+    public static int MergeColors(int backgroundColor, int foregroundColor) {
+        final byte ALPHA_CHANNEL = 24;
+        final byte RED_CHANNEL   = 16;
+        final byte GREEN_CHANNEL =  8;
+        final byte BLUE_CHANNEL  =  0;
+
+        final double ap1 = (double)(backgroundColor >> ALPHA_CHANNEL & 0xff) / 255d;
+        final double ap2 = (double)(foregroundColor >> ALPHA_CHANNEL & 0xff) / 255d;
+        final double ap = ap2 + (ap1 * (1 - ap2));
+
+        final double amount1 = (ap1 * (1 - ap2)) / ap;
+        final double amount2 = amount1 / ap;
+
+        int a = ((int)(ap * 255d)) & 0xff;
+
+        int r = ((int)(((float)(backgroundColor >> RED_CHANNEL & 0xff )*amount1) +
+                ((float)(foregroundColor >> RED_CHANNEL & 0xff )*amount2))) & 0xff;
+        int g = ((int)(((float)(backgroundColor >> GREEN_CHANNEL & 0xff )*amount1) +
+                ((float)(foregroundColor >> GREEN_CHANNEL & 0xff )*amount2))) & 0xff;
+        int b = ((int)(((float)(backgroundColor & 0xff )*amount1) +
+                ((float)(foregroundColor & 0xff )*amount2))) & 0xff;
+
+        return a << ALPHA_CHANNEL | r << RED_CHANNEL | g << GREEN_CHANNEL | b << BLUE_CHANNEL;
     }
 }

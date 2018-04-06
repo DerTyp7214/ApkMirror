@@ -1,16 +1,23 @@
 package com.dertyp7214.apkmirror;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -18,16 +25,26 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Layout;
 import android.util.Log;
+import android.view.Display;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.view.View.OnClickListener;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
     private ImageView appIcon, appBackground;
     private CollapsingToolbarLayout collapsingToolbar;
     private AppBarLayout appBarLayout;
-    private boolean appBarExpanded;
     private Menu collapsedMenu;
     private Button open, uninstall;
     private String packageName;
@@ -49,6 +65,10 @@ public class MainActivity extends AppCompatActivity {
     private List<Version> versions = new ArrayList<>();
     private RecyclerView recyclerView;
     private AppVersionAdapter appVersionAdapter;
+    private FloatingActionButton fab;
+    private PopupWindow description_popup;
+    private boolean appBarExpanded;
+    private boolean launchable;
     private static int notifyId;
     private static HashMap<String, App> apps = new HashMap<>();
 
@@ -134,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onGenerated(@NonNull Palette palette) {
                     int vibrantColor = palette.getDarkVibrantColor(R.color.colorPrimary);
+                    app.setAppColor(vibrantColor);
                     collapsingToolbar.setContentScrimColor(vibrantColor);
                     collapsingToolbar.setStatusBarScrimColor(vibrantColor);
                     appBackground.setBackgroundColor(vibrantColor);
@@ -154,27 +175,7 @@ public class MainActivity extends AppCompatActivity {
         description.setText(app.getDescription());
         version.setText(app.getVersion());
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                download(MainActivity.this, app);
-            }
-        });
-
-        uninstall.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                uninstall();
-            }
-        });
-
-        open.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                open();
-            }
-        });
+        fab = findViewById(R.id.fab);
 
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
@@ -207,9 +208,134 @@ public class MainActivity extends AppCompatActivity {
                 appVersionAdapter.notifyDataSetChanged();
             }
         });
+
+        description.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopupDescription(v);
+            }
+        });
+
+        setUp();
     }
 
-    private void download(Context context, App app) {
+    private void showPopupDescription(final View v){
+
+        final CoordinatorLayout rootLayout = findViewById(R.id.main_layout);
+
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View layout = inflater.inflate(R.layout.description_popup, (ViewGroup) findViewById(R.id.root_layout));
+
+        if(getSharedPreferences("settings", MODE_PRIVATE).getBoolean("colored_navbar", false)) {
+            getWindow().setNavigationBarColor(getResources().getColor(R.color.white));
+            if (!Utils.isColorDark(getResources().getColor(R.color.white)) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                v.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+        }
+
+        ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), 0x00000000, 0x80000000);
+        animator.setDuration(500);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                getWindow().setStatusBarColor(Utils.MergeColors(app.getAppColor(), (int) animation.getAnimatedValue()));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                    rootLayout.setForeground(new ColorDrawable((int) animation.getAnimatedValue()));
+            }
+        });
+        animator.start();
+
+        description_popup = new PopupWindow(layout);
+        description_popup.setWidth(LinearLayout.LayoutParams.MATCH_PARENT);
+        description_popup.setHeight(LinearLayout.LayoutParams.MATCH_PARENT);
+        description_popup.setAnimationStyle(R.style.Animation);
+        description_popup.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), 0x80000000, 0x00000000);
+                animator.setDuration(500);
+                animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        getWindow().setStatusBarColor(Utils.MergeColors(app.getAppColor(), (int) animation.getAnimatedValue()));
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                            rootLayout.setForeground(new ColorDrawable((int) animation.getAnimatedValue()));
+                    }
+                });
+                animator.start();
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ignored) {}
+                if (getSharedPreferences("settings", MODE_PRIVATE).getBoolean("colored_navbar", false)) {
+                    getWindow().setNavigationBarColor(app.getAppColor());
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                        v.setSystemUiVisibility(View.VISIBLE);
+                }
+            }
+        });
+        description_popup.showAtLocation(v, Gravity.CENTER, 0, 0);
+
+        Button close = layout.findViewById(R.id.btn_close);
+        TextView description = layout.findViewById(R.id.txt_big_description);
+
+        description.setText(app.getDescription());
+
+        close.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                description_popup.dismiss();
+            }
+        });
+
+    }
+
+    private void setUp(){
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                download(MainActivity.this, app);
+            }
+        });
+
+        uninstall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    uninstall();
+                }catch (Exception e){
+                    setUp();
+                }
+            }
+        });
+
+        final Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage(app.getPackageName());
+        if(LaunchIntent!=null)
+            launchable=true;
+        open.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    startActivity(LaunchIntent);
+                }catch (Exception e){
+                    setUp();
+                }
+            }
+        });
+
+        if(appInstalled(app.getPackageName())){
+            fab.setVisibility(View.INVISIBLE);
+            if(launchable)
+                open.setVisibility(View.VISIBLE);
+            if(!isSystem(app.getPackageName()))
+                uninstall.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void download(Activity context, App app) {
+        if(appInstalled(app.getPackageName())) {
+            setUp();
+            return;
+        }
+        Toast.makeText(context, "Downloading "+app.getTitle(), Toast.LENGTH_LONG).show();
         notifyId++;
         Log.d("NOTIFYID", notifyId+"");
         final Notifications notifications = new Notifications(context, notifyId, app.getTitle(), "Download", "", app.getAppIcon(), true);
@@ -224,6 +350,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 notifications.setFinished();
+                setUp();
             }
 
             @Override
@@ -238,23 +365,28 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void open() {
-        app.open(this);
-    }
-
     private void uninstall() {
-        app.uninstall(this);
+        Intent intent = new Intent(Intent.ACTION_DELETE);
+        intent.setData(Uri.parse("package:"+app.getPackageName()));
+        startActivityForResult(intent, 1);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (collapsedMenu != null
-                && (!appBarExpanded || collapsedMenu.size() != 1)) {
+        if (collapsedMenu != null && (!appBarExpanded || collapsedMenu.size() != 1) && !appInstalled(app.getPackageName())) {
             collapsedMenu.add("Download")
                     .setIcon(R.drawable.ic_file_download_white_24dp)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         }
         return super.onPrepareOptionsMenu(collapsedMenu);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == 1){
+            try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+            setUp();
+        }
     }
 
     @Override
@@ -265,14 +397,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        if(description_popup!=null) {
+            if (!description_popup.isShowing())
+                super.onBackPressed();
+            else
+                description_popup.dismiss();
+        }else{
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
             case R.id.action_settings:
                 return true;
             case android.R.id.home:
-                finishAfterTransition();
-                return true;
+                if (description_popup == null)
+                    return true;
+                else if (!description_popup.isShowing()) {
+                    fab.setVisibility(View.INVISIBLE);
+                    finishAfterTransition();
+                    return true;
+                } else
+                    description_popup.dismiss();
         }
 
         if (item.getTitle() == "Download") {
@@ -283,14 +433,25 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private boolean appInstalled(String uri) {
+    private boolean appInstalled(String packageName) {
         PackageManager pm = getPackageManager();
         try {
-            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
+            pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
             return true;
         } catch (PackageManager.NameNotFoundException e) {
+            return false;
         }
+    }
 
-        return false;
+    private boolean isSystem(String packageName){
+        PackageManager pm = getPackageManager();
+        try {
+            if((pm.getApplicationInfo(packageName, 0).flags & ApplicationInfo.FLAG_SYSTEM) != 0)
+                return true;
+            else
+                return false;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
     }
 }

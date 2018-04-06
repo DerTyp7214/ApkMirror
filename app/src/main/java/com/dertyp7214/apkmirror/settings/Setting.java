@@ -13,6 +13,7 @@ public class Setting {
 
     protected String text;
     protected String name;
+    protected String subTitle;
     protected Context context;
     protected settingsOnClickListener onClickListener;
 
@@ -20,6 +21,15 @@ public class Setting {
         this.name=name;
         this.text=text;
         this.context=context;
+    }
+
+    public Setting setSubTitle(String subTitle){
+        this.subTitle=subTitle;
+        return this;
+    }
+
+    public String getSubTitle(){
+        return subTitle!=null?subTitle:"";
     }
 
     public String getText() {

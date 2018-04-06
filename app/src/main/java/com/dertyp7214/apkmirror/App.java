@@ -5,6 +5,7 @@
 
 package com.dertyp7214.apkmirror;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.http.HttpEntity;
@@ -40,6 +42,7 @@ public class App {
     private Bitmap background, appIcon;
     private Context context;
     private AppConfig appConfig;
+    private int appColor;
     private String baseUrl = "https://www.apkmirror.com";
     private static List<Integer> download_id = new ArrayList<>();
 
@@ -70,7 +73,7 @@ public class App {
                             .split("class=\"table topmargin variants-table\"")[1]
                             .split("class=\"table-row headerFont\"");
                     for (String ver : versions) {
-                        if (ver.contains("nodpi") && (ver.contains("arm") || ver.contains("universal") ||ver.contains("noarch"))) {
+                        if ((ver.contains("nodpi") || ver.contains("480dpi")) && (ver.contains("arm") || ver.contains("universal") ||ver.contains("noarch"))) {
                             u = baseUrl + ver.split("<a")[1].split("href=\"")[1].split("\"")[0];
                             break;
                         }
@@ -105,6 +108,7 @@ public class App {
             this.appIcon = getBitmap(SiteTitleBar.getString("iconUrl"));
             this.apkUrl=getApkPath();
             this.packageName=ApkDetails.getString("package");
+            this.appColor = isColorDark(getDominantColor(getAppIcon()))?getDominantColor(getAppIcon()):manipulateColor(getDominantColor(getAppIcon()), 0.8F);
         } catch (Exception | WrongUriException e) {
             e.printStackTrace();
         }
@@ -244,7 +248,11 @@ public class App {
     }
 
     public int getAppColor(){
-        return isColorDark(getDominantColor(getAppIcon()))?getDominantColor(getAppIcon()):manipulateColor(getDominantColor(getAppIcon()), 0.8F);
+        return this.appColor;
+    }
+
+    public void setAppColor(int color){
+        this.appColor=color;
     }
 
     public void getVersions(final LoadListener listener) {
@@ -255,9 +263,9 @@ public class App {
 
                 String listContent;
                 try {
-                    listContent = content.split("Previous APKs")[1].split("class=\"listWidget\"")[0];
-                } catch (Exception e) {
                     listContent = content.split("All versions")[1].split("class=\"listWidget\"")[0];
+                } catch (Exception e) {
+                    listContent = content.split("Previous APKs")[1].split("class=\"listWidget\"")[0];
                 }
 
                 String[] listEntrys = listContent.split("class=\"appRow\"");
@@ -277,7 +285,7 @@ public class App {
         }).start();
     }
 
-    public void download(Context context, int id, Listener listener){
+    public void download(Activity context, int id, Listener listener){
         if(download_id.size()<=appConfig.getInteger(AppConfig.MAX_DOWNLOADS)&&id<download_id.size()) {
             Download download = new Download(this, context, listener);
             download_id.set(id, download.startDownload(id));
@@ -285,14 +293,6 @@ public class App {
         } else {
             listener.onCancel("Max Downloads");
         }
-    }
-
-    public void open(Context context){
-
-    }
-
-    public void uninstall(Context context){
-
     }
 
     public interface Listener{

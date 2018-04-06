@@ -35,12 +35,13 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private Activity context;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView title;
+        public TextView title, subTitle;
         public View box;
 
         public ViewHolder(View view) {
             super(view);
             title = view.findViewById(R.id.text);
+            subTitle = view.findViewById(R.id.subTitle);
             box = view.findViewById(R.id.box);
         }
     }
@@ -103,8 +104,8 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             case 0:
                 final ViewHolder viewHolder = (ViewHolder) holder;
                 final Setting setting = itemList.get(position);
-                TextView textView = viewHolder.title;
-                textView.setText(setting.getText());
+                viewHolder.title.setText(setting.getText());
+                viewHolder.subTitle.setText(setting.getSubTitle());
                 viewHolder.box.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -137,6 +138,7 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         settingSwitch.setChecked(isChecked);
                     }
                 });
+                break;
             case 3:
                 final ViewHolderColor viewHolderColor = (ViewHolderColor) holder;
                 final SettingColor settingColor = (SettingColor) itemList.get(position);

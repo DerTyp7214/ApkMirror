@@ -5,6 +5,8 @@
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/background"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/colorPrimary"
@@ -27,7 +29,7 @@
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:maxLines="1"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/white"
             android:textColorHint="@color/white" />
 
     </android.support.design.widget.TextInputLayout>
@@ -40,8 +42,8 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:layout_margin="10dp"
-        android:layout_weight="1"
-        android:background="@drawable/ic_search_black_24dp"
-        android:backgroundTint="@color/white" />
+        android:background="@drawable/abc_ic_search_api_material"
+        android:backgroundTint="@color/white"
+        tools:ignore="PrivateResource" />
 
 </RelativeLayout>

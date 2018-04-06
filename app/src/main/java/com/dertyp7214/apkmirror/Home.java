@@ -6,33 +6,32 @@
 package com.dertyp7214.apkmirror;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.TextView;
 
+import com.dertyp7214.apkmirror.components.Input;
 import com.dertyp7214.apkmirror.settings.Setting;
 import com.dertyp7214.apkmirror.settings.SettingCheckBox;
-import com.dertyp7214.apkmirror.settings.SettingColor;
+import com.dertyp7214.apkmirror.settings.SettingSwitch;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -46,6 +45,7 @@ public class Home extends AppCompatActivity {
 
     public static ProgressDialog progressDialog;
 
+    private Input input;
     private RecyclerView recyclerView, settingList;
     private AppListAdapter appListAdapter;
     private SettingsAdapter settingsAdapter;
@@ -92,13 +92,13 @@ public class Home extends AppCompatActivity {
         home = findViewById(R.id.view_home);
         dashboard = findViewById(R.id.view_dashboard);
 
+        setTaskDescription(new ActivityManager.TaskDescription("Apkmirror", BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher), getResources().getColor(R.color.colorPrimaryDark)));
+
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         askPermissions();
-
-        final TextInputEditText inputEditText = findViewById(R.id.input_querry);
-        final Button search = findViewById(R.id.btn_send);
+        input = findViewById(R.id.input);
 
         recyclerView = findViewById(R.id.rv);
 
@@ -121,27 +121,14 @@ public class Home extends AppCompatActivity {
             search(querry);
         }
 
-        search.setOnClickListener(new View.OnClickListener() {
+        input.setSubmitListener(new Input.SubmitListener() {
             @Override
-            public void onClick(View v) {
-                querry=inputEditText.getText().toString();
+            public void onSubmit(String text) {
+                querry=text;
                 search(querry);
-            }
-        });
-
-        inputEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId== EditorInfo.IME_ACTION_SEARCH){
-                    querry=v.getText().toString();
-                    search(querry);
-                }
                 InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-
                 assert inputManager != null;
                 inputManager.hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-                inputEditText.clearFocus();
-                return true;
             }
         });
 
@@ -161,9 +148,9 @@ public class Home extends AppCompatActivity {
 
     private List<Setting> getSettings() {
         return new ArrayList<>(Arrays.asList(
-                new Setting("version", "Version: " + BuildConfig.VERSION_NAME, this),
+                new Setting("version", "Version", this).setSubTitle(BuildConfig.VERSION_NAME),
                 new SettingCheckBox("search_at_start", "Show Googleapps on start", this, false),
-                new SettingCheckBox("colored_navbar", "Colored Navigationbar", this, false)
+                new SettingSwitch("colored_navbar", "Colored Navigationbar", this, false)
         ));
     }
 
@@ -214,6 +201,7 @@ public class Home extends AppCompatActivity {
         threads.add(thread);
     }
 
+    @Nullable
     private String getWebContent(String url) {
         try {
             URL web = new URL(url);

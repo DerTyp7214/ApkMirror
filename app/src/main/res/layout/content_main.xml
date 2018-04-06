@@ -65,7 +65,7 @@
             android:layout_alignStart="@+id/txt_publisher"
             android:layout_marginEnd="2dp"
             android:layout_toStartOf="@+id/btn_remove"
-            android:maxLines="1"
+            android:maxLines="2"
             android:text="1.0.0"
             android:textSize="12sp" />
 
@@ -99,6 +99,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/textView2"
+                        android:maxLines="15"
                         android:text="Description" />
                 </RelativeLayout>
 
