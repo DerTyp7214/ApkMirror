@@ -13,6 +13,8 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.support.design.widget.CoordinatorLayout;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +32,7 @@ public class BottomPopup {
 
     private View parent;
     private Activity activity;
-    private String text;
+    private Spanned text;
     private int currentStatusBarColor;
     private PopupWindow popup;
 
@@ -41,14 +43,18 @@ public class BottomPopup {
     }
 
     public void setText(String text){
+        this.text=Build.VERSION.SDK_INT >= Build.VERSION_CODES.N?Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY):Html.fromHtml(text);
+    }
+
+    public void setText(Spanned text){
         this.text=text;
     }
 
-    public void setUp(View root_layout){
+    public void setUp(View root_layout, int inflateLayout){
         final CoordinatorLayout rootLayout = (CoordinatorLayout) root_layout;
 
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View layout = inflater.inflate(R.layout.description_popup, (ViewGroup) activity.findViewById(R.id.root_layout));
+        final View layout = inflater.inflate(inflateLayout, (ViewGroup) activity.findViewById(R.id.root_layout));
 
         if(activity.getSharedPreferences("settings", MODE_PRIVATE).getBoolean("colored_navbar", false)) {
             activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.white));
@@ -98,9 +104,9 @@ public class BottomPopup {
         });
 
         Button close = layout.findViewById(R.id.btn_close);
-        TextView description = layout.findViewById(R.id.txt_big_description);
+        TextView textView = layout.findViewById(R.id.txt_text);
 
-        description.setText(text);
+        textView.setText(text);
 
         close.setOnClickListener(new View.OnClickListener() {
             @Override

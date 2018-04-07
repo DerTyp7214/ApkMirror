@@ -15,6 +15,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -37,7 +39,8 @@ import java.util.List;
 public class App {
 
     private String url;
-    private String title, publisher, version, packageName, size, description, apkUrl;
+    private String title, publisher, version, packageName, size, apkUrl;
+    private Spanned description;
     private String content;
     private Bitmap background, appIcon;
     private Context context;
@@ -123,17 +126,17 @@ public class App {
         return baseUrl+apkUrl;
     }
 
-    private String getDescriptionText() throws Exception{
-        return content.split("id=\"description\">")[1]
+    private Spanned getDescriptionText() throws Exception{
+        return fromHtml(content.split("id=\"description\">")[1]
                 .split("notes\">")[1]
-                .split("</div")[0]
-                .replace("<br />", "\n")
-                .replace("\"", "")
-                .replaceAll("(<a)[^&]*(>)", "")
-                .replaceAll("(<span)[^&]*(>)", "")
-                .replaceAll("(</)[^&]*(>)", "")
-                .replaceAll("(<)[^&]*(>)", "")
-                .replace(">", "");
+                .split("</div")[0]);
+    }
+
+    private Spanned fromHtml(String string){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+            return Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY);
+        else
+            return Html.fromHtml(string);
     }
 
     private Bundle getApkDetails()throws Exception{
@@ -231,8 +234,8 @@ public class App {
         return this.packageName;
     }
 
-    public String getDescription(){
-        return StringEscapeUtils.unescapeHtml4(this.description);
+    public Spanned getDescription(){
+        return this.description;
     }
 
     public String getTitle(){

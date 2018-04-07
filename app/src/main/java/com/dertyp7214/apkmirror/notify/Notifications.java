@@ -5,9 +5,16 @@
 
 package com.dertyp7214.apkmirror.notify;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.nfc.tech.NfcB;
+import android.text.Html;
+import android.text.Spanned;
+import android.view.View;
+
+import com.dertyp7214.apkmirror.R;
+import com.dertyp7214.apkmirror.components.BottomPopup;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,6 +26,7 @@ import java.util.List;
 public class Notifications {
 
     public final String TITLE, SUBTITLE, TIME;
+    private BottomPopup notificationPopup;
 
     public Notifications(String title, String subTitle, String time){
         this.TITLE=title;
@@ -57,4 +65,13 @@ public class Notifications {
         context.getSharedPreferences("notify", Context.MODE_PRIVATE).edit().putString("notiJSON", json.toString()).apply();
     }
 
+    public void onClick(int currentColor, Activity activity, View parent, View root_layout){
+        notificationPopup = new BottomPopup(currentColor, parent, activity);
+        notificationPopup.setUp(root_layout, R.layout.notification_popup);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+            notificationPopup.setText(Html.fromHtml("<h2>"+TITLE+"</h2><br><p>"+SUBTITLE+"</p><br><p>"+TIME+"</p>", Html.FROM_HTML_MODE_LEGACY));
+        else
+            notificationPopup.setText(Html.fromHtml("<h2>"+TITLE+"</h2><br><p>"+SUBTITLE+"</p><br><p>"+TIME+"</p>"));
+        notificationPopup.show();
+    }
 }

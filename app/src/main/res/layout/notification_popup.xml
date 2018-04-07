@@ -45,7 +45,7 @@
                         android:id="@+id/txt_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Description" />
+                        android:text="Big Text" />
 
                     <Button
                         android:id="@+id/btn_close"

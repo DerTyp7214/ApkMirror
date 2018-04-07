@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 description_popup = new BottomPopup(app.getAppColor(), v, MainActivity.this);
                 description_popup.setText(app.getDescription());
-                description_popup.setUp(findViewById(R.id.main_layout));
+                description_popup.setUp(findViewById(R.id.main_layout), R.layout.description_popup);
                 description_popup.show();
             }
         });
