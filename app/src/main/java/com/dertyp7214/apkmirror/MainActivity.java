@@ -46,6 +46,8 @@ import android.widget.TextView;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 
+import com.dertyp7214.apkmirror.components.BottomPopup;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private AppVersionAdapter appVersionAdapter;
     private FloatingActionButton fab;
-    private PopupWindow description_popup;
+    private BottomPopup description_popup;
     private boolean appBarExpanded;
     private boolean launchable;
     private static int notifyId;
@@ -212,80 +214,14 @@ public class MainActivity extends AppCompatActivity {
         description.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                showPopupDescription(v);
+                description_popup = new BottomPopup(app.getAppColor(), v, MainActivity.this);
+                description_popup.setText(app.getDescription());
+                description_popup.setUp(findViewById(R.id.main_layout));
+                description_popup.show();
             }
         });
 
         setUp();
-    }
-
-    private void showPopupDescription(final View v){
-
-        final CoordinatorLayout rootLayout = findViewById(R.id.main_layout);
-
-        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View layout = inflater.inflate(R.layout.description_popup, (ViewGroup) findViewById(R.id.root_layout));
-
-        if(getSharedPreferences("settings", MODE_PRIVATE).getBoolean("colored_navbar", false)) {
-            getWindow().setNavigationBarColor(getResources().getColor(R.color.white));
-            if (!Utils.isColorDark(getResources().getColor(R.color.white)) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                v.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
-        }
-
-        ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), 0x00000000, 0x80000000);
-        animator.setDuration(500);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                getWindow().setStatusBarColor(Utils.MergeColors(app.getAppColor(), (int) animation.getAnimatedValue()));
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                    rootLayout.setForeground(new ColorDrawable((int) animation.getAnimatedValue()));
-            }
-        });
-        animator.start();
-
-        description_popup = new PopupWindow(layout);
-        description_popup.setWidth(LinearLayout.LayoutParams.MATCH_PARENT);
-        description_popup.setHeight(LinearLayout.LayoutParams.MATCH_PARENT);
-        description_popup.setAnimationStyle(R.style.Animation);
-        description_popup.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), 0x80000000, 0x00000000);
-                animator.setDuration(500);
-                animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        getWindow().setStatusBarColor(Utils.MergeColors(app.getAppColor(), (int) animation.getAnimatedValue()));
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                            rootLayout.setForeground(new ColorDrawable((int) animation.getAnimatedValue()));
-                    }
-                });
-                animator.start();
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ignored) {}
-                if (getSharedPreferences("settings", MODE_PRIVATE).getBoolean("colored_navbar", false)) {
-                    getWindow().setNavigationBarColor(app.getAppColor());
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                        v.setSystemUiVisibility(View.VISIBLE);
-                }
-            }
-        });
-        description_popup.showAtLocation(v, Gravity.CENTER, 0, 0);
-
-        Button close = layout.findViewById(R.id.btn_close);
-        TextView description = layout.findViewById(R.id.txt_big_description);
-
-        description.setText(app.getDescription());
-
-        close.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                description_popup.dismiss();
-            }
-        });
-
     }
 
     private void setUp(){
