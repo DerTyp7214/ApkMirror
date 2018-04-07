@@ -9,12 +9,19 @@ import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.support.design.widget.CoordinatorLayout;
 import android.text.Html;
+import android.text.Layout;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.text.style.URLSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,8 +30,10 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dertyp7214.apkmirror.R;
+import com.dertyp7214.apkmirror.Utils;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -51,7 +60,7 @@ public class BottomPopup {
     }
 
     public void setUp(View root_layout, int inflateLayout){
-        final CoordinatorLayout rootLayout = (CoordinatorLayout) root_layout;
+        final View rootLayout = root_layout;
 
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View layout = inflater.inflate(inflateLayout, (ViewGroup) activity.findViewById(R.id.root_layout));
@@ -106,7 +115,7 @@ public class BottomPopup {
         Button close = layout.findViewById(R.id.btn_close);
         TextView textView = layout.findViewById(R.id.txt_text);
 
-        textView.setText(text);
+        setTextViewHTML(textView, text, activity);
 
         close.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,6 +165,34 @@ public class BottomPopup {
     private boolean isColorDark(int color){
         double darkness = 1-(0.299* Color.red(color) + 0.587*Color.green(color) + 0.114*Color.blue(color))/255;
         return !(darkness < 0.5);
+    }
+
+    private void makeLinkClickable(SpannableStringBuilder strBuilder, final URLSpan span, final Context context){
+        int start = strBuilder.getSpanStart(span);
+        int end = strBuilder.getSpanEnd(span);
+        int flags = strBuilder.getSpanFlags(span);
+        ClickableSpan clickable = new ClickableSpan() {
+            public void onClick(View view) {
+                try {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(span.getURL()));
+                    context.startActivity(browserIntent);
+                }catch (Exception e){
+                    Toast.makeText(context, "Not clickable link!", Toast.LENGTH_LONG).show();
+                }
+            }
+        };
+        strBuilder.setSpan(clickable, start, end, flags);
+        strBuilder.removeSpan(span);
+    }
+
+    private void setTextViewHTML(TextView text, Spanned html, Context context){
+        SpannableStringBuilder strBuilder = new SpannableStringBuilder(html);
+        URLSpan[] urls = strBuilder.getSpans(0, html.length(), URLSpan.class);
+        for(URLSpan span : urls) {
+            makeLinkClickable(strBuilder, span, context);
+        }
+        text.setText(strBuilder);
+        text.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
 }

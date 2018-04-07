@@ -61,6 +61,10 @@ public class Notifications {
         }
     }
 
+    public void setSmallIcon(int image){
+        builder.setSmallIcon(image);
+    }
+
     public void showNotification(){
         ids.add(ids.size()!=0?ids.get(ids.size()-1)+1:1);
         //id=ids.get(ids.size()-1);

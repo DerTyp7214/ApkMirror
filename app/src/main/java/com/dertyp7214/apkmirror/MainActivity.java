@@ -174,8 +174,8 @@ public class MainActivity extends AppCompatActivity {
 
         appIcon.setImageBitmap(app.getAppIcon());
         publisher.setText(app.getPublisher());
-        description.setText(app.getDescription());
         version.setText(app.getVersion());
+        Utils.setTextViewHTML(description, app.getDescription(), this);
 
         fab = findViewById(R.id.fab);
 
@@ -224,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
         setUp();
     }
 
-    private void setUp(){
+    private void setUp() {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -237,32 +237,41 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 try {
                     uninstall();
-                }catch (Exception e){
+                } catch (Exception e) {
                     setUp();
                 }
             }
         });
 
         final Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage(app.getPackageName());
-        if(LaunchIntent!=null)
-            launchable=true;
+        if (LaunchIntent != null)
+            launchable = true;
         open.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
                     startActivity(LaunchIntent);
-                }catch (Exception e){
+                } catch (Exception e) {
                     setUp();
                 }
             }
         });
 
-        if(appInstalled(app.getPackageName())){
-            fab.setVisibility(View.INVISIBLE);
-            if(launchable)
+        if (appInstalled(app.getPackageName())) {
+            if(!isNewerVersion(app))
+                fab.setVisibility(View.INVISIBLE);
+            if (launchable)
                 open.setVisibility(View.VISIBLE);
-            if(!isSystem(app.getPackageName()))
+            if (!isSystem(app.getPackageName()))
                 uninstall.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private boolean isNewerVersion(App app){
+        try {
+            return !app.getVersion().split(" \\(")[0].equals(getPackageManager().getPackageInfo(app.getPackageName(), 0).versionName);
+        }catch (Exception e){
+            return true;
         }
     }
 
@@ -309,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (collapsedMenu != null && (!appBarExpanded || collapsedMenu.size() != 1) && !appInstalled(app.getPackageName())) {
+        if (collapsedMenu != null && (!appBarExpanded || collapsedMenu.size() != 1) && (!appInstalled(app.getPackageName()) || isNewerVersion(app))) {
             collapsedMenu.add("Download")
                     .setIcon(R.drawable.ic_file_download_white_24dp)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
@@ -351,14 +360,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_settings:
                 return true;
             case android.R.id.home:
-                if (description_popup == null)
-                    return true;
-                else if (!description_popup.isShowing()) {
-                    fab.setVisibility(View.INVISIBLE);
-                    finishAfterTransition();
-                    return true;
-                } else
-                    description_popup.dismiss();
+                fab.setVisibility(View.INVISIBLE);
+                finishAfterTransition();
+                return true;
         }
 
         if (item.getTitle() == "Download") {

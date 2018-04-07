@@ -3,7 +3,7 @@
  * Created by Josua Lengwenath
  */
 
-package com.dertyp7214.apkmirror;
+package com.dertyp7214.apkmirror.settings;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -20,6 +20,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.dertyp7214.apkmirror.R;
 import com.dertyp7214.apkmirror.settings.Setting;
 import com.dertyp7214.apkmirror.settings.SettingCheckBox;
 import com.dertyp7214.apkmirror.settings.SettingColor;

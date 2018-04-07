@@ -10,7 +10,6 @@ import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -18,20 +17,26 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.dertyp7214.apkmirror.components.Input;
+import com.dertyp7214.apkmirror.notify.Notifications;
+import com.dertyp7214.apkmirror.notify.NotificationsAdapter;
+import com.dertyp7214.apkmirror.notify.RecyclerItemTouchHelper;
 import com.dertyp7214.apkmirror.settings.Setting;
 import com.dertyp7214.apkmirror.settings.SettingCheckBox;
 import com.dertyp7214.apkmirror.settings.SettingSwitch;
+import com.dertyp7214.apkmirror.settings.SettingsAdapter;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -41,9 +46,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class Home extends AppCompatActivity {
+public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
 
     public static ProgressDialog progressDialog;
+    public static Home instance;
+
+    public NotificationsAdapter notificationsAdapter;
 
     private Input input;
     private RecyclerView recyclerView, settingList;
@@ -54,7 +62,7 @@ public class Home extends AppCompatActivity {
     private boolean loading = false;
     private boolean cancled = false;
 
-    private View home, dashboard;
+    private View home, dashboard, notifications;
 
     private List<Thread> threads = new ArrayList<>();
 
@@ -70,12 +78,15 @@ public class Home extends AppCompatActivity {
                 case R.id.navigation_home:
                     home.setVisibility(View.VISIBLE);
                     dashboard.setVisibility(View.INVISIBLE);
+                    notifications.setVisibility(View.INVISIBLE);
                     return true;
                 case R.id.navigation_dashboard:
                     dashboard.setVisibility(View.VISIBLE);
                     home.setVisibility(View.INVISIBLE);
+                    notifications.setVisibility(View.INVISIBLE);
                     return true;
                 case R.id.navigation_notifications:
+                    notifications.setVisibility(View.VISIBLE);
                     home.setVisibility(View.INVISIBLE);
                     dashboard.setVisibility(View.INVISIBLE);
                     return true;
@@ -89,8 +100,11 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        instance=this;
+
         home = findViewById(R.id.view_home);
         dashboard = findViewById(R.id.view_dashboard);
+        notifications = findViewById(R.id.view_notification);
 
         setTaskDescription(new ActivityManager.TaskDescription("Apkmirror", BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher), getResources().getColor(R.color.colorPrimaryDark)));
 
@@ -144,6 +158,23 @@ public class Home extends AppCompatActivity {
         settingList.setAdapter(settingsAdapter);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(settingList.getContext(), layoutManager.getOrientation());
         settingList.addItemDecoration(dividerItemDecoration);
+
+        setUpNotifications();
+
+    }
+
+    private void setUpNotifications(){
+        RecyclerView recyclerView = findViewById(R.id.noti_rv);
+        notificationsAdapter = new NotificationsAdapter(this, Notifications.getNotificationsList(this), findViewById(R.id.container));
+
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        recyclerView.setAdapter(notificationsAdapter);
+
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
     }
 
     private List<Setting> getSettings() {
@@ -302,5 +333,18 @@ public class Home extends AppCompatActivity {
             }
         });
         loading=false;
+    }
+
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        if (viewHolder instanceof NotificationsAdapter.MyViewHolder) {
+            String name = Notifications.getNotificationsList(this).get(viewHolder.getAdapterPosition()).TITLE;
+
+            final Notifications deletedItem = Notifications.getNotificationsList(this).get(viewHolder.getAdapterPosition());
+
+            notificationsAdapter.removeItem(viewHolder.getAdapterPosition());
+            Notifications.removeNotification(deletedItem, this);
+            Snackbar.make(findViewById(R.id.container), name + " removed from notifications!", Snackbar.LENGTH_LONG).show();
+        }
     }
 }
