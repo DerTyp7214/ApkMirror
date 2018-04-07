@@ -104,14 +104,16 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             case 0:
                 final ViewHolder viewHolder = (ViewHolder) holder;
                 final Setting setting = itemList.get(position);
-                viewHolder.title.setText(setting.getText());
-                viewHolder.subTitle.setText(setting.getSubTitle());
-                viewHolder.box.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        setting.onClick();
-                    }
-                });
+                if(setting!=null) {
+                    viewHolder.title.setText(setting.getText());
+                    viewHolder.subTitle.setText(setting.getSubTitle());
+                    viewHolder.box.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            setting.onClick();
+                        }
+                    });
+                }
                 break;
             case 1:
                 final ViewHolderCheckBox viewHolderCheckBox = (ViewHolderCheckBox) holder;

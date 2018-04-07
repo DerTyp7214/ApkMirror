@@ -6,6 +6,7 @@
 package com.dertyp7214.apkmirror;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -271,6 +272,11 @@ public class Utils {
         }else{
             return true; // It's a dark color
         }
+    }
+
+    public static boolean hasNavBar (Resources resources) {
+        int id = resources.getIdentifier("config_showNavigationBar", "bool", "android");
+        return id > 0 && resources.getBoolean(id);
     }
 
     public static int MergeColors(int backgroundColor, int foregroundColor) {
