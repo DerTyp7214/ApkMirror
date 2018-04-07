@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "48434371986",
+    "firebase_url": "https://apkmirror-6c010.firebaseio.com",
+    "project_id": "apkmirror-6c010",
+    "storage_bucket": "apkmirror-6c010.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:48434371986:android:cc4b4e01c7156b38",
+        "android_client_info": {
+          "package_name": "com.dertyp7214.apkmirror"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "48434371986-9k7utfippq1vkcav46mnri8a80uiqvo7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dertyp7214.apkmirror",
+            "certificate_hash": "aff64ed0b58bd71e13ff1aef2969dadfc2e8bedf"
+          }
+        },
+        {
+          "client_id": "48434371986-imdp98l102m825dbo47uusnvnle7cqsj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBULnFYUWkuwzllgxu3Od9x-UdCAZfRk2Q"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "48434371986-imdp98l102m825dbo47uusnvnle7cqsj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
