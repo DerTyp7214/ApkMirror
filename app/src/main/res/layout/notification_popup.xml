@@ -56,7 +56,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
                         android:padding="0dp"
-                        android:text="Close" />
+                        android:text="@string/popup_close" />
 
                 </RelativeLayout>
             </LinearLayout>

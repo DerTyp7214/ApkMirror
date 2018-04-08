@@ -22,7 +22,7 @@
             android:layout_height="64dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="7dp"
+            android:layout_marginStart="7dp"
             android:transitionName="icon"
             app:srcCompat="@mipmap/ic_launcher" />
 
@@ -32,7 +32,7 @@
             android:layout_width="100dp"
             android:layout_height="40dp"
             android:layout_alignBottom="@+id/app_icon"
-            android:layout_marginRight="5dp"
+            android:layout_marginEnd="5dp"
             android:layout_toStartOf="@+id/btn_open"
             android:text="Uninstall" />
 
@@ -43,7 +43,7 @@
             android:layout_height="40dp"
             android:layout_alignBottom="@+id/app_icon"
             android:layout_alignParentEnd="true"
-            android:layout_marginRight="7dp"
+            android:layout_marginEnd="7dp"
             android:text="Open" />
 
         <TextView
@@ -51,7 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/app_icon"
-            android:layout_marginLeft="7dp"
+            android:layout_marginStart="7dp"
             android:layout_toEndOf="@+id/app_icon"
             android:minLines="1"
             android:text="Publisher"
@@ -127,7 +127,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:minLines="1"
-                        android:paddingLeft="7dp"
+                        android:paddingStart="7dp"
                         android:paddingTop="3dp"
                         android:text="Versions"
                         android:textColor="#000000" />

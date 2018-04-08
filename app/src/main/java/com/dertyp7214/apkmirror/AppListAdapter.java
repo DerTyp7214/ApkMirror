@@ -65,7 +65,7 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHo
             @Override
             public void onClick(View v) {
                 Home.progressDialog = new ProgressDialog(context);
-                Home.progressDialog.setMessage("Loading "+listItem.getTitle()+"...");
+                Home.progressDialog.setMessage(context.getString(R.string.adapter_loading)+" "+listItem.getTitle()+"...");
                 Home.progressDialog.setCancelable(false);
                 Home.progressDialog.show();
                 ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(context, holder.icon, "icon");

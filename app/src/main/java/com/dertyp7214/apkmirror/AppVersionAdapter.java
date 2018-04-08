@@ -66,7 +66,7 @@ public class AppVersionAdapter extends RecyclerView.Adapter<AppVersionAdapter.My
             @Override
             public void onClick(View v) {
                 Home.progressDialog = new ProgressDialog(context);
-                Home.progressDialog.setMessage("Loading "+listItem.getTitle()+"...");
+                Home.progressDialog.setMessage(context.getString(R.string.adapter_loading)+" "+listItem.getTitle()+"...");
                 Home.progressDialog.setCancelable(false);
                 Home.progressDialog.show();
                 context.startActivity(new Intent(context, MainActivity.class).putExtra("url", listItem.getUrl()).putExtra("icon", listItem.getIcon()));

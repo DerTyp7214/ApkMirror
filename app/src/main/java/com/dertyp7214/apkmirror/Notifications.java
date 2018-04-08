@@ -99,14 +99,14 @@ public class Notifications {
     public void setFinished(){
         removeProgress();
         clearActions();
-        builder.setSubText("Finished");
+        builder.setSubText(context.getString(R.string.notification_finished));
         builder.setOngoing(false);
         builder.setSmallIcon(android.R.drawable.stat_sys_download_done);
         notificationManager.notify(id, builder.build());
     }
 
     public void setCanceled(){
-        setCanceled("Canceled");
+        setCanceled(context.getString(R.string.notification_canceled));
     }
 
     public void setCanceled(String message){

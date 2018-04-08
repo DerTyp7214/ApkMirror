@@ -25,7 +25,7 @@
             android:id="@+id/input_querry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Search"
+            android:hint="@string/input_hint"
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:maxLines="1"

@@ -177,7 +177,7 @@ public class BottomPopup {
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(span.getURL()));
                     context.startActivity(browserIntent);
                 }catch (Exception e){
-                    Toast.makeText(context, "Not clickable link!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, context.getString(R.string.popup_error), Toast.LENGTH_LONG).show();
                 }
             }
         };

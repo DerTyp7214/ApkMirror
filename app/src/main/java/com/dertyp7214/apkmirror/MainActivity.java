@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(vibrantColor);
-            setTaskDescription(new ActivityManager.TaskDescription("Apkmirror - "+app.getTitle(), app.getAppIcon(), vibrantColor));
+            setTaskDescription(new ActivityManager.TaskDescription(getString(R.string.app_name)+" - "+app.getTitle(), app.getAppIcon(), vibrantColor));
             if(getSharedPreferences("settings", MODE_PRIVATE).getBoolean("colored_navbar", false))
                 window.setNavigationBarColor(vibrantColor);
         }catch (Exception e) {
@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
                     Window window = getWindow();
                     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                     window.setStatusBarColor(vibrantColor);
-                    setTaskDescription(new ActivityManager.TaskDescription("Apkmirror - "+app.getTitle(), app.getAppIcon(), vibrantColor));
+                    setTaskDescription(new ActivityManager.TaskDescription(getString(R.string.app_name)+" - "+app.getTitle(), app.getAppIcon(), vibrantColor));
                     if(getSharedPreferences("settings", MODE_PRIVATE).getBoolean("colored_navbar", false))
                         window.setNavigationBarColor(vibrantColor);
                 }
@@ -280,11 +280,11 @@ public class MainActivity extends AppCompatActivity {
             setUp();
             return;
         }
-        Toast.makeText(context, "Downloading "+app.getTitle(), Toast.LENGTH_LONG).show();
+        Toast.makeText(context, getString(R.string.notification_downloading)+" "+app.getTitle(), Toast.LENGTH_LONG).show();
         notifyId++;
         Log.d("NOTIFYID", notifyId+"");
-        final Notifications notifications = new Notifications(context, notifyId, app.getTitle(), "Download", "", app.getAppIcon(), true);
-        notifications.addButton(R.drawable.ic_file_download_white_24dp, "Cancel", new Intent(context, Reciever.class).putExtra(Reciever.ACTION, Reciever.CANCEL_DOWNLOAD).putExtra(Reciever.ID, notifyId));
+        final Notifications notifications = new Notifications(context, notifyId, app.getTitle(), getString(R.string.notification_download), "", app.getAppIcon(), true);
+        notifications.addButton(R.drawable.ic_file_download_white_24dp, getString(R.string.notification_cancel), new Intent(context, Reciever.class).putExtra(Reciever.ACTION, Reciever.CANCEL_DOWNLOAD).putExtra(Reciever.ID, notifyId));
         notifications.showNotification();
         app.download(context, notifyId, new App.Listener() {
             @Override
@@ -319,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (collapsedMenu != null && (!appBarExpanded || collapsedMenu.size() != 1) && (!appInstalled(app.getPackageName()) || isNewerVersion(app))) {
-            collapsedMenu.add("Download")
+            collapsedMenu.add(getString(R.string.notification_download))
                     .setIcon(R.drawable.ic_file_download_white_24dp)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         }
@@ -365,7 +365,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
         }
 
-        if (item.getTitle() == "Download") {
+        if (item.getTitle() == getString(R.string.notification_download)) {
             download(this, app);
             return true;
         }

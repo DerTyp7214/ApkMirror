@@ -1,0 +1,30 @@
+<!--
+  ~ Copyright (c) 2018.
+  ~ Created by Josua Lengwenath
+  -->
+
+<resources>
+    <string name="app_name">Apk Mirror</string>
+    <string name="delete">LÖSCHEN</string>
+    <string name="action_settings">Einstellungen</string>
+    <string name="title_activity_home">Home</string>
+    <string name="title_home">Startseite</string>
+    <string name="title_dashboard">Einstellungen</string>
+    <string name="title_notifications">Benachrichtigungen</string>
+    <string name="text_version">Version</string>
+    <string name="text_search_at_start">Zeige Google-Apps beim Start</string>
+    <string name="text_colored_navbar">Farbige Navigationsleiste</string>
+    <string name="text_swipe_snackbar">von Benachrichtigungen entfernt!</string>
+    <string name="notification_canceled">Abgebrochen</string>
+    <string name="notification_cancel">Abbrechen</string>
+    <string name="notification_downloading">Downloading</string>
+    <string name="notification_download">Download</string>
+    <string name="notification_max_downloads">Maximale Downloads</string>
+    <string name="notification_connection_error">Verbindungsfehler</string>
+    <string name="notification_finished">Fertig</string>
+    <string name="popup_error">Nicht klickbarer Link!</string>
+    <string name="popup_close">Schließen</string>
+    <string name="adapter_loading">Lade</string>
+    <string name="input_hint">Suchen</string>
+    <string name="load_more">Lade mehr</string>
+</resources>

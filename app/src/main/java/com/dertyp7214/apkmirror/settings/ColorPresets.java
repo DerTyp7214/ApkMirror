@@ -110,7 +110,7 @@ public class ColorPresets extends Dialog {
 
     private void animateViewColor(final View view, int time, final int color2) {
         final int color1 = ColorUtil.getDominantColor(ColorUtil.drawableToBitmap(((LayerDrawable)view.getBackground()).findDrawableByLayerId(id.plate_color)));
-        ValueAnimator anim = ValueAnimator.ofInt(new int[]{0, 100});
+        ValueAnimator anim = ValueAnimator.ofInt(0, 100);
         anim.setDuration((long)time);
         anim.addUpdateListener(new AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator animation) {

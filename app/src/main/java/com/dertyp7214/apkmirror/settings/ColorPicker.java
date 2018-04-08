@@ -339,11 +339,11 @@ public class ColorPicker extends Dialog {
         void cancel();
     }
 
-    public static enum Theme {
+    public enum Theme {
         DARK,
         LIGHT;
 
-        private Theme() {
+        Theme() {
         }
     }
 }

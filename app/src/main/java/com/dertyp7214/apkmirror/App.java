@@ -294,7 +294,7 @@ public class App {
             download_id.set(id, download.startDownload(id));
             Log.d("DOWNLOAD_ID", download_id.get(id)+"");
         } else {
-            listener.onCancel("Max Downloads");
+            listener.onCancel(context.getString(R.string.notification_max_downloads));
         }
     }
 

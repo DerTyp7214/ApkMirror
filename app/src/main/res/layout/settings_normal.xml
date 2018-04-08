@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginLeft="32dp"
+        android:layout_marginStart="32dp"
         android:maxLines="1"
         android:text="TextView"
         android:textColor="#000000"
@@ -32,6 +32,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginLeft="32dp"
+        android:layout_marginStart="32dp"
         android:text="TextView" />
 </RelativeLayout>

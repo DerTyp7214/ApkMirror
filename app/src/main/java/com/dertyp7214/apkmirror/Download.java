@@ -45,7 +45,7 @@ public class Download {
                     install_apk(uri.getUri());
                 } else {
                     app.removeDownload(id);
-                    listener.onCancel("Connection Error");
+                    listener.onCancel(context.getString(R.string.notification_connection_error));
                 }
             }
         });

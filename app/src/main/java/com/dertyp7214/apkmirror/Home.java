@@ -106,7 +106,7 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
         dashboard = findViewById(R.id.view_dashboard);
         notifications = findViewById(R.id.view_notification);
 
-        setTaskDescription(new ActivityManager.TaskDescription("Apkmirror", BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher), getResources().getColor(R.color.colorPrimaryDark)));
+        setTaskDescription(new ActivityManager.TaskDescription(getString(R.string.app_name), BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher), getResources().getColor(R.color.colorPrimaryDark)));
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -179,9 +179,9 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
 
     private List<Setting> getSettings() {
         return new ArrayList<>(Arrays.asList(
-                new Setting("version", "Version", this).setSubTitle(BuildConfig.VERSION_NAME),
-                new SettingCheckBox("search_at_start", "Show Googleapps on start", this, false),
-                new SettingSwitch("colored_navbar", "Colored Navigationbar", this, false)
+                new Setting("version", getString(R.string.text_version), this).setSubTitle(BuildConfig.VERSION_NAME),
+                new SettingCheckBox("search_at_start", getString(R.string.text_search_at_start), this, false),
+                new SettingSwitch("colored_navbar", getString(R.string.text_colored_navbar), this, false)
         ));
     }
 
@@ -344,7 +344,7 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
 
             notificationsAdapter.removeItem(viewHolder.getAdapterPosition());
             Notifications.removeNotification(deletedItem, this);
-            Snackbar.make(findViewById(R.id.container), name + " removed from notifications!", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(findViewById(R.id.container), name + " "+getString(R.string.text_swipe_snackbar), Snackbar.LENGTH_LONG).show();
         }
     }
 }
