@@ -27,4 +27,6 @@
     <string name="adapter_loading">Lade</string>
     <string name="input_hint">Suchen</string>
     <string name="load_more">Lade mehr</string>
+    <string name="description">Beschreibung</string>
+    <string name="versions">Versionen</string>
 </resources>

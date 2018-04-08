@@ -202,7 +202,7 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
                             @Override
                             public void run() {
                                 progressDialog = new ProgressDialog(Home.this);
-                                progressDialog.setMessage("Loading...");
+                                progressDialog.setMessage(getString(R.string.adapter_loading)+"...");
                                 progressDialog.setCancelable(false);
                                 try {
                                     progressDialog.show();
