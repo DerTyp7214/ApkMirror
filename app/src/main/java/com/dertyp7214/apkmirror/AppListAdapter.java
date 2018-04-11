@@ -8,7 +8,6 @@ package com.dertyp7214.apkmirror;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
@@ -60,16 +59,21 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHo
         final AppListItem listItem = itemList.get(position);
         holder.title.setText(listItem.getTitle());
         holder.publisher.setText(listItem.getPublisher());
-        holder.icon.setImageBitmap(listItem.getIcon());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                holder.icon.setImageBitmap(listItem.getIcon(context));
+            }
+        }).start();
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Home.progressDialog = new ProgressDialog(context);
-                Home.progressDialog.setMessage(context.getString(R.string.adapter_loading)+" "+listItem.getTitle()+"...");
+                Home.progressDialog.setMessage(context.getString(R.string.adapter_loading) + " " + listItem.getTitle() + "...");
                 Home.progressDialog.setCancelable(false);
                 Home.progressDialog.show();
                 ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(context, holder.icon, "icon");
-                context.startActivity(new Intent(context, MainActivity.class).putExtra("url", listItem.getUrl()).putExtra("icon", listItem.getIcon()), options.toBundle());
+                context.startActivity(new Intent(context, MainActivity.class).putExtra("url", listItem.getUrl()).putExtra("icon", listItem.getIcon(context)), options.toBundle());
             }
         });
     }

@@ -304,9 +304,8 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
                             .split("\"")[0]
                             .replace("&w=32&h=32&q=100", ""));
 
-                    Bitmap icon = BitmapFactory.decodeStream(iconUrl.openConnection().getInputStream());
                     if (!cancled)
-                        appListItems.add(new AppListItem(url, title, publisher, icon));
+                        appListItems.add(new AppListItem(url, title, publisher, iconUrl));
                     else
                         Thread.currentThread().interrupt();
                     synchronized (adapter) {
