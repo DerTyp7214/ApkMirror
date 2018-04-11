@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Apk Mirror</string>
+    <string name="delete">DELETE</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_home">Home</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Settings</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="text_version">Version</string>
+    <string name="text_search_at_start">Show Googleapps on start</string>
+    <string name="text_colored_navbar">Colored Navigationbar</string>
+    <string name="text_swipe_snackbar">removed from notifications!</string>
+    <string name="notification_canceled">Canceled</string>
+    <string name="notification_cancel">Cancel</string>
+    <string name="notification_downloading">Downloading</string>
+    <string name="notification_download">Download</string>
+    <string name="notification_max_downloads">Max Downloads</string>
+    <string name="notification_connection_error">Connection Error</string>
+    <string name="notification_finished">Finished</string>
+    <string name="popup_error">Not clickable link!</string>
+    <string name="popup_close">Close</string>
+    <string name="adapter_loading">Loading</string>
+    <string name="input_hint">Search</string>
+    <string name="load_more">Load more</string>
+    <string name="description">Description</string>
+    <string name="versions">Versions</string>
+</resources>
