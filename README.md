@@ -8,4 +8,4 @@ This is an unofficial app.
 
 It may be wont work if the website changes its style.
 
-[Latest APK](https://github.com/DerTyp7214/ApkMirror/blob/master/app/release/app-release.apk?raw=true)
+[Latest APK](./app/release/app-release.apk?raw=true)
