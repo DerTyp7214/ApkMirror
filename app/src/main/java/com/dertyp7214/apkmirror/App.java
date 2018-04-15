@@ -117,6 +117,15 @@ public class App {
         }
     }
 
+    public void getData(callback callback){
+        getData();
+        callback.callback(this);
+    }
+
+    interface callback{
+        void callback(App app);
+    }
+
     private String getApkPath() throws Exception, WrongUriException {
         String url = content.split("btn btn-flat downloadButton")[1].split("href=\"")[1].split("\"")[0];
         if(url.startsWith("/wp-content"))

@@ -49,6 +49,7 @@ import java.util.Objects;
 public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
 
     public static ProgressDialog progressDialog;
+    public static ProgressDialog progressDialogApp;
     public static Home instance;
 
     public NotificationsAdapter notificationsAdapter;

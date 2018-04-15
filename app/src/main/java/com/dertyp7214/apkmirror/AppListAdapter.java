@@ -8,7 +8,10 @@ package com.dertyp7214.apkmirror;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -17,8 +20,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
+
+import static com.dertyp7214.apkmirror.Utils.apps;
 
 public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHolder> {
 
@@ -68,12 +74,40 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHo
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Home.progressDialog = new ProgressDialog(context);
-                Home.progressDialog.setMessage(context.getString(R.string.adapter_loading) + " " + listItem.getTitle() + "...");
-                Home.progressDialog.setCancelable(false);
-                Home.progressDialog.show();
-                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(context, holder.icon, "icon");
-                context.startActivity(new Intent(context, MainActivity.class).putExtra("url", listItem.getUrl()).putExtra("icon", listItem.getIcon(context)), options.toBundle());
+                Home.progressDialogApp = new ProgressDialog(context);
+                Home.progressDialogApp.setMessage(context.getString(R.string.adapter_loading) + " " + listItem.getTitle() + "...");
+                Home.progressDialogApp.setCancelable(false);
+                Home.progressDialogApp.show();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Looper.prepare();
+                        if (!apps.containsKey(listItem.getUrl())) {
+                            App app = new App(listItem.getUrl(), listItem.getIcon(context), context);
+                            app.getData(new App.callback() {
+                                @Override
+                                public void callback(App app) {
+                                    apps.put(listItem.getUrl(), app);
+                                    context.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(context, holder.icon, "icon");
+                                            context.startActivity(new Intent(context, MainActivity.class).putExtra("url", listItem.getUrl()).putExtra("icon", listItem.getIcon(context)), options.toBundle());
+                                        }
+                                    });
+                                }
+                            });
+                        }else {
+                            context.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(context, holder.icon, "icon");
+                                    context.startActivity(new Intent(context, MainActivity.class).putExtra("url", listItem.getUrl()).putExtra("icon", listItem.getIcon(context)), options.toBundle());
+                                }
+                            });
+                        }
+                    }
+                }).start();
             }
         });
     }

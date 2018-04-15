@@ -1,23 +1,17 @@
 package com.dertyp7214.apkmirror;
 
-import android.animation.ArgbEvaluator;
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Point;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -25,23 +19,14 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Layout;
 import android.util.Log;
-import android.view.Display;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
@@ -51,6 +36,8 @@ import com.dertyp7214.apkmirror.components.BottomPopup;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.dertyp7214.apkmirror.Utils.apps;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -72,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
     private boolean appBarExpanded;
     private boolean launchable;
     private static int notifyId;
-    private static HashMap<String, App> apps = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
             apps.put(data.getString("url"), app);
         }
 
-        Home.progressDialog.cancel();
+        Home.progressDialogApp.dismiss();
 
         packageManager = getPackageManager();
         setTitle(app.getTitle());

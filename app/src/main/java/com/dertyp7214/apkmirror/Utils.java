@@ -49,6 +49,8 @@ import java.util.concurrent.ExecutionException;
 
 public class Utils {
 
+    public static HashMap<String, App> apps = new HashMap<>();
+
     public static BooleanUri download(int id, String url, String path, App.Listener listener){
 
         try {
