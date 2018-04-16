@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -108,6 +109,14 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
         notifications = findViewById(R.id.view_notification);
 
         setTaskDescription(new ActivityManager.TaskDescription(getString(R.string.app_name), BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher), getResources().getColor(R.color.colorPrimaryDark)));
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            if(!Utils.isColorDark(getResources().getColor(R.color.colorPrimaryDark, null)))
+                findViewById(R.id.navigation).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            if(!Utils.isColorDark(getResources().getColor(R.color.colorPrimaryDark, null)))
+                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);

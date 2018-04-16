@@ -68,7 +68,13 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHo
         new Thread(new Runnable() {
             @Override
             public void run() {
-                holder.icon.setImageBitmap(listItem.getIcon(context));
+                final Bitmap bmp = listItem.getIcon(context);
+                context.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        holder.icon.setImageBitmap(bmp);
+                    }
+                });
             }
         }).start();
         holder.card.setOnClickListener(new View.OnClickListener() {

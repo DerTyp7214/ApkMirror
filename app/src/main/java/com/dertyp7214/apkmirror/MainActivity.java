@@ -7,6 +7,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -80,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
         version = findViewById(R.id.txt_ver);
 
         Bundle data = getIntent().getExtras();
+
+
+        getWindow().getDecorView().setSystemUiVisibility(0);
 
         if(notifyId<1&&notifyId!=0)
             notifyId=0;
@@ -262,10 +266,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void download(Activity context, App app) {
-        if(appInstalled(app.getPackageName())) {
-            setUp();
-            return;
-        }
         Toast.makeText(context, getString(R.string.notification_downloading)+" "+app.getTitle(), Toast.LENGTH_LONG).show();
         notifyId++;
         Log.d("NOTIFYID", notifyId+"");

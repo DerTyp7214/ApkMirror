@@ -66,8 +66,8 @@ public class BottomPopup {
         final View layout = inflater.inflate(inflateLayout, (ViewGroup) activity.findViewById(R.id.root_layout));
 
         if(activity.getSharedPreferences("settings", MODE_PRIVATE).getBoolean("colored_navbar", false)) {
-            activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.white));
-            if (!isColorDark(activity.getResources().getColor(R.color.white)) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.material_grey_850));
+            if (!isColorDark(activity.getResources().getColor(R.color.material_grey_850)) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 parent.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
         }
 

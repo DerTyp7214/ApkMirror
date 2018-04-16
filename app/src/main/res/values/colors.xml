@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#b5453f</color>
-    <color name="colorPrimaryDark">#9f3030</color>
-    <color name="colorAccent">#EBA33C</color>
-    <color name="white">#ffffff</color>
+    <color name="colorPrimary">@*android:color/material_grey_900</color>
+    <color name="colorPrimaryDark">@*android:color/material_grey_900</color>
+    <color name="colorAccent">@*android:color/material_deep_teal_500</color>
+    <color name="white">@*android:color/primary_text_default_material_dark</color>
+    <color name="black">@*android:color/primary_text_default_material_light</color>
+    <color name="material_grey_850">@*android:color/material_grey_850</color>
 </resources>
