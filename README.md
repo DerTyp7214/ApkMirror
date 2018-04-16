@@ -1,6 +1,6 @@
 # ApkMirror
 
-[![License](https://raw.githubusercontent.com/DerTyp7214/ApkMirror/master/license.svg)](MIT_LICENSE)
+[![License](https://github.com/DerTyp7214/ApkMirror/blob/master/license.svg)](MIT_LICENSE)
 
 This is an unofficial app.
 
