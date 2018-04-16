@@ -1,6 +1,6 @@
 # ApkMirror
 
-[![License](https://img.shields.io/badge/License-MIT-EBA33C.svg)](MIT_LICENSE)
+[![License](https://raw.githubusercontent.com/DerTyp7214/ApkMirror/master/license.svg)](MIT_LICENSE)
 
 This is an unofficial app.
 
