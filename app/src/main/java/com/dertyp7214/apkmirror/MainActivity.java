@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
         description.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                description_popup = new BottomPopup(app.getAppColor(), v, MainActivity.this);
+                description_popup = new BottomPopup(app.getAppColor(), v, MainActivity.this, getSharedPreferences("settings", MODE_PRIVATE).getBoolean("blur_dialog", false));
                 description_popup.setText(app.getDescription());
                 description_popup.setUp(findViewById(R.id.main_layout), R.layout.description_popup);
                 description_popup.show();

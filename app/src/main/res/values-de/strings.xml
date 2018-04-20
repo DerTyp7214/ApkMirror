@@ -15,6 +15,7 @@
     <string name="text_search_at_start">Zeige Google-Apps beim Start</string>
     <string name="text_colored_navbar">Farbige Navigationsleiste</string>
     <string name="text_swipe_snackbar">von Benachrichtigungen entfernt!</string>
+    <string name="text_blur_dialog">Popuphintergrund verschwimmen</string>
     <string name="notification_canceled">Abgebrochen</string>
     <string name="notification_cancel">Abbrechen</string>
     <string name="notification_downloading">Downloading</string>

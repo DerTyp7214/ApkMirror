@@ -76,7 +76,13 @@ public class App {
                             .split("class=\"table topmargin variants-table\"")[1]
                             .split("class=\"table-row headerFont\"");
                     for (String ver : versions) {
-                        if ((ver.contains("nodpi") || ver.contains("480dpi")) && (ver.contains("arm") || ver.contains("universal") ||ver.contains("noarch"))) {
+                        if ((ver.contains("nodpi") ||
+                                ver.contains("480dpi") ||
+                                ver.contains("360dpi")) &&
+                                (ver.contains("arm") ||
+                                        ver.contains("universal") ||
+                                        ver.contains("noarch") ||
+                                        ver.contains("arm64")) || ver.contains("Android")) {
                             u = baseUrl + ver.split("<a")[1].split("href=\"")[1].split("\"")[0];
                             break;
                         }
@@ -277,7 +283,11 @@ public class App {
                 try {
                     listContent = content.split("All versions")[1].split("class=\"listWidget\"")[0];
                 } catch (Exception e) {
-                    listContent = content.split("Previous APKs")[1].split("class=\"listWidget\"")[0];
+                    try {
+                        listContent = content.split("Previous APKs")[1].split("class=\"listWidget\"")[0];
+                    }catch (Exception ignored){
+                        listContent="";
+                    }
                 }
 
                 String[] listEntrys = listContent.split("class=\"appRow\"");

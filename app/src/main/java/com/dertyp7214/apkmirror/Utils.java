@@ -338,13 +338,15 @@ public class Utils {
     }
 
     public static void setTextViewHTML(TextView text, Spanned html, Context context){
-        SpannableStringBuilder strBuilder = new SpannableStringBuilder(html);
-        URLSpan[] urls = strBuilder.getSpans(0, html.length(), URLSpan.class);
-        for(URLSpan span : urls) {
-            makeLinkClickable(strBuilder, span, context);
-        }
-        text.setText(strBuilder);
-        text.setMovementMethod(LinkMovementMethod.getInstance());
+        try {
+            SpannableStringBuilder strBuilder = new SpannableStringBuilder(html);
+            URLSpan[] urls = strBuilder.getSpans(0, html.length(), URLSpan.class);
+            for (URLSpan span : urls) {
+                makeLinkClickable(strBuilder, span, context);
+            }
+            text.setText(strBuilder);
+            text.setMovementMethod(LinkMovementMethod.getInstance());
+        }catch (Exception ignored){}
     }
 
     public static String getCurrentTimeStamp(String format){

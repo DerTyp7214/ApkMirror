@@ -10,6 +10,7 @@
     <string name="text_search_at_start">Show Googleapps on start</string>
     <string name="text_colored_navbar">Colored Navigationbar</string>
     <string name="text_swipe_snackbar">removed from notifications!</string>
+    <string name="text_blur_dialog">blur Dialog</string>
     <string name="notification_canceled">Canceled</string>
     <string name="notification_cancel">Cancel</string>
     <string name="notification_downloading">Downloading</string>

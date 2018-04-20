@@ -191,7 +191,8 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
         return new ArrayList<>(Arrays.asList(
                 new Setting("version", getString(R.string.text_version), this).setSubTitle(BuildConfig.VERSION_NAME),
                 new SettingCheckBox("search_at_start", getString(R.string.text_search_at_start), this, false),
-                new SettingSwitch("colored_navbar", getString(R.string.text_colored_navbar), this, false)
+                new SettingSwitch("colored_navbar", getString(R.string.text_colored_navbar), this, false),
+                new SettingSwitch("blur_dialog", getString(R.string.text_blur_dialog), this, false)
         ));
     }
 

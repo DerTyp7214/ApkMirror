@@ -30,6 +30,8 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class Notifications {
 
     public final String TITLE, SUBTITLE, TIME;
@@ -48,7 +50,7 @@ public class Notifications {
     }
 
     public static List<Notifications> getNotificationsList(Context context){
-        SharedPreferences preferences = context.getSharedPreferences("notify", Context.MODE_PRIVATE);
+        SharedPreferences preferences = context.getSharedPreferences("notify", MODE_PRIVATE);
         try {
             List<Notifications> notifications = new ArrayList<>();
             JSONArray jsonArray = new JSONArray(preferences.getString("notiJSON", "[]"));
@@ -89,7 +91,7 @@ public class Notifications {
             Log.d("JSON", json.toString());
         }
         json.append("]");
-        context.getSharedPreferences("notify", Context.MODE_PRIVATE).edit().putString("notiJSON", json.toString()).apply();
+        context.getSharedPreferences("notify", MODE_PRIVATE).edit().putString("notiJSON", json.toString()).apply();
     }
 
     public static void removeNotification(Notifications notifications, Context context){
@@ -101,7 +103,7 @@ public class Notifications {
     }
 
     public void onClick(int currentColor, Activity activity, View parent, View root_layout){
-        notificationPopup = new BottomPopup(currentColor, parent, activity);
+        notificationPopup = new BottomPopup(currentColor, parent, activity, activity.getSharedPreferences("settings", MODE_PRIVATE).getBoolean("blur_dialog", false));
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
             notificationPopup.setText(Html.fromHtml("<h2>"+TITLE+"</h2><p>"+SUBTITLE+"</p><p><small>"+TIME+"</small></p>", Html.FROM_HTML_MODE_LEGACY));
         else
