@@ -53,6 +53,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -76,8 +77,9 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
     private boolean loading = false;
     private boolean cancled = false;
     private ProgressDialog updateDialog;
-
     private View home, dashboard, notifications;
+
+    private String API_TOKEN = "e098ff2a9e59bc19f78829e64d25ed0c90ab5713";
 
     private List<Thread> threads = new ArrayList<>();
 
@@ -375,9 +377,11 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
     private String getWebContent(String url) {
         try {
             URL web = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) web.openConnection();
+            connection.setRequestProperty("Authorization", "token "+API_TOKEN);
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(
-                            web.openStream()));
+                            connection.getInputStream()));
 
             String inputLine;
             StringBuilder ret = new StringBuilder();
