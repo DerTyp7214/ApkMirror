@@ -10,10 +10,12 @@ import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
+import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,9 +28,12 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.dertyp7214.apkmirror.components.Input;
 import com.dertyp7214.apkmirror.notify.Notifications;
@@ -39,8 +44,16 @@ import com.dertyp7214.apkmirror.settings.SettingCheckBox;
 import com.dertyp7214.apkmirror.settings.SettingSwitch;
 import com.dertyp7214.apkmirror.settings.SettingsAdapter;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,8 +62,7 @@ import java.util.Objects;
 
 public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
 
-    public static ProgressDialog progressDialog;
-    public static ProgressDialog progressDialogApp;
+    public static ProgressDialog progressDialog, progressDialogApp;
     public static Home instance;
 
     public NotificationsAdapter notificationsAdapter;
@@ -63,6 +75,7 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
     private String querry;
     private boolean loading = false;
     private boolean cancled = false;
+    private ProgressDialog updateDialog;
 
     private View home, dashboard, notifications;
 
@@ -190,10 +203,125 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
     private List<Setting> getSettings() {
         return new ArrayList<>(Arrays.asList(
                 new Setting("version", getString(R.string.text_version), this).setSubTitle(BuildConfig.VERSION_NAME),
+                new Setting("check_update", getString(R.string.text_check_update), this).setSubTitle(getString(R.string.text_click_check)).addSettingsOnClick(new Setting.settingsOnClickListener() {
+                    @Override
+                    public void onClick(String name, Setting instance, TextView subTitle, ProgressBar imageRight) {
+                        checkForUpdate(instance, subTitle, imageRight);
+                    }
+                }),
                 new SettingCheckBox("search_at_start", getString(R.string.text_search_at_start), this, false),
                 new SettingSwitch("colored_navbar", getString(R.string.text_colored_navbar), this, false),
                 new SettingSwitch("blur_dialog", getString(R.string.text_blur_dialog), this, false)
         ));
+    }
+
+    private void checkForUpdate(final Setting setting, final TextView subTitle, final ProgressBar imageRight) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Home.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageRight.setVisibility(View.VISIBLE);
+                            imageRight.setIndeterminate(true);
+                        }
+                    });
+                    JSONObject jsonObject = new JSONObject(getWebContent("https://api.github.com/repos/DerTyp7214/ApkMirror/releases/latest"));
+                    String version = jsonObject.getString("tag_name");
+                    final String downloadUrl = jsonObject.getJSONArray("assets").getJSONObject(0).getString("browser_download_url");
+                    Home.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageRight.setVisibility(View.INVISIBLE);
+                            imageRight.setIndeterminate(false);
+                        }
+                    });
+                    if(!version.replace("v", "").equals(BuildConfig.VERSION_NAME)){
+                        setting.addSettingsOnClick(new Setting.settingsOnClickListener() {
+                            @Override
+                            public void onClick(String name, Setting setting, TextView subTitle, ProgressBar imageRight) {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Looper.prepare();
+                                        Home.this.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                updateDialog = new ProgressDialog(Home.this);
+                                                updateDialog.setMessage(getString(R.string.notification_downloading) + " update");
+                                                updateDialog.setCancelable(false);
+                                                updateDialog.show();
+                                            }
+                                        });
+                                        final File apk = DownloadFile(downloadUrl);
+                                        updateDialog.cancel();
+                                        Utils.install_apk(apk, Home.this);
+                                    }
+                                }).start();
+                            }
+                        });
+                        Home.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                subTitle.setText(getString(R.string.text_touch_to_update));
+                            }
+                        });
+                    } else {
+                        Home.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                subTitle.setText(getString(R.string.text_latest_version));
+                            }
+                        });
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+        }).start();
+    }
+
+    private Drawable getProgressBarIndeterminate() {
+        final int[] attrs = {android.R.attr.indeterminateDrawable};
+        final int attrs_indeterminateDrawable_index = 0;
+        TypedArray a = this.obtainStyledAttributes(android.R.style.Widget_ProgressBar, attrs);
+        try {
+            return a.getDrawable(attrs_indeterminateDrawable_index);
+        } finally {
+            a.recycle();
+        }
+    }
+
+    private File DownloadFile(String url){
+
+        try {
+            URL u = new URL(url);
+            InputStream is = u.openStream();
+
+            DataInputStream dis = new DataInputStream(is);
+
+            byte[] buffer = new byte[1024];
+            int length;
+
+            FileOutputStream fos = new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/" + ".apkmirror/update.apk"));
+            while ((length = dis.read(buffer))>0) {
+                fos.write(buffer, 0, length);
+            }
+
+            dis.close();
+            fos.close();
+            is.close();
+
+            return new File(Environment.getExternalStorageDirectory() + "/" + ".apkmirror/update.apk");
+
+        } catch (MalformedURLException mue) {
+            Log.e("SYNC getUpdate", "malformed url error", mue);
+        } catch (IOException ioe) {
+            Log.e("SYNC getUpdate", "io error", ioe);
+        } catch (SecurityException se) {
+            Log.e("SYNC getUpdate", "security error", se);
+        }
+        return null;
     }
 
     private void search(final String querry){

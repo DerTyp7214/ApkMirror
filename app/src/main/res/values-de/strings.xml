@@ -16,6 +16,10 @@
     <string name="text_colored_navbar">Farbige Navigationsleiste</string>
     <string name="text_swipe_snackbar">von Benachrichtigungen entfernt!</string>
     <string name="text_blur_dialog">Popuphintergrund verschwimmen</string>
+    <string name="text_check_update">Auf Update überprüfen</string>
+    <string name="text_touch_to_update">Drücke nochmal um das Update runterzuladen</string>
+    <string name="text_latest_version">Neuste Version</string>
+    <string name="text_click_check">Drücke um nach Updates zu suchen</string>
     <string name="notification_canceled">Abgebrochen</string>
     <string name="notification_cancel">Abbrechen</string>
     <string name="notification_downloading">Downloading</string>

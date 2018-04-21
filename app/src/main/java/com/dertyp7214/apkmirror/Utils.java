@@ -6,6 +6,7 @@
 package com.dertyp7214.apkmirror;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -16,7 +17,9 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
+import android.support.v4.content.FileProvider;
 import android.text.Html;
 import android.text.Layout;
 import android.text.SpannableStringBuilder;
@@ -46,6 +49,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 
 public class Utils {
 
@@ -361,5 +365,35 @@ public class Utils {
 
             return null;
         }
+    }
+
+    public static void install_apk(File file, Context context) {
+        try {
+            if (file.exists()) {
+                String[] fileNameArray = file.getName().split(Pattern.quote("."));
+                if (fileNameArray[fileNameArray.length - 1].equals("apk")) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        Uri downloaded_apk = getFileUri(context, file);
+                        Intent intent = new Intent(Intent.ACTION_VIEW).setDataAndType(downloaded_apk,
+                                "application/vnd.android.package-archive");
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        context.startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setDataAndType(Uri.fromFile(file),
+                                "application/vnd.android.package-archive");
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(intent);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static Uri getFileUri(Context context, File file) {
+        return FileProvider.getUriForFile(context,
+                context.getApplicationContext().getPackageName() + ".GenericFileProvider", file);
     }
 }

@@ -8,6 +8,9 @@ package com.dertyp7214.apkmirror.settings;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 public class Setting {
 
@@ -47,12 +50,12 @@ public class Setting {
         return this;
     }
 
-    public void onClick(){
+    public void onClick(TextView subTitle, ProgressBar imageRight){
         if(onClickListener!=null)
-            onClickListener.onClick(name);
+            onClickListener.onClick(name, this, subTitle, imageRight);
     }
 
     public interface settingsOnClickListener{
-        void onClick(String name);
+        void onClick(String name, Setting setting, TextView subTitle, ProgressBar imageRight);
     }
 }

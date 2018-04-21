@@ -5,6 +5,7 @@
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/box"
     android:layout_width="match_parent"
     android:layout_height="55dp"
@@ -14,24 +15,38 @@
     android:paddingRight="20dp"
     android:paddingBottom="7dp">
 
-    <TextView
-        android:id="@+id/text"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="32dp"
-        android:maxLines="1"
-        android:text="TextView"
-        android:textColor="#000000"
-        android:textSize="18sp" />
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="32dp">
 
-    <TextView
-        android:id="@+id/subTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="32dp"
-        android:text="TextView" />
+        <TextView
+            android:id="@+id/subTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_toStartOf="@+id/progressBar"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/progressBar"
+            android:maxLines="1"
+            android:text="TextView"
+            android:textColor="#000000"
+            android:textSize="18sp" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:visibility="invisible" />
+
+    </RelativeLayout>
+
 </RelativeLayout>

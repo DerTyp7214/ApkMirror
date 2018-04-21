@@ -17,6 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -38,12 +40,14 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView title, subTitle;
         public View box;
+        public ProgressBar imageRight;
 
         public ViewHolder(View view) {
             super(view);
             title = view.findViewById(R.id.text);
             subTitle = view.findViewById(R.id.subTitle);
             box = view.findViewById(R.id.box);
+            imageRight = view.findViewById(R.id.progressBar);
         }
     }
 
@@ -111,7 +115,7 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     viewHolder.box.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            setting.onClick();
+                            setting.onClick(viewHolder.subTitle, viewHolder.imageRight);
                         }
                     });
                 }
