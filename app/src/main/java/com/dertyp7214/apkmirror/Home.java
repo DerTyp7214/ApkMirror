@@ -79,7 +79,7 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
     private ProgressDialog updateDialog;
     private View home, dashboard, notifications;
 
-    private String API_TOKEN = "e098ff2a9e59bc19f78829e64d25ed0c90ab5713";
+    private String API_TOKEN = "a9fac492a7729222d63c231279c7de3e642a9390";
 
     private List<Thread> threads = new ArrayList<>();
 
