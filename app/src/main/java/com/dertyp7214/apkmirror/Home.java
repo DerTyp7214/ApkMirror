@@ -9,10 +9,12 @@ import android.Manifest;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -35,12 +37,15 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.dertyp7214.apkmirror.components.BottomPopup;
 import com.dertyp7214.apkmirror.components.Input;
+import com.dertyp7214.apkmirror.components.InputDialog;
 import com.dertyp7214.apkmirror.notify.Notifications;
 import com.dertyp7214.apkmirror.notify.NotificationsAdapter;
 import com.dertyp7214.apkmirror.notify.RecyclerItemTouchHelper;
 import com.dertyp7214.apkmirror.settings.Setting;
 import com.dertyp7214.apkmirror.settings.SettingCheckBox;
+import com.dertyp7214.apkmirror.settings.SettingPlaceholder;
 import com.dertyp7214.apkmirror.settings.SettingSwitch;
 import com.dertyp7214.apkmirror.settings.SettingsAdapter;
 
@@ -79,7 +84,7 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
     private ProgressDialog updateDialog;
     private View home, dashboard, notifications;
 
-    private String API_TOKEN = "a9fac492a7729222d63c231279c7de3e642a9390";
+    private String API_TOKEN;
 
     private List<Thread> threads = new ArrayList<>();
 
@@ -119,9 +124,13 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
 
         instance=this;
 
+        API_TOKEN=getSharedPreferences("settings", MODE_PRIVATE).getString("API_KEY", "NULL");
+
         home = findViewById(R.id.view_home);
         dashboard = findViewById(R.id.view_dashboard);
         notifications = findViewById(R.id.view_notification);
+
+
 
         setTaskDescription(new ActivityManager.TaskDescription(getString(R.string.app_name), BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher), getResources().getColor(R.color.colorPrimaryDark)));
 
@@ -204,6 +213,7 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
 
     private List<Setting> getSettings() {
         return new ArrayList<>(Arrays.asList(
+                new SettingPlaceholder("appdetails", getString(R.string.text_appdetails), this),
                 new Setting("version", getString(R.string.text_version), this).setSubTitle(BuildConfig.VERSION_NAME),
                 new Setting("check_update", getString(R.string.text_check_update), this).setSubTitle(getString(R.string.text_click_check)).addSettingsOnClick(new Setting.settingsOnClickListener() {
                     @Override
@@ -211,10 +221,53 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
                         checkForUpdate(instance, subTitle, imageRight);
                     }
                 }),
+                new Setting("sourcecode", "Sourcecode", this).setSubTitle(getString(R.string.text_sourcecode)).addSettingsOnClick(new Setting.settingsOnClickListener() {
+                    @Override
+                    public void onClick(String name, Setting setting, TextView subTitle, ProgressBar imageRight) {
+                        openUrl("http://github.com/DerTyp7214/ApkMirror");
+                    }
+                }),
+                new SettingPlaceholder("preferences", getString(R.string.text_prefs), this),
                 new SettingCheckBox("search_at_start", getString(R.string.text_search_at_start), this, false),
                 new SettingSwitch("colored_navbar", getString(R.string.text_colored_navbar), this, false),
-                new SettingSwitch("blur_dialog", getString(R.string.text_blur_dialog), this, false)
+                new SettingSwitch("blur_dialog", getString(R.string.text_blur_dialog), this, false),
+                new Setting("api_key", getString(R.string.text_api_key), this).setSubTitle(Utils.cutString(getSharedPreferences("settings", MODE_PRIVATE).getString("API_KEY", getString(R.string.text_not_set)), 30)).addSettingsOnClick(new Setting.settingsOnClickListener() {
+                    @Override
+                    public void onClick(String name, Setting setting, TextView subTitle, ProgressBar imageRight) {
+                        InputDialog dialog = new InputDialog(getString(R.string.text_api_key), getSharedPreferences("settings", MODE_PRIVATE).getString("API_KEY", ""), getString(R.string.text_api_key), Home.this);
+                        dialog.setListener(new InputDialog.Listener() {
+                            @Override
+                            public void onSubmit(String text) {
+                                getSharedPreferences("settings", MODE_PRIVATE).edit().putString("API_KEY", text).apply();
+                            }
+
+                            @Override
+                            public void onCancel() {
+
+                            }
+                        });
+                        dialog.show();
+                    }
+                }),
+                new SettingPlaceholder("social", getString(R.string.text_social), this),
+                new Setting("github", "GitHub", this).setSubTitle(getString(R.string.text_github)).addSettingsOnClick(new Setting.settingsOnClickListener() {
+                    @Override
+                    public void onClick(String name, Setting setting, TextView subTitle, ProgressBar imageRight) {
+                        openUrl("http://github.com/DerTyp7214");
+                    }
+                }),
+                new Setting("googleplus", "Google+", this).setSubTitle(getString(R.string.text_googleplus)).addSettingsOnClick(new Setting.settingsOnClickListener() {
+                    @Override
+                    public void onClick(String name, Setting setting, TextView subTitle, ProgressBar imageRight) {
+                        openUrl("http://plus.google.com/u/0/116183493734176118582");
+                    }
+                })
         ));
+    }
+
+    private void openUrl(String url){
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(browserIntent);
     }
 
     private void checkForUpdate(final Setting setting, final TextView subTitle, final ProgressBar imageRight) {
@@ -379,9 +432,11 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
             URL web = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) web.openConnection();
             connection.setRequestProperty("Authorization", "token "+API_TOKEN);
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(
-                            connection.getInputStream()));
+            BufferedReader in;
+            if(!API_TOKEN.equals("NULL"))
+                in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            else
+                in = new BufferedReader(new InputStreamReader(web.openStream()));
 
             String inputLine;
             StringBuilder ret = new StringBuilder();

@@ -15,6 +15,14 @@
     <string name="text_touch_to_update">Touch again to download Update</string>
     <string name="text_latest_version">Latest version</string>
     <string name="text_click_check">Click to check for updated</string>
+    <string name="text_api_key">API Key</string>
+    <string name="text_not_set">Not set</string>
+    <string name="text_github">DerTyp7214 on GitHub</string>
+    <string name="text_googleplus">Josua Lengwenath on Google+</string>
+    <string name="text_sourcecode">App Scourcecode on GitHub</string>
+    <string name="text_appdetails">App Details</string>
+    <string name="text_social">Social</string>
+    <string name="text_prefs">Preferences</string>
     <string name="notification_canceled">Canceled</string>
     <string name="notification_cancel">Cancel</string>
     <string name="notification_downloading">Downloading</string>
@@ -24,6 +32,7 @@
     <string name="notification_finished">Finished</string>
     <string name="popup_error">Not clickable link!</string>
     <string name="popup_close">Close</string>
+    <string name="popup_ok">OK</string>
     <string name="adapter_loading">Loading</string>
     <string name="input_hint">Search</string>
     <string name="load_more">Load more</string>

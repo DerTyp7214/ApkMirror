@@ -20,6 +20,14 @@
     <string name="text_touch_to_update">Drücke nochmal um das Update runterzuladen</string>
     <string name="text_latest_version">Neuste Version</string>
     <string name="text_click_check">Drücke um nach Updates zu suchen</string>
+    <string name="text_api_key">API Key</string>
+    <string name="text_not_set">Nicht gesetzt</string>
+    <string name="text_github">DerTyp7214 bei GitHub</string>
+    <string name="text_googleplus">Josua Lengwenath bei Google+</string>
+    <string name="text_sourcecode">App Scourcecode bei GitHub</string>
+    <string name="text_appdetails">App Details</string>
+    <string name="text_social">Social</string>
+    <string name="text_prefs">Preferences</string>
     <string name="notification_canceled">Abgebrochen</string>
     <string name="notification_cancel">Abbrechen</string>
     <string name="notification_downloading">Downloading</string>
@@ -29,6 +37,7 @@
     <string name="notification_finished">Fertig</string>
     <string name="popup_error">Nicht klickbarer Link!</string>
     <string name="popup_close">Schließen</string>
+    <string name="popup_ok">OK</string>
     <string name="adapter_loading">Lade</string>
     <string name="input_hint">Suchen</string>
     <string name="load_more">Lade mehr</string>

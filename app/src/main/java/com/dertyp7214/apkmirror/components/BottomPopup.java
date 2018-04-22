@@ -40,6 +40,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -61,6 +62,8 @@ public class BottomPopup {
     private Allocation output, input;
     private RenderScript rs;
     private boolean blur;
+    private View layout;
+    private TextView textView;
 
     public BottomPopup(int currentStatusBarColor, View parent, Activity activity, boolean blur){
         this.parent=parent;
@@ -85,7 +88,7 @@ public class BottomPopup {
         blurOverlay=view;
 
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View layout = inflater.inflate(inflateLayout, (ViewGroup) activity.findViewById(R.id.root_layout));
+        layout = inflater.inflate(inflateLayout, (ViewGroup) activity.findViewById(R.id.root_layout));
 
         if(activity.getSharedPreferences("settings", MODE_PRIVATE).getBoolean("colored_navbar", false)) {
             activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.material_grey_850));
@@ -151,7 +154,7 @@ public class BottomPopup {
         });
 
         Button close = layout.findViewById(R.id.btn_close);
-        TextView textView = layout.findViewById(R.id.txt_text);
+        textView = layout.findViewById(R.id.txt_text);
 
         setTextViewHTML(textView, text, activity);
 
@@ -161,6 +164,19 @@ public class BottomPopup {
                 popup.dismiss();
             }
         });
+    }
+
+    public void setOnclick(int view, final ClickListener onClickListener){
+        layout.findViewById(view).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickListener.onClick(v, textView.getText().toString());
+            }
+        });
+    }
+
+    public interface ClickListener{
+        void onClick(View root, String text);
     }
 
     public void show(){

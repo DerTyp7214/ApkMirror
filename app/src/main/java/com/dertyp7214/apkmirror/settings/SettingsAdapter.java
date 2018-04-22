@@ -81,6 +81,15 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+    public class ViewHolderPlaceHolder extends ViewHolder {
+        public TextView title;
+
+        public ViewHolderPlaceHolder(View view) {
+            super(view);
+            title = view.findViewById(R.id.text);
+        }
+    }
+
     public SettingsAdapter(List<Setting> itemList, Activity context) {
         this.itemList = itemList;
         this.context = context;
@@ -98,6 +107,8 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 return new ViewHolderSwitch(LayoutInflater.from(parent.getContext()).inflate(R.layout.settings_togglebutton, parent, false));
             case 3:
                 return new ViewHolderColor(LayoutInflater.from(parent.getContext()).inflate(R.layout.settings_color, parent, false));
+            case 4:
+                return new ViewHolderPlaceHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.settings_placeholder, parent, false));
             default:
                 return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.settings_normal, parent, false));
         }
@@ -160,6 +171,11 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     }
                 });
                 break;
+            case 4:
+                final ViewHolderPlaceHolder viewHolderPlaceHolder = (ViewHolderPlaceHolder) holder;
+                final SettingPlaceholder settingPlaceholder = (SettingPlaceholder) itemList.get(position);
+                viewHolderPlaceHolder.title.setText(settingPlaceholder.getText());
+                break;
         }
     }
 
@@ -172,7 +188,7 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public int getItemViewType(int position) {
         // Just as an example, return 0 or 2 depending on position
         // Note that unlike in ListView adapters, types don't have to be contiguous
-        return itemList.get(position) instanceof SettingCheckBox?1:itemList.get(position) instanceof SettingSwitch?2:itemList.get(position) instanceof SettingColor?3:0;
+        return itemList.get(position) instanceof SettingCheckBox?1:itemList.get(position) instanceof SettingSwitch?2:itemList.get(position) instanceof SettingColor?3:itemList.get(position) instanceof SettingPlaceholder?4:0;
     }
 
     public void saveSettings(){

@@ -396,4 +396,14 @@ public class Utils {
         return FileProvider.getUriForFile(context,
                 context.getApplicationContext().getPackageName() + ".GenericFileProvider", file);
     }
+
+    public static String cutString(String string, int cutAt){
+        if(string.length()<cutAt)
+            return string;
+        StringBuilder ret = new StringBuilder();
+        for(int i=0;i<cutAt;i++)
+            ret.append(string.charAt(i));
+        ret.append("...");
+        return ret.toString();
+    }
 }
