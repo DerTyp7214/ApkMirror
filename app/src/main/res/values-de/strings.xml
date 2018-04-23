@@ -28,6 +28,7 @@
     <string name="text_appdetails">App Details</string>
     <string name="text_social">Social</string>
     <string name="text_prefs">Preferences</string>
+    <string name="text_dark_theme">Dunkles Thema</string>
     <string name="notification_canceled">Abgebrochen</string>
     <string name="notification_cancel">Abbrechen</string>
     <string name="notification_downloading">Downloading</string>

@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.dertyp7214.apkmirror.R;
+import com.dertyp7214.apkmirror.ThemeManager;
 
 import java.util.List;
 
@@ -56,6 +57,12 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
         final Notifications item = notificationsList.get(position);
+        final ThemeManager themeManager = ThemeManager.getInstance(activity);
+        themeManager.isDarkTheme();
+        holder.title.setTextColor(themeManager.getTitleTextColor());
+        holder.content.setTextColor(themeManager.getSubTitleTextColor());
+        holder.time.setTextColor(themeManager.getSubTitleTextColor());
+        holder.viewForeground.setBackgroundColor(themeManager.getElementColor());
         holder.title.setText(item.TITLE);
         holder.content.setText(item.SUBTITLE);
         holder.time.setText(item.TIME);

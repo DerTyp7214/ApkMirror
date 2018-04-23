@@ -36,4 +36,24 @@
         <item name="android:windowExitAnimation">@anim/popup_hide</item>
     </style>
 
+    <style name="ProgressStyleDark" parent="Base.V7.Theme.AppCompat.Light.Dialog">
+        <item name="android:colorBackground">@color/element_color_dark</item>
+        <item name="android:windowTitleStyle">@style/TitleDark</item>
+        <item name="android:windowBackground">@color/element_color_dark</item>
+    </style>
+
+    <style name="TitleDark" parent="android:Widget">
+        <item name="android:maxLines">1</item>
+        <item name="android:scrollHorizontally">true</item>
+        <item name="android:textAppearance">@style/TextDark</item>
+    </style>
+
+    <style name="TextDark" parent="Base.TextAppearance.AppCompat.Title">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="ProgressStyleLight">
+
+    </style>
+
 </resources>

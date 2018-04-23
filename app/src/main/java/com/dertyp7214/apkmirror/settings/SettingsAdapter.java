@@ -23,6 +23,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.dertyp7214.apkmirror.R;
+import com.dertyp7214.apkmirror.ThemeManager;
 import com.dertyp7214.apkmirror.settings.Setting;
 import com.dertyp7214.apkmirror.settings.SettingCheckBox;
 import com.dertyp7214.apkmirror.settings.SettingColor;
@@ -53,19 +54,23 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public class ViewHolderCheckBox extends ViewHolder {
         public CheckBox title;
+        public View box;
 
         public ViewHolderCheckBox(View view) {
             super(view);
             title = view.findViewById(R.id.text);
+            box = view.findViewById(R.id.box);
         }
     }
 
     public class ViewHolderSwitch extends ViewHolder {
         public Switch title;
+        public View box;
 
         public ViewHolderSwitch(View view) {
             super(view);
             title = view.findViewById(R.id.text);
+            box = view.findViewById(R.id.box);
         }
     }
 
@@ -83,10 +88,12 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public class ViewHolderPlaceHolder extends ViewHolder {
         public TextView title;
+        public View box;
 
         public ViewHolderPlaceHolder(View view) {
             super(view);
             title = view.findViewById(R.id.text);
+            box = view.findViewById(R.id.box);
         }
     }
 
@@ -116,11 +123,16 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, int position) {
+        final ThemeManager themeManager = ThemeManager.getInstance(context);
+        themeManager.isDarkTheme();
+        ((ViewHolder) holder).box.setBackgroundColor(themeManager.getElementColor());
+        ((ViewHolder) holder).title.setTextColor(themeManager.getTitleTextColor());
         switch (holder.getItemViewType()){
             case 0:
                 final ViewHolder viewHolder = (ViewHolder) holder;
                 final Setting setting = itemList.get(position);
                 if(setting!=null) {
+                    viewHolder.subTitle.setTextColor(themeManager.getSubTitleTextColor());
                     viewHolder.title.setText(setting.getText());
                     viewHolder.subTitle.setText(setting.getSubTitle());
                     viewHolder.box.setOnClickListener(new View.OnClickListener() {
@@ -153,7 +165,7 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        settingSwitch.setChecked(isChecked);
+                        settingSwitch.onCheckedChanged(isChecked);
                     }
                 });
                 break;
@@ -175,6 +187,7 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 final ViewHolderPlaceHolder viewHolderPlaceHolder = (ViewHolderPlaceHolder) holder;
                 final SettingPlaceholder settingPlaceholder = (SettingPlaceholder) itemList.get(position);
                 viewHolderPlaceHolder.title.setText(settingPlaceholder.getText());
+                viewHolderPlaceHolder.box.setBackgroundColor(themeManager.getPlaceHolderBackgroundColor());
                 break;
         }
     }

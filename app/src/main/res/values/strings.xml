@@ -23,6 +23,7 @@
     <string name="text_appdetails">App Details</string>
     <string name="text_social">Social</string>
     <string name="text_prefs">Preferences</string>
+    <string name="text_dark_theme">Dark Theme</string>
     <string name="notification_canceled">Canceled</string>
     <string name="notification_cancel">Cancel</string>
     <string name="notification_downloading">Downloading</string>

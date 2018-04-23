@@ -6,13 +6,19 @@
 package com.dertyp7214.apkmirror;
 
 import android.Manifest;
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -74,7 +80,7 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
     public NotificationsAdapter notificationsAdapter;
 
     private Input input;
-    private RecyclerView recyclerView, settingList;
+    private RecyclerView recyclerView, settingList, notiRecyclerView;
     private AppListAdapter appListAdapter;
     private SettingsAdapter settingsAdapter;
     private int site = 1;
@@ -83,6 +89,7 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
     private boolean cancled = false;
     private ProgressDialog updateDialog;
     private View home, dashboard, notifications;
+    private ThemeManager themeManager;
 
     private String API_TOKEN;
 
@@ -134,13 +141,15 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
 
         setTaskDescription(new ActivityManager.TaskDescription(getString(R.string.app_name), BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher), getResources().getColor(R.color.colorPrimaryDark)));
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            if(!Utils.isColorDark(getResources().getColor(R.color.colorPrimaryDark, null)))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Utils.isColorDark(getResources().getColor(R.color.colorPrimaryDark, null))) {
                 findViewById(R.id.navigation).setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            } else {
+                findViewById(R.id.navigation).setSystemUiVisibility(View.VISIBLE);
+            }
+        }
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            if(!Utils.isColorDark(getResources().getColor(R.color.colorPrimaryDark, null)))
-                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+        setUpNavigationBar();
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -194,18 +203,64 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
         settingList.addItemDecoration(dividerItemDecoration);
 
         setUpNotifications();
+        setUpTheme();
 
     }
 
+    private void setUpTheme(){
+        themeManager = ThemeManager.getInstance(this);
+        themeManager.isDarkTheme();
+        ((BottomNavigationView) findViewById(R.id.navigation)).setItemTextColor(themeManager.getNavigationColors());
+        ((BottomNavigationView) findViewById(R.id.navigation)).setItemIconTintList(themeManager.getNavigationColors());
+        List<View> views = new ArrayList<>();
+        views.add(findViewById(R.id.container));
+
+        for(View v : views)
+            v.setBackgroundColor(themeManager.getBackgroundColor());
+
+        refreshRecyclerView(recyclerView);
+        refreshRecyclerView(settingList);
+        refreshRecyclerView(notiRecyclerView);
+    }
+
+    private void refreshRecyclerView(RecyclerView recyclerView){
+        recyclerView.getAdapter().notifyDataSetChanged();
+        recyclerView.scrollBy(1, 1);
+        recyclerView.scrollBy(-1, -1);
+    }
+
+    private void setUpNavigationBar() {
+        int colorFrom = getWindow().getNavigationBarColor();
+        int colorTo = getResources().getColor(R.color.colorPrimary);
+        if (!getSharedPreferences("settings", MODE_PRIVATE).getBoolean("colored_navbar", false))
+            colorTo = Color.BLACK;
+        ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(),colorFrom, colorTo);
+        animator.setDuration(300);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                getWindow().setNavigationBarColor((int) animation.getAnimatedValue());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    if (!Utils.isColorDark((int) animation.getAnimatedValue())) {
+                        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+                    } else {
+                        getWindow().getDecorView().setSystemUiVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        });
+        animator.start();
+    }
+
     private void setUpNotifications(){
-        RecyclerView recyclerView = findViewById(R.id.noti_rv);
+        notiRecyclerView = findViewById(R.id.noti_rv);
         notificationsAdapter = new NotificationsAdapter(this, Notifications.getNotificationsList(this), findViewById(R.id.container));
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        recyclerView.setAdapter(notificationsAdapter);
+        notiRecyclerView.setLayoutManager(layoutManager);
+        notiRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        notiRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        notiRecyclerView.setAdapter(notificationsAdapter);
 
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
@@ -229,16 +284,40 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
                 }),
                 new SettingPlaceholder("preferences", getString(R.string.text_prefs), this),
                 new SettingCheckBox("search_at_start", getString(R.string.text_search_at_start), this, false),
-                new SettingSwitch("colored_navbar", getString(R.string.text_colored_navbar), this, false),
+                new SettingSwitch("colored_navbar", getString(R.string.text_colored_navbar), this, false).setCheckedChangeListener(new SettingSwitch.CheckedChangeListener() {
+                    @Override
+                    public void onChangeChecked(boolean value) {
+                        Home.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                setUpNavigationBar();
+                            }
+                        });
+                    }
+                }),
+                new SettingSwitch("dark_theme", getString(R.string.text_dark_theme), this, false).setCheckedChangeListener(new SettingSwitch.CheckedChangeListener() {
+                    @Override
+                    public void onChangeChecked(final boolean value) {
+                        Home.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
+                                preferences.edit().putBoolean("dark_theme", value).apply();
+                                setUpTheme();
+                            }
+                        });
+                    }
+                }),
                 new SettingSwitch("blur_dialog", getString(R.string.text_blur_dialog), this, false),
                 new Setting("api_key", getString(R.string.text_api_key), this).setSubTitle(Utils.cutString(getSharedPreferences("settings", MODE_PRIVATE).getString("API_KEY", getString(R.string.text_not_set)), 30)).addSettingsOnClick(new Setting.settingsOnClickListener() {
                     @Override
-                    public void onClick(String name, Setting setting, TextView subTitle, ProgressBar imageRight) {
+                    public void onClick(String name, Setting setting, final TextView subTitle, ProgressBar imageRight) {
                         InputDialog dialog = new InputDialog(getString(R.string.text_api_key), getSharedPreferences("settings", MODE_PRIVATE).getString("API_KEY", ""), getString(R.string.text_api_key), Home.this);
                         dialog.setListener(new InputDialog.Listener() {
                             @Override
                             public void onSubmit(String text) {
                                 getSharedPreferences("settings", MODE_PRIVATE).edit().putString("API_KEY", text).apply();
+                                subTitle.setText(Utils.cutString(getSharedPreferences("settings", MODE_PRIVATE).getString("API_KEY", getString(R.string.text_not_set)), 30));
                             }
 
                             @Override
@@ -303,7 +382,7 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
                                         Home.this.runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                updateDialog = new ProgressDialog(Home.this);
+                                                updateDialog = new ProgressDialog(Home.this, themeManager.getProgressStyle());
                                                 updateDialog.setMessage(getString(R.string.notification_downloading) + " update");
                                                 updateDialog.setCancelable(false);
                                                 updateDialog.show();
@@ -395,7 +474,7 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                progressDialog = new ProgressDialog(Home.this);
+                                progressDialog = new ProgressDialog(Home.this, themeManager.getProgressStyle());
                                 progressDialog.setMessage(getString(R.string.adapter_loading)+"...");
                                 progressDialog.setCancelable(false);
                                 try {

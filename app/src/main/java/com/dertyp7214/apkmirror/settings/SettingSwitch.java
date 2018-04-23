@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 public class SettingSwitch extends Setting {
 
     private boolean checked;
+    private CheckedChangeListener checkedChangeListener;
 
     public SettingSwitch(String name, String text, Context context, boolean checked) {
         super(name, text, context);
@@ -26,6 +27,21 @@ public class SettingSwitch extends Setting {
     public void setChecked(boolean checked){
         this.checked=checked;
         saveSetting();
+    }
+
+    public Setting setCheckedChangeListener(CheckedChangeListener changeListener){
+        this.checkedChangeListener=changeListener;
+        return this;
+    }
+
+    public void onCheckedChanged(boolean value){
+        setChecked(value);
+        if(checkedChangeListener!=null)
+            checkedChangeListener.onChangeChecked(checked);
+    }
+
+    public interface CheckedChangeListener{
+        void onChangeChecked(boolean value);
     }
 
     @Override

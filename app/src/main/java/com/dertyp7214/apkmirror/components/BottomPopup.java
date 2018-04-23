@@ -47,6 +47,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dertyp7214.apkmirror.R;
+import com.dertyp7214.apkmirror.ThemeManager;
+import com.dertyp7214.apkmirror.Utils;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -65,6 +67,8 @@ public class BottomPopup {
     private View layout;
     private TextView textView;
 
+    private int duration = 500;
+
     public BottomPopup(int currentStatusBarColor, View parent, Activity activity, boolean blur){
         this.parent=parent;
         this.activity=activity;
@@ -80,8 +84,29 @@ public class BottomPopup {
         this.text=text;
     }
 
+    private void setUpNavigationBar(int colorTo) {
+        int colorFrom = activity.getWindow().getNavigationBarColor();
+        ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(),colorFrom, colorTo);
+        animator.setDuration(duration);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                activity.getWindow().setNavigationBarColor((int) animation.getAnimatedValue());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    if (!Utils.isColorDark((int) animation.getAnimatedValue())) {
+                        activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+                    } else {
+                        activity.getWindow().getDecorView().setSystemUiVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        });
+        animator.start();
+    }
+
     public void setUp(final View root_layout, int inflateLayout){
         rootLayout = root_layout;
+        final ThemeManager themeManager = ThemeManager.getInstance(activity);
 
         setUpBitmap();
 
@@ -89,15 +114,15 @@ public class BottomPopup {
 
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         layout = inflater.inflate(inflateLayout, (ViewGroup) activity.findViewById(R.id.root_layout));
+        layout.findViewById(R.id.scroll).setBackgroundColor(themeManager.getElementColor());
+        ((TextView) layout.findViewById(R.id.txt_text)).setTextColor(themeManager.getSubTitleTextColor());
 
         if(activity.getSharedPreferences("settings", MODE_PRIVATE).getBoolean("colored_navbar", false)) {
-            activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.material_grey_850));
-            if (!isColorDark(activity.getResources().getColor(R.color.material_grey_850)) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                parent.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+            setUpNavigationBar(themeManager.getElementColor());
         }
 
         ValueAnimator animator = ValueAnimator.ofInt(1, 80);
-        animator.setDuration(500);
+        animator.setDuration(duration);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -122,7 +147,7 @@ public class BottomPopup {
             @Override
             public void onDismiss() {
                 ValueAnimator animator = ValueAnimator.ofInt(80, 1);
-                animator.setDuration(500);
+                animator.setDuration(duration);
                 animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
@@ -142,13 +167,8 @@ public class BottomPopup {
                     }
                 });
                 animator.start();
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ignored) {}
                 if(activity.getSharedPreferences("settings", MODE_PRIVATE).getBoolean("colored_navbar", false)) {
-                    activity.getWindow().setNavigationBarColor(currentStatusBarColor);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                        parent.setSystemUiVisibility(View.VISIBLE);
+                    setUpNavigationBar(currentStatusBarColor);
                 }
             }
         });

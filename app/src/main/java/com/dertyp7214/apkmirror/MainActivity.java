@@ -14,8 +14,10 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -81,9 +83,6 @@ public class MainActivity extends AppCompatActivity {
         version = findViewById(R.id.txt_ver);
 
         Bundle data = getIntent().getExtras();
-
-
-        getWindow().getDecorView().setSystemUiVisibility(0);
 
         if(notifyId<1&&notifyId!=0)
             notifyId=0;
@@ -160,6 +159,11 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
+        if(!Utils.isColorDark(getWindow().getNavigationBarColor()) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+        else
+            getWindow().getDecorView().setSystemUiVisibility(View.VISIBLE);
+
         int color = getResources().getColor(android.R.color.background_dark);
 
         appIcon.setImageBitmap(app.getAppIcon());
@@ -212,6 +216,20 @@ public class MainActivity extends AppCompatActivity {
         });
 
         setUp();
+        setUpTheme();
+    }
+
+    private void setUpTheme(){
+        final ThemeManager themeManager = ThemeManager.getInstance(this);
+        themeManager.isDarkTheme();
+        publisher.setTextColor(themeManager.getSubTitleTextColor());
+        version.setTextColor(themeManager.getSubTitleTextColor());
+        description.setTextColor(themeManager.getSubTitleTextColor());
+        findViewById(R.id.include).setBackgroundColor(themeManager.getBackgroundColor());
+        ((CardView) findViewById(R.id.cardDesc)).setCardBackgroundColor(themeManager.getElementColor());
+        ((CardView) findViewById(R.id.cardVer)).setCardBackgroundColor(themeManager.getElementColor());
+        ((TextView) findViewById(R.id.textView2)).setTextColor(themeManager.getSubTitleTextColor());
+        ((TextView) findViewById(R.id.textView)).setTextColor(themeManager.getTitleTextColor());
     }
 
     private void setUp() {

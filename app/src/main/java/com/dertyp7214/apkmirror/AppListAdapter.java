@@ -63,6 +63,11 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHo
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
         final AppListItem listItem = itemList.get(position);
+        final ThemeManager themeManager = ThemeManager.getInstance(context);
+        themeManager.isDarkTheme();
+        holder.title.setTextColor(themeManager.getTitleTextColor());
+        holder.publisher.setTextColor(themeManager.getSubTitleTextColor());
+        holder.card.setCardBackgroundColor(themeManager.getElementColor());
         holder.title.setText(listItem.getTitle());
         holder.publisher.setText(listItem.getPublisher());
         new Thread(new Runnable() {
@@ -80,7 +85,7 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHo
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Home.progressDialogApp = new ProgressDialog(context);
+                Home.progressDialogApp = new ProgressDialog(context, themeManager.getProgressStyle());
                 Home.progressDialogApp.setMessage(context.getString(R.string.adapter_loading) + " " + listItem.getTitle() + "...");
                 Home.progressDialogApp.setCancelable(false);
                 Home.progressDialogApp.show();
