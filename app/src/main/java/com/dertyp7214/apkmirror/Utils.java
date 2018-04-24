@@ -324,13 +324,20 @@ public class Utils {
     }
 
     private static void makeLinkClickable(SpannableStringBuilder strBuilder, final URLSpan span, final Context context){
+        int e = 0;
+        String url = span.getURL();
+        if((url.endsWith(")") && !url.contains("(")) || url.endsWith("!"))
+            e = 1;
         int start = strBuilder.getSpanStart(span);
-        int end = strBuilder.getSpanEnd(span);
+        int end = strBuilder.getSpanEnd(span)-e;
         int flags = strBuilder.getSpanFlags(span);
         ClickableSpan clickable = new ClickableSpan() {
             public void onClick(View view) {
                 try {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(span.getURL()));
+                    String url = span.getURL();
+                    if((url.endsWith(")") && !url.contains("(")) || url.endsWith("!"))
+                        url = url.substring(0, url.length()-2);
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                     context.startActivity(browserIntent);
                 }catch (Exception e){
                     Toast.makeText(context, context.getString(R.string.popup_error), Toast.LENGTH_LONG).show();

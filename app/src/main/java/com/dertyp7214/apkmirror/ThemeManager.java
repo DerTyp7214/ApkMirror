@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.support.annotation.Nullable;
 
 public class ThemeManager {
 
@@ -54,7 +55,7 @@ public class ThemeManager {
     }
 
     public int getProgressStyle(){
-        return darkTheme ? R.style.ProgressStyleDark : R.style.ProgressStyleLight;
+        return darkTheme ? R.style.ProgressStyleDark : 0;
     }
 
     public ColorStateList getNavigationColors(){
