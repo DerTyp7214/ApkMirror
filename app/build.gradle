@@ -23,7 +23,7 @@ android {
 }
 
 def ver = '27.1.1'
-def ver2 = '15.0.0'
+def ver2 = '15.0.2'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -33,8 +33,8 @@ dependencies {
     implementation "com.android.support:design:$ver"
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation "com.android.support:palette-v7:$ver"
     implementation "com.android.support:cardview-v7:$ver"
     implementation 'org.apache.commons:commons-lang3:3.6'
