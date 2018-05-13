@@ -71,6 +71,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
 
@@ -339,6 +340,12 @@ public class Home extends AppCompatActivity implements RecyclerItemTouchHelper.R
                     @Override
                     public void onClick(String name, Setting setting, TextView subTitle, ProgressBar imageRight) {
                         openUrl("http://plus.google.com/u/0/116183493734176118582");
+                    }
+                }),
+                new Setting("donate", getString(R.string.text_donate), this).setSubTitle(getString(R.string.text_donate_sub)).addSettingsOnClick(new Setting.settingsOnClickListener() {
+                    @Override
+                    public void onClick(String name, Setting setting, TextView subTitle, ProgressBar imageRight) {
+                        openUrl("https://paypal.me/JosuaLengwenath");
                     }
                 })
         ));

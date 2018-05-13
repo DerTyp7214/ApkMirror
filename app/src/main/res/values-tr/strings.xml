@@ -24,6 +24,8 @@
     <string name="text_social">Social</string>
     <string name="text_prefs">Preferences</string>
     <string name="text_dark_theme">Dark Theme</string>
+    <string name="text_donate">Donate</string>
+    <string name="text_donate_sub">Donate me on PayPal</string>
     <string name="notification_canceled">Canceled</string>
     <string name="notification_cancel">Cancel</string>
     <string name="notification_downloading">Downloading</string>
