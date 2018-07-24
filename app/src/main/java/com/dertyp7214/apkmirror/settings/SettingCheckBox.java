@@ -15,22 +15,23 @@ public class SettingCheckBox extends Setting {
 
     public SettingCheckBox(String name, String text, Context context, boolean checked) {
         super(name, text, context);
-        this.checked=checked;
+        this.checked = checked;
         loadSetting();
     }
 
-    public boolean isChecked(){
+    public boolean isChecked() {
         return this.checked;
     }
 
-    public void setChecked(boolean checked){
-        this.checked=checked;
+    public void setChecked(boolean checked) {
+        this.checked = checked;
         saveSetting();
     }
 
     @Override
-    public void saveSetting(){
-        SharedPreferences preferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+    public void saveSetting() {
+        SharedPreferences preferences =
+                context.getSharedPreferences("settings", Context.MODE_PRIVATE);
         @SuppressLint("CommitPrefEdits")
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean(name, checked);
@@ -38,8 +39,9 @@ public class SettingCheckBox extends Setting {
     }
 
     @Override
-    public void loadSetting(){
-        SharedPreferences preferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
-        this.checked=preferences.getBoolean(name, checked);
+    public void loadSetting() {
+        SharedPreferences preferences =
+                context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        this.checked = preferences.getBoolean(name, checked);
     }
 }

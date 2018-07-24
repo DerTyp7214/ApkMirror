@@ -67,12 +67,9 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         holder.content.setText(item.SUBTITLE);
         holder.time.setText(item.TIME);
 
-        holder.viewForeground.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                item.onClick(activity.getResources().getColor(R.color.colorPrimaryDark), activity, holder.viewForeground, root_layout);
-            }
-        });
+        holder.viewForeground.setOnClickListener(v -> item
+                .onClick(activity.getResources().getColor(R.color.colorPrimaryDark), activity,
+                        holder.viewForeground, root_layout));
     }
 
     @Override

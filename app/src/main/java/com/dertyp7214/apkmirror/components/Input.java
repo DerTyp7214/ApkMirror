@@ -48,10 +48,11 @@ public class Input extends LinearLayout {
         initializeViews(context);
     }
 
-    private void initializeViews(Context context){
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    private void initializeViews(Context context) {
+        LayoutInflater inflater =
+                (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.input, this);
-        this.context=context;
+        this.context = context;
     }
 
     @Override
@@ -62,53 +63,47 @@ public class Input extends LinearLayout {
         search = this.findViewById(R.id.btn_send);
         background = this.findViewById(R.id.background);
 
-        search.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(listener!=null)
-                    listener.onSubmit(inputEditText.getText().toString());
-            }
+        search.setOnClickListener(v -> {
+            if (listener != null)
+                listener.onSubmit(inputEditText.getText().toString());
         });
 
-        inputEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    if(listener!=null)
-                        listener.onSubmit(v.getText().toString());
-                }
-                inputEditText.clearFocus();
-                return true;
+        inputEditText.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                if (listener != null)
+                    listener.onSubmit(v.getText().toString());
             }
+            inputEditText.clearFocus();
+            return true;
         });
     }
 
-    public void setBackgroundColor(int color){
+    public void setBackgroundColor(int color) {
         background.setBackgroundColor(color);
     }
 
-    public void setText(String text){
+    public void setText(String text) {
         inputEditText.setText(text);
     }
 
-    public void setTextColor(int color){
+    public void setTextColor(int color) {
         inputEditText.setTextColor(color);
         inputEditText.setHintTextColor(color);
     }
 
-    public void setImage(Drawable drawable){
+    public void setImage(Drawable drawable) {
         search.setBackground(drawable);
     }
 
-    public void setImageTint(int color){
+    public void setImageTint(int color) {
         search.setBackgroundTintList(new ColorStateList(new int[][]{}, new int[]{color}));
     }
 
-    public void setSubmitListener(SubmitListener listener){
-        this.listener=listener;
+    public void setSubmitListener(SubmitListener listener) {
+        this.listener = listener;
     }
 
-    public interface SubmitListener{
+    public interface SubmitListener {
         void onSubmit(String text);
     }
 }

@@ -70,56 +70,42 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.MyViewHo
         holder.card.setCardBackgroundColor(themeManager.getElementColor());
         holder.title.setText(listItem.getTitle());
         holder.publisher.setText(listItem.getPublisher());
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final Bitmap bmp = listItem.getIcon(context);
-                context.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        holder.icon.setImageBitmap(bmp);
-                    }
-                });
-            }
+        new Thread(() -> {
+            final Bitmap bmp = listItem.getIcon(context);
+            context.runOnUiThread(() -> holder.icon.setImageBitmap(bmp));
         }).start();
-        holder.card.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Home.progressDialogApp = new ProgressDialog(context, themeManager.getProgressStyle());
-                Home.progressDialogApp.setMessage(context.getString(R.string.adapter_loading) + " " + listItem.getTitle() + "...");
-                Home.progressDialogApp.setCancelable(false);
-                Home.progressDialogApp.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Looper.prepare();
-                        if (!apps.containsKey(listItem.getUrl())) {
-                            App app = new App(listItem.getUrl(), listItem.getIcon(context), context);
-                            app.getData(new App.callback() {
-                                @Override
-                                public void callback(App app) {
-                                    apps.put(listItem.getUrl(), app);
-                                    context.runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(context, holder.icon, "icon");
-                                            context.startActivity(new Intent(context, MainActivity.class).putExtra("url", listItem.getUrl()).putExtra("icon", listItem.getIcon(context)), options.toBundle());
-                                        }
-                                    });
-                                }
-                            });
-                        }else {
-                            context.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(context, holder.icon, "icon");
-                                    context.startActivity(new Intent(context, MainActivity.class).putExtra("url", listItem.getUrl()).putExtra("icon", listItem.getIcon(context)), options.toBundle());
-                                }
-                            });
-                        }
-                    }
-                }).start();
-            }
+        holder.card.setOnClickListener(v -> {
+            Home.progressDialogApp = new ProgressDialog(context, themeManager.getProgressStyle());
+            Home.progressDialogApp.setMessage(
+                    context.getString(R.string.adapter_loading) + " " + listItem.getTitle()
+                            + "...");
+            Home.progressDialogApp.setCancelable(false);
+            Home.progressDialogApp.show();
+            new Thread(() -> {
+                Looper.prepare();
+                if (! apps.containsKey(listItem.getUrl())) {
+                    App app = new App(listItem.getUrl(), listItem.getIcon(context), context);
+                    app.getData(app1 -> {
+                        apps.put(listItem.getUrl(), app1);
+                        context.runOnUiThread(() -> {
+                            ActivityOptions options = ActivityOptions
+                                    .makeSceneTransitionAnimation(context, holder.icon, "icon");
+                            context.startActivity(new Intent(context, MainActivity.class)
+                                            .putExtra("url", listItem.getUrl())
+                                            .putExtra("icon", listItem.getIcon(context)),
+                                    options.toBundle());
+                        });
+                    });
+                } else {
+                    context.runOnUiThread(() -> {
+                        ActivityOptions options = ActivityOptions
+                                .makeSceneTransitionAnimation(context, holder.icon, "icon");
+                        context.startActivity(new Intent(context, MainActivity.class)
+                                .putExtra("url", listItem.getUrl())
+                                .putExtra("icon", listItem.getIcon(context)), options.toBundle());
+                    });
+                }
+            }).start();
         });
     }
 

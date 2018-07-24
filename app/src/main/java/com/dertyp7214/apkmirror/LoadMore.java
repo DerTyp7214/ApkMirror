@@ -11,7 +11,8 @@ public class LoadMore extends AppListItem {
     public LoadMore() {
         super(null, null, null, null);
     }
-    public boolean isLoadMore(){
+
+    public boolean isLoadMore() {
         return true;
     }
 }

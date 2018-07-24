@@ -5,30 +5,32 @@
 
 package com.dertyp7214.apkmirror.settings;
 
-        import android.animation.ValueAnimator;
-        import android.animation.ValueAnimator.AnimatorUpdateListener;
-        import android.app.Dialog;
-        import android.content.Context;
-        import android.graphics.drawable.GradientDrawable;
-        import android.graphics.drawable.LayerDrawable;
-        import android.os.Bundle;
-        import android.text.Editable;
-        import android.text.TextWatcher;
-        import android.view.View;
-        import android.widget.Button;
-        import android.widget.EditText;
-        import android.widget.RelativeLayout;
-        import android.widget.SeekBar;
-        import android.widget.TextView;
-        import android.widget.SeekBar.OnSeekBarChangeListener;
-        import com.hacker.module.colorpicker.Color.Color;
-        import com.hacker.module.colorpicker.Color.ColorSeekBar;
-        import com.hacker.module.colorpicker.ColorList;
-        import com.hacker.module.colorpicker.ColorLists.ColorLists;
-        import com.hacker.module.colorpicker.R.id;
-        import com.hacker.module.colorpicker.R.layout;
-        import java.util.ArrayList;
-        import java.util.List;
+import android.animation.ValueAnimator;
+import android.animation.ValueAnimator.AnimatorUpdateListener;
+import android.app.Dialog;
+import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.SeekBar.OnSeekBarChangeListener;
+
+import com.hacker.module.colorpicker.Color.Color;
+import com.hacker.module.colorpicker.Color.ColorSeekBar;
+import com.hacker.module.colorpicker.ColorList;
+import com.hacker.module.colorpicker.ColorLists.ColorLists;
+import com.hacker.module.colorpicker.R.id;
+import com.hacker.module.colorpicker.R.layout;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ColorPicker extends Dialog {
     private TextView redTxt;
@@ -64,14 +66,14 @@ public class ColorPicker extends Dialog {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(1);
         this.setContentView(layout.color_picker);
-        this.hexCode = (EditText) this.findViewById(id.hexTxt);
-        this.redTxt = (TextView) this.findViewById(id.txtRed);
-        this.greenTxt = (TextView) this.findViewById(id.txtGreen);
-        this.blueTxt = (TextView) this.findViewById(id.txtBlue);
-        this.hashTag = (TextView) this.findViewById(id.textView);
-        this.redBar = (ColorSeekBar) this.findViewById(id.red);
-        this.greenBar = (ColorSeekBar) this.findViewById(id.green);
-        this.blueBar = (ColorSeekBar) this.findViewById(id.blue);
+        this.hexCode = this.findViewById(id.hexTxt);
+        this.redTxt = this.findViewById(id.txtRed);
+        this.greenTxt = this.findViewById(id.txtGreen);
+        this.blueTxt = this.findViewById(id.txtBlue);
+        this.hashTag = this.findViewById(id.textView);
+        this.redBar = this.findViewById(id.red);
+        this.greenBar = this.findViewById(id.green);
+        this.blueBar = this.findViewById(id.blue);
         this.colorView = this.findViewById(id.colorView);
         LayerDrawable bgDrawable = (LayerDrawable) this.colorView.getBackground();
         this.shape = (GradientDrawable) bgDrawable.findDrawableByLayerId(id.color_plate);
@@ -80,10 +82,15 @@ public class ColorPicker extends Dialog {
         this.redBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 ColorPicker.this.red = (float) i;
-                ColorPicker.this.setAllColors(ColorPicker.this.red, ColorPicker.this.green, ColorPicker.this.blue);
-                ColorPicker.this.listener.updateColor(ColorPicker.this.getIntFromColor(ColorPicker.this.red, ColorPicker.this.green, ColorPicker.this.blue));
-                if (!ColorPicker.this.anim.isRunning()) {
-                    ColorPicker.this.setHex(ColorPicker.this.getIntFromColor(ColorPicker.this.red, ColorPicker.this.green, ColorPicker.this.blue));
+                ColorPicker.this.setAllColors(ColorPicker.this.red, ColorPicker.this.green,
+                        ColorPicker.this.blue);
+                ColorPicker.this.listener.updateColor(ColorPicker.this
+                        .getIntFromColor(ColorPicker.this.red, ColorPicker.this.green,
+                                ColorPicker.this.blue));
+                if (! ColorPicker.this.anim.isRunning()) {
+                    ColorPicker.this.setHex(ColorPicker.this
+                            .getIntFromColor(ColorPicker.this.red, ColorPicker.this.green,
+                                    ColorPicker.this.blue));
                 }
 
             }
@@ -99,10 +106,15 @@ public class ColorPicker extends Dialog {
         this.greenBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 ColorPicker.this.green = (float) i;
-                ColorPicker.this.setAllColors(ColorPicker.this.red, ColorPicker.this.green, ColorPicker.this.blue);
-                ColorPicker.this.listener.updateColor(ColorPicker.this.getIntFromColor(ColorPicker.this.red, ColorPicker.this.green, ColorPicker.this.blue));
-                if (!ColorPicker.this.anim.isRunning()) {
-                    ColorPicker.this.setHex(ColorPicker.this.getIntFromColor(ColorPicker.this.red, ColorPicker.this.green, ColorPicker.this.blue));
+                ColorPicker.this.setAllColors(ColorPicker.this.red, ColorPicker.this.green,
+                        ColorPicker.this.blue);
+                ColorPicker.this.listener.updateColor(ColorPicker.this
+                        .getIntFromColor(ColorPicker.this.red, ColorPicker.this.green,
+                                ColorPicker.this.blue));
+                if (! ColorPicker.this.anim.isRunning()) {
+                    ColorPicker.this.setHex(ColorPicker.this
+                            .getIntFromColor(ColorPicker.this.red, ColorPicker.this.green,
+                                    ColorPicker.this.blue));
                 }
 
             }
@@ -118,10 +130,15 @@ public class ColorPicker extends Dialog {
         this.blueBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 ColorPicker.this.blue = (float) i;
-                ColorPicker.this.setAllColors(ColorPicker.this.red, ColorPicker.this.green, ColorPicker.this.blue);
-                ColorPicker.this.listener.updateColor(ColorPicker.this.getIntFromColor(ColorPicker.this.red, ColorPicker.this.green, ColorPicker.this.blue));
-                if (!ColorPicker.this.anim.isRunning()) {
-                    ColorPicker.this.setHex(ColorPicker.this.getIntFromColor(ColorPicker.this.red, ColorPicker.this.green, ColorPicker.this.blue));
+                ColorPicker.this.setAllColors(ColorPicker.this.red, ColorPicker.this.green,
+                        ColorPicker.this.blue);
+                ColorPicker.this.listener.updateColor(ColorPicker.this
+                        .getIntFromColor(ColorPicker.this.red, ColorPicker.this.green,
+                                ColorPicker.this.blue));
+                if (! ColorPicker.this.anim.isRunning()) {
+                    ColorPicker.this.setHex(ColorPicker.this
+                            .getIntFromColor(ColorPicker.this.red, ColorPicker.this.green,
+                                    ColorPicker.this.blue));
                 }
 
             }
@@ -133,31 +150,21 @@ public class ColorPicker extends Dialog {
             }
         });
         this.Setup();
-        this.btn_ok = (Button) this.findViewById(id.btn_ok);
-        this.btn_cancel = (Button) this.findViewById(id.btn_cancel);
-        this.btn_back = (Button) this.findViewById(id.btn_back);
-        this.btn_ok.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                ColorPicker.this.actionOK();
-            }
-        });
-        this.btn_cancel.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                ColorPicker.this.actionCancel();
-            }
-        });
+        this.btn_ok = this.findViewById(id.btn_ok);
+        this.btn_cancel = this.findViewById(id.btn_cancel);
+        this.btn_back = this.findViewById(id.btn_back);
+        this.btn_ok.setOnClickListener(view -> ColorPicker.this.actionOK());
+        this.btn_cancel.setOnClickListener(view -> ColorPicker.this.actionCancel());
         if (this.colorList == null) {
             this.btn_back.setVisibility(View.INVISIBLE);
         }
 
-        this.btn_back.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                ColorPicker colorPicker = ColorPicker.this;
-                ColorPresets colorPresets = new ColorPresets(c, colorList, ColorPicker.this);
-                colorPicker.hide();
-                colorPresets.show();
-                colorPresets.setTheme(colorPicker.theme);
-            }
+        this.btn_back.setOnClickListener(v -> {
+            ColorPicker colorPicker = ColorPicker.this;
+            ColorPresets colorPresets = new ColorPresets(c, colorList, ColorPicker.this);
+            colorPicker.hide();
+            colorPresets.show();
+            colorPresets.setTheme(colorPicker.theme);
         });
         this.hexCode.addTextChangedListener(new TextWatcher() {
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -168,9 +175,14 @@ public class ColorPicker extends Dialog {
 
             public void afterTextChanged(Editable editable) {
                 if (ColorPicker.this.hexCode.getText().length() == 6) {
-                    int color = Color.parseColor("#" + ColorPicker.this.hexCode.getText().toString());
-                    ColorPicker.this.setAllColors(Color.red(color), Color.green(color), Color.blue(color), true);
-                    ColorPicker.this.listener.updateColor(ColorPicker.this.getIntFromColor(ColorPicker.this.red, ColorPicker.this.green, ColorPicker.this.blue));
+                    int color =
+                            Color.parseColor("#" + ColorPicker.this.hexCode.getText().toString());
+                    ColorPicker.this
+                            .setAllColors(Color.red(color), Color.green(color), Color.blue(color),
+                                    true);
+                    ColorPicker.this.listener.updateColor(ColorPicker.this
+                            .getIntFromColor(ColorPicker.this.red, ColorPicker.this.green,
+                                    ColorPicker.this.blue));
                     ColorPicker.this.redBar.setProgress(Color.red(color));
                     ColorPicker.this.greenBar.setProgress(Color.green(color));
                     ColorPicker.this.blueBar.setProgress(Color.blue(color));
@@ -189,7 +201,7 @@ public class ColorPicker extends Dialog {
     }
 
     public void setColorLists(ColorList colorList1, ColorList colorList2, ColorList colorList3, ColorList colorList4, ColorList colorList5, ColorList colorList6, ColorList colorList7, ColorList colorList8) {
-        this.colorList = new ArrayList();
+        this.colorList = new ArrayList<>();
         this.colorList.add(colorList1);
         this.colorList.add(colorList2);
         this.colorList.add(colorList3);
@@ -201,7 +213,7 @@ public class ColorPicker extends Dialog {
     }
 
     public void setColorLists(ColorLists colorLists1, ColorLists colorLists2, ColorLists colorLists3, ColorLists colorLists4, ColorLists colorLists5, ColorLists colorLists6, ColorLists colorLists7, ColorLists colorLists8) {
-        this.colorList = new ArrayList();
+        this.colorList = new ArrayList<>();
         this.colorList.add(colorLists1.getList());
         this.colorList.add(colorLists2.getList());
         this.colorList.add(colorLists3.getList());
@@ -213,7 +225,7 @@ public class ColorPicker extends Dialog {
     }
 
     public void setTheme(ColorPicker.Theme theme) {
-        RelativeLayout ly = (RelativeLayout) this.findViewById(id.ly);
+        RelativeLayout ly = this.findViewById(id.ly);
         this.theme = theme;
         switch (theme) {
             case LIGHT:
@@ -246,7 +258,7 @@ public class ColorPicker extends Dialog {
     }
 
     private void Setup() {
-        int color = -7829368;
+        int color = - 7829368;
         this.setAllColors(Color.red(color), Color.green(color), Color.blue(color), false);
     }
 
@@ -283,7 +295,7 @@ public class ColorPicker extends Dialog {
         this.red = (float) rc;
         this.green = (float) gc;
         this.blue = (float) bc;
-        if (!self) {
+        if (! self) {
             this.animateSeek(this.redBar, 0, rc, this.animTime);
             this.animateSeek(this.greenBar, 0, gc, this.animTime);
             this.animateSeek(this.blueBar, 0, bc, this.animTime);
@@ -297,13 +309,11 @@ public class ColorPicker extends Dialog {
     }
 
     private void animateSeek(final SeekBar seekBar, int from, int toVal, int time) {
-        this.anim = ValueAnimator.ofInt(new int[]{from, toVal});
+        this.anim = ValueAnimator.ofInt(from, toVal);
         this.anim.setDuration((long) time);
-        this.anim.addUpdateListener(new AnimatorUpdateListener() {
-            public void onAnimationUpdate(ValueAnimator animation) {
-                int animProgress = (Integer) animation.getAnimatedValue();
-                seekBar.setProgress(animProgress);
-            }
+        this.anim.addUpdateListener(animation -> {
+            int animProgress = (Integer) animation.getAnimatedValue();
+            seekBar.setProgress(animProgress);
         });
         this.anim.start();
     }
@@ -320,7 +330,7 @@ public class ColorPicker extends Dialog {
         R = R << 16 & 16711680;
         G = G << 8 & '\uff00';
         B &= 255;
-        return -16777216 | R | G | B;
+        return - 16777216 | R | G | B;
     }
 
     public int getColorInt() {
@@ -328,7 +338,8 @@ public class ColorPicker extends Dialog {
     }
 
     public String getColorString() {
-        return String.format("#%06X", 16777215 & this.getIntFromColor(this.red, this.green, this.blue));
+        return String
+                .format("#%06X", 16777215 & this.getIntFromColor(this.red, this.green, this.blue));
     }
 
     public interface Listener {

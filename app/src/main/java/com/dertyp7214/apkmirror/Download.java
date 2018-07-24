@@ -35,18 +35,18 @@ public class Download {
     }
 
     public int startDownload(final int id) {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Utils.BooleanUri uri = Utils.download(threads.size() != 0 ? threads.size() - 1 : 0, app.getApkUrl(), new File(Environment.getExternalStorageDirectory(), ".apkmirror").getAbsolutePath(), listener);
-                if (uri.getBoolean()) {
-                    listener.onFinish();
-                    app.removeDownload(id);
-                    install_apk(uri.getUri());
-                } else {
-                    app.removeDownload(id);
-                    listener.onCancel(context.getString(R.string.notification_connection_error));
-                }
+        Thread thread = new Thread(() -> {
+            Utils.BooleanUri uri =
+                    Utils.download(threads.size() != 0 ? threads.size() - 1 : 0, app.getApkUrl(),
+                            new File(Environment.getExternalStorageDirectory(), ".apkmirror")
+                                    .getAbsolutePath(), listener);
+            if (uri.getBoolean()) {
+                listener.onFinish();
+                app.removeDownload(id);
+                install_apk(uri.getUri());
+            } else {
+                app.removeDownload(id);
+                listener.onCancel(context.getString(R.string.notification_connection_error));
             }
         });
         thread.start();
@@ -67,8 +67,9 @@ public class Download {
                 if (fileNameArray[fileNameArray.length - 1].equals("apk")) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         Uri downloaded_apk = getFileUri(context, file);
-                        Intent intent = new Intent(Intent.ACTION_VIEW).setDataAndType(downloaded_apk,
-                                "application/vnd.android.package-archive");
+                        Intent intent =
+                                new Intent(Intent.ACTION_VIEW).setDataAndType(downloaded_apk,
+                                        "application/vnd.android.package-archive");
                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         context.startActivityForResult(intent, 1);
                     } else {

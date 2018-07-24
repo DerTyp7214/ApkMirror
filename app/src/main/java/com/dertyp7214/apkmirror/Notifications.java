@@ -33,15 +33,16 @@ public class Notifications {
     public Notifications(Context context, int id, String title, String subTitle, String content, Bitmap icon, boolean progress) {
         this.context = context;
         this.title = title;
-        this.subTitle=subTitle;
+        this.subTitle = subTitle;
         this.content = content;
         this.icon = icon;
         this.progress = progress;
         this.max = 100;
-        this.id=id;
+        this.id = id;
 
-        if(notificationManager==null)
-            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager == null)
+            notificationManager =
+                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         builder = null;
         builder = new NotificationCompat.Builder(context)
                 .setSmallIcon(android.R.drawable.stat_sys_download)
@@ -50,37 +51,39 @@ public class Notifications {
                 .setContentText(content)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setSubText(subTitle);
-        if(progress)
+        if (progress)
             builder.setSubText("0%");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String groupId = "apkmirror_id";
             CharSequence groupName = "Apkmirror";
-            NotificationChannel channel = new NotificationChannel(groupId, groupName, NotificationManager.IMPORTANCE_LOW);
+            NotificationChannel channel =
+                    new NotificationChannel(groupId, groupName, NotificationManager.IMPORTANCE_LOW);
             notificationManager.createNotificationChannel(channel);
             builder.setChannelId(groupId);
         }
     }
 
-    public void setSmallIcon(int image){
+    public void setSmallIcon(int image) {
         builder.setSmallIcon(image);
     }
 
-    public void showNotification(){
-        ids.add(ids.size()!=0?ids.get(ids.size()-1)+1:1);
+    public void showNotification() {
+        ids.add(ids.size() != 0 ? ids.get(ids.size() - 1) + 1 : 1);
         //id=ids.get(ids.size()-1);
         notificationManager.notify(id, builder.build());
     }
 
-    public void addButton(int icon, String text, Intent intent){
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    public void addButton(int icon, String text, Intent intent) {
+        PendingIntent pendingIntent =
+                PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.addAction(icon, text, pendingIntent);
     }
 
-    public void setProgress(int progress){
-        if(this.progress){
+    public void setProgress(int progress) {
+        if (this.progress) {
             //builder.setOngoing(true);
             builder.setSmallIcon(android.R.drawable.stat_sys_download);
-            builder.setSubText(progress+"%");
+            builder.setSubText(progress + "%");
             builder.setProgress(this.max, progress, false);
             notificationManager.notify(id, builder.build());
         }
@@ -90,13 +93,13 @@ public class Notifications {
         builder.mActions.clear();
     }
 
-    public void removeProgress(){
+    public void removeProgress() {
         builder.setProgress(0, 0, false);
         builder.setSubText(null);
         builder.setOngoing(false);
     }
 
-    public void setFinished(){
+    public void setFinished() {
         removeProgress();
         clearActions();
         builder.setSubText(context.getString(R.string.notification_finished));
@@ -105,20 +108,20 @@ public class Notifications {
         notificationManager.notify(id, builder.build());
     }
 
-    public void setCanceled(){
+    public void setCanceled() {
         setCanceled(context.getString(R.string.notification_canceled));
     }
 
-    public void setCanceled(String message){
+    public void setCanceled(String message) {
         removeProgress();
         clearActions();
         builder.setSubText(message);
         builder.setSmallIcon(android.R.drawable.ic_menu_close_clear_cancel);
-        Log.d("CANCEL", id+"");
+        Log.d("CANCEL", id + "");
         notificationManager.notify(id, builder.build());
     }
 
-    public void removeNotification(){
+    public void removeNotification() {
         notificationManager.cancel(id);
     }
 }

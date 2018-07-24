@@ -107,17 +107,23 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType) {
             case 0:
-                return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.settings_normal, parent, false));
+                return new ViewHolder(LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.settings_normal, parent, false));
             case 1:
-                return new ViewHolderCheckBox(LayoutInflater.from(parent.getContext()).inflate(R.layout.settings_checkbox, parent, false));
+                return new ViewHolderCheckBox(LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.settings_checkbox, parent, false));
             case 2:
-                return new ViewHolderSwitch(LayoutInflater.from(parent.getContext()).inflate(R.layout.settings_togglebutton, parent, false));
+                return new ViewHolderSwitch(LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.settings_togglebutton, parent, false));
             case 3:
-                return new ViewHolderColor(LayoutInflater.from(parent.getContext()).inflate(R.layout.settings_color, parent, false));
+                return new ViewHolderColor(LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.settings_color, parent, false));
             case 4:
-                return new ViewHolderPlaceHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.settings_placeholder, parent, false));
+                return new ViewHolderPlaceHolder(LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.settings_placeholder, parent, false));
             default:
-                return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.settings_normal, parent, false));
+                return new ViewHolder(LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.settings_normal, parent, false));
         }
     }
 
@@ -127,20 +133,16 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         themeManager.isDarkTheme();
         ((ViewHolder) holder).box.setBackgroundColor(themeManager.getElementColor());
         ((ViewHolder) holder).title.setTextColor(themeManager.getTitleTextColor());
-        switch (holder.getItemViewType()){
+        switch (holder.getItemViewType()) {
             case 0:
                 final ViewHolder viewHolder = (ViewHolder) holder;
                 final Setting setting = itemList.get(position);
-                if(setting!=null) {
+                if (setting != null) {
                     viewHolder.subTitle.setTextColor(themeManager.getSubTitleTextColor());
                     viewHolder.title.setText(setting.getText());
                     viewHolder.subTitle.setText(setting.getSubTitle());
-                    viewHolder.box.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            setting.onClick(viewHolder.subTitle, viewHolder.imageRight);
-                        }
-                    });
+                    viewHolder.box.setOnClickListener(
+                            v -> setting.onClick(viewHolder.subTitle, viewHolder.imageRight));
                 }
                 break;
             case 1:
@@ -149,12 +151,8 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 CheckBox checkBox = viewHolderCheckBox.title;
                 checkBox.setText(settingCheckBox.getText());
                 checkBox.setChecked(settingCheckBox.isChecked());
-                checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        settingCheckBox.setChecked(isChecked);
-                    }
-                });
+                checkBox.setOnCheckedChangeListener(
+                        (buttonView, isChecked) -> settingCheckBox.setChecked(isChecked));
                 break;
             case 2:
                 final ViewHolderSwitch viewHolderSwitch = (ViewHolderSwitch) holder;
@@ -162,32 +160,28 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 Switch aSwitch = viewHolderSwitch.title;
                 aSwitch.setText(settingSwitch.getText());
                 aSwitch.setChecked(settingSwitch.isChecked());
-                aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        settingSwitch.onCheckedChanged(isChecked);
-                    }
-                });
+                aSwitch.setOnCheckedChangeListener(
+                        (buttonView, isChecked) -> settingSwitch.onCheckedChanged(isChecked));
                 break;
             case 3:
                 final ViewHolderColor viewHolderColor = (ViewHolderColor) holder;
                 final SettingColor settingColor = (SettingColor) itemList.get(position);
                 viewHolderColor.title.setText(settingColor.getText());
-                LayerDrawable bgDrawable = (LayerDrawable) viewHolderColor.colorView.getBackground();
-                final GradientDrawable shape = (GradientDrawable) bgDrawable.findDrawableByLayerId(R.id.plate_color);
+                LayerDrawable bgDrawable =
+                        (LayerDrawable) viewHolderColor.colorView.getBackground();
+                final GradientDrawable shape =
+                        (GradientDrawable) bgDrawable.findDrawableByLayerId(R.id.plate_color);
                 shape.setColor(settingColor.getColorInt());
-                viewHolderColor.box.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        settingColor.onClick(viewHolderColor.colorView);
-                    }
-                });
+                viewHolderColor.box.setOnClickListener(
+                        v -> settingColor.onClick(viewHolderColor.colorView));
                 break;
             case 4:
                 final ViewHolderPlaceHolder viewHolderPlaceHolder = (ViewHolderPlaceHolder) holder;
-                final SettingPlaceholder settingPlaceholder = (SettingPlaceholder) itemList.get(position);
+                final SettingPlaceholder settingPlaceholder =
+                        (SettingPlaceholder) itemList.get(position);
                 viewHolderPlaceHolder.title.setText(settingPlaceholder.getText());
-                viewHolderPlaceHolder.box.setBackgroundColor(themeManager.getPlaceHolderBackgroundColor());
+                viewHolderPlaceHolder.box
+                        .setBackgroundColor(themeManager.getPlaceHolderBackgroundColor());
                 break;
         }
     }
@@ -201,11 +195,14 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public int getItemViewType(int position) {
         // Just as an example, return 0 or 2 depending on position
         // Note that unlike in ListView adapters, types don't have to be contiguous
-        return itemList.get(position) instanceof SettingCheckBox?1:itemList.get(position) instanceof SettingSwitch?2:itemList.get(position) instanceof SettingColor?3:itemList.get(position) instanceof SettingPlaceholder?4:0;
+        return itemList.get(position) instanceof SettingCheckBox ? 1 : itemList
+                .get(position) instanceof SettingSwitch ? 2 : itemList
+                .get(position) instanceof SettingColor ? 3 : itemList
+                .get(position) instanceof SettingPlaceholder ? 4 : 0;
     }
 
-    public void saveSettings(){
-        for(Setting setting : itemList){
+    public void saveSettings() {
+        for (Setting setting : itemList) {
             setting.saveSetting();
         }
     }

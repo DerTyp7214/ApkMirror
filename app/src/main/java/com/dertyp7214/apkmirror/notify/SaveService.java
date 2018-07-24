@@ -20,7 +20,7 @@ public class SaveService extends Service {
     public IBinder onBind(Intent intent) {
         Log.d("SERVICE", "BIND");
         Bundle bundle = intent.getExtras();
-        if(bundle!=null)
+        if (bundle != null)
             save(bundle.getString("title"), bundle.getString("content"));
         return null;
     }
@@ -30,7 +30,8 @@ public class SaveService extends Service {
         super.onCreate();
     }
 
-    private void save(String title, String content){
-        Notifications.addNotification(new Notifications(title, content, Utils.getCurrentTimeStamp("HH:mm")), this);
+    private void save(String title, String content) {
+        Notifications.addNotification(
+                new Notifications(title, content, Utils.getCurrentTimeStamp("HH:mm")), this);
     }
 }

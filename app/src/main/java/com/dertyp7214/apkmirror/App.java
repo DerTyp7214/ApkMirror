@@ -49,26 +49,27 @@ public class App {
     private String baseUrl = "https://www.apkmirror.com";
     private static List<Integer> download_id = new ArrayList<>();
 
-    public App(String url, Context context){
+    public App(String url, Context context) {
         App(url, null, context);
     }
 
-    public App(String url, Bitmap icon, Context context){
+    public App(String url, Bitmap icon, Context context) {
         App(url, icon, context);
     }
 
-    private void App(String url, Bitmap icon, Context context){
-        this.url=url;
-        this.background=icon;
-        this.appConfig=AppConfig.getInstance(context);
-        this.context=context;
-        if(download_id.size()<appConfig.getInteger(AppConfig.MAX_DOWNLOADS)){
-            for(int i=0;i<appConfig.getInteger(AppConfig.MAX_DOWNLOADS);i++)
+    private void App(String url, Bitmap icon, Context context) {
+        this.url = url;
+        this.background = icon;
+        this.appConfig = AppConfig.getInstance(context);
+        this.context = context;
+        if (download_id.size() < appConfig.getInteger(AppConfig.MAX_DOWNLOADS)) {
+            for (int i = 0; i < appConfig.getInteger(AppConfig.MAX_DOWNLOADS); i++)
                 download_id.add(0);
         }
         try {
             content = getContent(url);
-            if(content.contains("class=\"widgetHeader\">Download")||(!content.contains("class=\"apk-detail-table\""))){
+            if (content.contains("class=\"widgetHeader\">Download") || (! content
+                    .contains("class=\"apk-detail-table\""))) {
                 String u = "";
                 try {
                     String[] versions = content
@@ -87,18 +88,18 @@ public class App {
                             break;
                         }
                     }
-                }catch (Exception e){
-                    u = baseUrl+content
+                } catch (Exception e) {
+                    u = baseUrl + content
                             .split("class=\"widgetHeader\">All versions")[1]
                             .split("<h5")[1]
                             .split("href=\"")[1]
                             .split("\"")[0];
                 }
-                if(u.length()>1)
+                if (u.length() > 1)
                     content = getContent(u);
             }
-        }catch (WrongUriException exeption){
-            content="";
+        } catch (WrongUriException exeption) {
+            content = "";
             Log.d("WrongUriException", exeption.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
@@ -115,46 +116,48 @@ public class App {
             //this.size=ApkDetails.getString("size");
             this.description = getDescriptionText();
             this.appIcon = getBitmap(SiteTitleBar.getString("iconUrl"));
-            this.apkUrl=getApkPath();
-            this.packageName=ApkDetails.getString("package");
-            this.appColor = isColorDark(getDominantColor(getAppIcon()))?getDominantColor(getAppIcon()):manipulateColor(getDominantColor(getAppIcon()), 0.8F);
+            this.apkUrl = getApkPath();
+            this.packageName = ApkDetails.getString("package");
+            this.appColor = isColorDark(getDominantColor(getAppIcon())) ? getDominantColor(
+                    getAppIcon()) : manipulateColor(getDominantColor(getAppIcon()), 0.8F);
         } catch (Exception | WrongUriException e) {
             e.printStackTrace();
         }
     }
 
-    public void getData(callback callback){
+    public void getData(callback callback) {
         getData();
         callback.callback(this);
     }
 
-    interface callback{
+    interface callback {
         void callback(App app);
     }
 
     private String getApkPath() throws Exception, WrongUriException {
-        String url = content.split("btn btn-flat downloadButton")[1].split("href=\"")[1].split("\"")[0];
-        if(url.startsWith("/wp-content"))
-            return baseUrl+url;
-        String content = getContent(baseUrl+url);
+        String url =
+                content.split("btn btn-flat downloadButton")[1].split("href=\"")[1].split("\"")[0];
+        if (url.startsWith("/wp-content"))
+            return baseUrl + url;
+        String content = getContent(baseUrl + url);
         String apkUrl = content.split("nofollow")[1].split("href=\"")[1].split("\"")[0];
-        return baseUrl+apkUrl;
+        return baseUrl + apkUrl;
     }
 
-    private Spanned getDescriptionText() throws Exception{
+    private Spanned getDescriptionText() throws Exception {
         return fromHtml(content.split("id=\"description\">")[1]
                 .split("notes\">")[1]
                 .split("</div")[0]);
     }
 
-    private Spanned fromHtml(String string){
+    private Spanned fromHtml(String string) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
             return Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY);
         else
             return Html.fromHtml(string);
     }
 
-    private Bundle getApkDetails()throws Exception{
+    private Bundle getApkDetails() throws Exception {
         Bundle bundle = new Bundle();
 
         String apk_detail_table = content.split("class=\"apk-detail-table\"")[1];
@@ -171,11 +174,13 @@ public class App {
         return bundle;
     }
 
-    private boolean isColorDark(int color){
-        double darkness = 1-(0.299* Color.red(color) + 0.587*Color.green(color) + 0.114*Color.blue(color))/255;
-        if(darkness<0.5){
+    private boolean isColorDark(int color) {
+        double darkness = 1 -
+                (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color))
+                        / 255;
+        if (darkness < 0.5) {
             return false; // It's a light color
-        }else{
+        } else {
             return true; // It's a dark color
         }
     }
@@ -186,51 +191,54 @@ public class App {
         int g = Math.round(Color.green(color) * factor);
         int b = Math.round(Color.blue(color) * factor);
         return Color.argb(a,
-                Math.min(r,255),
-                Math.min(g,255),
-                Math.min(b,255));
+                Math.min(r, 255),
+                Math.min(g, 255),
+                Math.min(b, 255));
     }
 
-    private Bundle getSiteTitleBar()throws Exception{
+    private Bundle getSiteTitleBar() throws Exception {
         Bundle bundle = new Bundle();
 
         String table_cell = content.split("class=\"siteTitleBar\"")[1];
         String appIconUrl = table_cell.split("<img")[1].split("src=\"")[1].split("\"")[0];
         String title = table_cell.split("<h1 title=\"")[1].split("\">")[1].split("</")[0];
-        String publisher = table_cell.split("<h3 title=\"")[1].split("<a")[1].split(">")[1].split("</")[0];
+        String publisher =
+                table_cell.split("<h3 title=\"")[1].split("<a")[1].split(">")[1].split("</")[0];
 
-        bundle.putString("iconUrl", baseUrl+appIconUrl);
+        bundle.putString("iconUrl", baseUrl + appIconUrl);
         bundle.putString("title", title);
         bundle.putString("publisher", publisher);
 
         return bundle;
     }
 
-    public App(App app){
-        this.url=app.url;
-        this.context=app.context;
-        this.content=app.content;
-        this.title=app.title;
-        this.background=app.background;
+    public App(App app) {
+        this.url = app.url;
+        this.context = app.context;
+        this.content = app.content;
+        this.title = app.title;
+        this.background = app.background;
     }
 
-    public static void cancel(int id){
+    public static void cancel(int id) {
         try {
             Download.cancelDownload(download_id.get(id));
             download_id.remove(id);
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
     }
 
     public void removeDownload(int id) {
         try {
             List<Integer> tmp = new ArrayList<>();
-            for(int i=0;i<tmp.size();i++)
-                if(i!=id)
+            for (int i = 0; i < tmp.size(); i++)
+                if (i != id)
                     tmp.add(download_id.get(i));
             download_id.clear();
             download_id.addAll(tmp);
 
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     public String getUrl() {
@@ -249,85 +257,89 @@ public class App {
         return this.packageName;
     }
 
-    public Spanned getDescription(){
+    public Spanned getDescription() {
         return this.description;
     }
 
-    public String getTitle(){
+    public String getTitle() {
         return StringEscapeUtils.unescapeHtml4(this.title);
     }
 
-    public String getPublisher(){
+    public String getPublisher() {
         return StringEscapeUtils.unescapeHtml4(this.publisher);
     }
 
-    public Bitmap getAppIcon(){
+    public Bitmap getAppIcon() {
         return this.appIcon;
     }
 
-    public int getAppColor(){
+    public int getAppColor() {
         return this.appColor;
     }
 
-    public void setAppColor(int color){
-        this.appColor=color;
+    public void setAppColor(int color) {
+        this.appColor = color;
     }
 
     public void getVersions(final LoadListener listener) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                List<Version> list = new ArrayList<>();
+        new Thread(() -> {
+            List<Version> list = new ArrayList<>();
 
-                String listContent;
+            String listContent;
+            try {
+                listContent = content.split("All versions")[1].split("class=\"listWidget\"")[0];
+            } catch (Exception e) {
                 try {
-                    listContent = content.split("All versions")[1].split("class=\"listWidget\"")[0];
-                } catch (Exception e) {
-                    try {
-                        listContent = content.split("Previous APKs")[1].split("class=\"listWidget\"")[0];
-                    }catch (Exception ignored){
-                        listContent="";
-                    }
+                    listContent =
+                            content.split("Previous APKs")[1].split("class=\"listWidget\"")[0];
+                } catch (Exception ignored) {
+                    listContent = "";
                 }
-
-                String[] listEntrys = listContent.split("class=\"appRow\"");
-
-                for (String entry : listEntrys) {
-                    try {
-                        String url = entry.split("<h5")[1].split("<a")[1].split("href=\"")[1].split("\"")[0];
-                        String title = entry.split("<h5")[1].split("title=\"")[1].split("\"")[0];
-                        String date = entry.split("class=\"dateyear_utc\"")[1].split(">")[1].split("</")[0];
-                        list.add(new Version(title, date, appIcon, baseUrl + url));
-                    } catch (Exception ignored) {
-                    }
-                }
-
-                listener.onLoadFinish(list);
             }
+
+            String[] listEntrys = listContent.split("class=\"appRow\"");
+
+            for (String entry : listEntrys) {
+                try {
+                    String url =
+                            entry.split("<h5")[1].split("<a")[1].split("href=\"")[1].split("\"")[0];
+                    String title = entry.split("<h5")[1].split("title=\"")[1].split("\"")[0];
+                    String date =
+                            entry.split("class=\"dateyear_utc\"")[1].split(">")[1].split("</")[0];
+                    list.add(new Version(title, date, appIcon, baseUrl + url));
+                } catch (Exception ignored) {
+                }
+            }
+
+            listener.onLoadFinish(list);
         }).start();
     }
 
-    public void download(Activity context, int id, Listener listener){
-        if(download_id.size()<=appConfig.getInteger(AppConfig.MAX_DOWNLOADS)&&id<download_id.size()) {
+    public void download(Activity context, int id, Listener listener) {
+        if (download_id.size() <= appConfig.getInteger(AppConfig.MAX_DOWNLOADS) && id < download_id
+                .size()) {
             Download download = new Download(this, context, listener);
             download_id.set(id, download.startDownload(id));
-            Log.d("DOWNLOAD_ID", download_id.get(id)+"");
+            Log.d("DOWNLOAD_ID", download_id.get(id) + "");
         } else {
             listener.onCancel(context.getString(R.string.notification_max_downloads));
         }
     }
 
-    public interface Listener{
+    public interface Listener {
         void onUpdate(int progress);
+
         void onFinish();
+
         void onStart();
+
         void onCancel(String message);
     }
 
-    private String getContent(String url) throws WrongUriException{
+    private String getContent(String url) throws WrongUriException {
         try {
             String data = new GetContentFromUrl().execute(url).get();
-            if(data==null)
+            if (data == null)
                 throw new WrongUriException();
             return data;
         } catch (Exception e) {
@@ -342,23 +354,23 @@ public class App {
         return color;
     }
 
-    private Bitmap getBitmap(String url){
-        if(this.background!=null)
+    private Bitmap getBitmap(String url) {
+        if (this.background != null)
             return this.background;
-        if(url==null)
+        if (url == null)
             return BitmapFactory.decodeResource(context.getResources(), R.drawable.header);
         try {
             Bitmap data = new GetBitmapFromUrl().execute(url).get();
-            if(data==null)
+            if (data == null)
                 return null;
-            this.background=data;
+            this.background = data;
             return data;
         } catch (Exception e) {
             return null;
         }
     }
 
-    public String getApkUrl(){
+    public String getApkUrl() {
         return this.apkUrl;
     }
 
@@ -380,13 +392,13 @@ public class App {
                 String resString = sb.toString();
 
                 is.close();
-                return  resString;
-            }catch (Exception e){
+                return resString;
+            } catch (Exception e) {
                 return null;
             }
         }
 
-        protected void onPostExecute(String string){
+        protected void onPostExecute(String string) {
 
         }
     }
@@ -397,12 +409,12 @@ public class App {
             try {
                 URL url = new URL(urls[0]);
                 return BitmapFactory.decodeStream(url.openConnection().getInputStream());
-            }catch (Exception e){
+            } catch (Exception e) {
                 return null;
             }
         }
 
-        protected void onPostExecute(String string){
+        protected void onPostExecute(String string) {
 
         }
     }
@@ -413,7 +425,7 @@ public class App {
         }
     }
 
-    public interface LoadListener{
+    public interface LoadListener {
         void onLoadFinish(List<Version> versions);
     }
 }

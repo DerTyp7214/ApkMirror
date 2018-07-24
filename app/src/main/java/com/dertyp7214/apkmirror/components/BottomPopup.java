@@ -69,72 +69,74 @@ public class BottomPopup {
 
     private int duration = 500;
 
-    public BottomPopup(int currentStatusBarColor, View parent, Activity activity, boolean blur){
-        this.parent=parent;
-        this.activity=activity;
-        this.currentStatusBarColor=currentStatusBarColor;
-        this.blur=blur;
+    public BottomPopup(int currentStatusBarColor, View parent, Activity activity, boolean blur) {
+        this.parent = parent;
+        this.activity = activity;
+        this.currentStatusBarColor = currentStatusBarColor;
+        this.blur = blur;
     }
 
-    public void setText(String text){
-        this.text=Build.VERSION.SDK_INT >= Build.VERSION_CODES.N?Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY):Html.fromHtml(text);
+    public void setText(String text) {
+        this.text = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? Html
+                .fromHtml(text, Html.FROM_HTML_MODE_LEGACY) : Html.fromHtml(text);
     }
 
-    public void setText(Spanned text){
-        this.text=text;
+    public void setText(Spanned text) {
+        this.text = text;
     }
 
     private void setUpNavigationBar(int colorTo) {
         int colorFrom = activity.getWindow().getNavigationBarColor();
-        ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(),colorFrom, colorTo);
+        ValueAnimator animator = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
         animator.setDuration(duration);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                activity.getWindow().setNavigationBarColor((int) animation.getAnimatedValue());
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    if (!Utils.isColorDark((int) animation.getAnimatedValue())) {
-                        activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
-                    } else {
-                        activity.getWindow().getDecorView().setSystemUiVisibility(View.VISIBLE);
-                    }
+        animator.addUpdateListener(animation -> {
+            activity.getWindow().setNavigationBarColor((int) animation.getAnimatedValue());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (! Utils.isColorDark((int) animation.getAnimatedValue())) {
+                    activity.getWindow().getDecorView()
+                            .setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+                } else {
+                    activity.getWindow().getDecorView().setSystemUiVisibility(View.VISIBLE);
                 }
             }
         });
         animator.start();
     }
 
-    public void setUp(final View root_layout, int inflateLayout){
+    public void setUp(final View root_layout, int inflateLayout) {
         rootLayout = root_layout;
         final ThemeManager themeManager = ThemeManager.getInstance(activity);
 
         setUpBitmap();
 
-        blurOverlay=view;
+        blurOverlay = view;
 
-        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        layout = inflater.inflate(inflateLayout, (ViewGroup) activity.findViewById(R.id.root_layout));
+        LayoutInflater inflater =
+                (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        layout = inflater.inflate(inflateLayout, activity.findViewById(R.id.root_layout));
         layout.findViewById(R.id.scroll).setBackgroundColor(themeManager.getElementColor());
-        ((TextView) layout.findViewById(R.id.txt_text)).setTextColor(themeManager.getSubTitleTextColor());
+        ((TextView) layout.findViewById(R.id.txt_text))
+                .setTextColor(themeManager.getSubTitleTextColor());
 
-        if(activity.getSharedPreferences("settings", MODE_PRIVATE).getBoolean("colored_navbar", false)) {
+        if (activity.getSharedPreferences("settings", MODE_PRIVATE)
+                .getBoolean("colored_navbar", false)) {
             setUpNavigationBar(themeManager.getElementColor());
         }
 
         ValueAnimator animator = ValueAnimator.ofInt(1, 80);
         animator.setDuration(duration);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                activity.getWindow().setStatusBarColor(MergeColors(currentStatusBarColor, getColor((int) animation.getAnimatedValue())));
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    int color = getColor((int) animation.getAnimatedValue());
-                    float radius = ((Number) animation.getAnimatedValue()).floatValue();
-                    if (blur)
-                        blurOverlay = blur(view, radius / 4);
-                    rootLayout.setForeground(new BitmapDrawable(activity.getResources(),
-                            overlay(blurOverlay, createImage(blurOverlay.getWidth(), blurOverlay.getHeight(), color))));
-                }
+        animator.addUpdateListener(animation -> {
+            activity.getWindow().setStatusBarColor(MergeColors(currentStatusBarColor,
+                    getColor((int) animation.getAnimatedValue())));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                int color = getColor((int) animation.getAnimatedValue());
+                float radius = ((Number) animation.getAnimatedValue()).floatValue();
+                if (blur)
+                    blurOverlay = blur(view, radius / 4);
+                rootLayout.setForeground(new BitmapDrawable(activity.getResources(),
+                        overlay(blurOverlay,
+                                createImage(blurOverlay.getWidth(), blurOverlay.getHeight(),
+                                        color))));
             }
         });
         animator.start();
@@ -143,33 +145,31 @@ public class BottomPopup {
         popup.setWidth(LinearLayout.LayoutParams.MATCH_PARENT);
         popup.setHeight(LinearLayout.LayoutParams.MATCH_PARENT);
         popup.setAnimationStyle(R.style.Animation);
-        popup.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                ValueAnimator animator = ValueAnimator.ofInt(80, 1);
-                animator.setDuration(duration);
-                animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        activity.getWindow().setStatusBarColor(MergeColors(currentStatusBarColor, getColor((int) animation.getAnimatedValue())));
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            if((int) animation.getAnimatedValue() == 1){
-                                root_layout.setForeground(new ColorDrawable(0x00000000));
-                            }else {
-                                int color = getColor((int) animation.getAnimatedValue());
-                                float radius = ((Number) animation.getAnimatedValue()).floatValue();
-                                if (blur)
-                                    blurOverlay = blur(view, radius / 8);
-                                rootLayout.setForeground(new BitmapDrawable(activity.getResources(),
-                                        overlay(blurOverlay, createImage(blurOverlay.getWidth(), blurOverlay.getHeight(), color))));
-                            }
-                        }
+        popup.setOnDismissListener(() -> {
+            ValueAnimator animator1 = ValueAnimator.ofInt(80, 1);
+            animator1.setDuration(duration);
+            animator1.addUpdateListener(animation -> {
+                activity.getWindow().setStatusBarColor(MergeColors(currentStatusBarColor,
+                        getColor((int) animation.getAnimatedValue())));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if ((int) animation.getAnimatedValue() == 1) {
+                        root_layout.setForeground(new ColorDrawable(0x00000000));
+                    } else {
+                        int color = getColor((int) animation.getAnimatedValue());
+                        float radius = ((Number) animation.getAnimatedValue()).floatValue();
+                        if (blur)
+                            blurOverlay = blur(view, radius / 8);
+                        rootLayout.setForeground(new BitmapDrawable(activity.getResources(),
+                                overlay(blurOverlay,
+                                        createImage(blurOverlay.getWidth(), blurOverlay.getHeight(),
+                                                color))));
                     }
-                });
-                animator.start();
-                if(activity.getSharedPreferences("settings", MODE_PRIVATE).getBoolean("colored_navbar", false)) {
-                    setUpNavigationBar(currentStatusBarColor);
                 }
+            });
+            animator1.start();
+            if (activity.getSharedPreferences("settings", MODE_PRIVATE)
+                    .getBoolean("colored_navbar", false)) {
+                setUpNavigationBar(currentStatusBarColor);
             }
         });
 
@@ -178,41 +178,32 @@ public class BottomPopup {
 
         setTextViewHTML(textView, text, activity);
 
-        close.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popup.dismiss();
-            }
-        });
+        close.setOnClickListener(v -> popup.dismiss());
     }
 
-    public void setOnclick(int view, final ClickListener onClickListener){
-        layout.findViewById(view).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickListener.onClick(v, textView.getText().toString());
-            }
-        });
+    public void setOnclick(int view, final ClickListener onClickListener) {
+        layout.findViewById(view).setOnClickListener(
+                v -> onClickListener.onClick(v, textView.getText().toString()));
     }
 
-    public interface ClickListener{
+    public interface ClickListener {
         void onClick(View root, String text);
     }
 
-    public void show(){
+    public void show() {
         setUpBitmap();
         popup.showAtLocation(parent, Gravity.CENTER, 0, 0);
     }
 
-    public void dismiss(){
+    public void dismiss() {
         popup.dismiss();
     }
 
-    public boolean isShowing(){
+    public boolean isShowing() {
         return popup != null && popup.isShowing();
     }
 
-    private void setUpBitmap(){
+    private void setUpBitmap() {
         rootLayout.destroyDrawingCache();
         rootLayout.setDrawingCacheEnabled(true);
         rootLayout.buildDrawingCache();
@@ -226,14 +217,14 @@ public class BottomPopup {
         script = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
     }
 
-    private int getColor(int v){
-        String value = v+"";
-        if(!(value.length() >1))
-            value="0"+value;
-        return Color.parseColor("#"+value+"000000");
+    private int getColor(int v) {
+        String value = v + "";
+        if (! (value.length() > 1))
+            value = "0" + value;
+        return Color.parseColor("#" + value + "000000");
     }
 
-    private Bitmap blur(Bitmap bitmapOriginal, float radius){
+    private Bitmap blur(Bitmap bitmapOriginal, float radius) {
         input.copyFrom(bitmapOriginal);
         script.setRadius(radius);
         script.setInput(input);
@@ -244,52 +235,55 @@ public class BottomPopup {
 
     private int MergeColors(int backgroundColor, int foregroundColor) {
         final byte ALPHA_CHANNEL = 24;
-        final byte RED_CHANNEL   = 16;
-        final byte GREEN_CHANNEL =  8;
-        final byte BLUE_CHANNEL  =  0;
+        final byte RED_CHANNEL = 16;
+        final byte GREEN_CHANNEL = 8;
+        final byte BLUE_CHANNEL = 0;
 
-        final double ap1 = (double)(backgroundColor >> ALPHA_CHANNEL & 0xff) / 255d;
-        final double ap2 = (double)(foregroundColor >> ALPHA_CHANNEL & 0xff) / 255d;
+        final double ap1 = (double) (backgroundColor >> ALPHA_CHANNEL & 0xff) / 255d;
+        final double ap2 = (double) (foregroundColor >> ALPHA_CHANNEL & 0xff) / 255d;
         final double ap = ap2 + (ap1 * (1 - ap2));
 
         final double amount1 = (ap1 * (1 - ap2)) / ap;
         final double amount2 = amount1 / ap;
 
-        int a = ((int)(ap * 255d)) & 0xff;
+        int a = ((int) (ap * 255d)) & 0xff;
 
-        int r = ((int)(((float)(backgroundColor >> RED_CHANNEL & 0xff )*amount1) +
-                ((float)(foregroundColor >> RED_CHANNEL & 0xff )*amount2))) & 0xff;
-        int g = ((int)(((float)(backgroundColor >> GREEN_CHANNEL & 0xff )*amount1) +
-                ((float)(foregroundColor >> GREEN_CHANNEL & 0xff )*amount2))) & 0xff;
-        int b = ((int)(((float)(backgroundColor & 0xff )*amount1) +
-                ((float)(foregroundColor & 0xff )*amount2))) & 0xff;
+        int r = ((int) (((float) (backgroundColor >> RED_CHANNEL & 0xff) * amount1) +
+                ((float) (foregroundColor >> RED_CHANNEL & 0xff) * amount2))) & 0xff;
+        int g = ((int) (((float) (backgroundColor >> GREEN_CHANNEL & 0xff) * amount1) +
+                ((float) (foregroundColor >> GREEN_CHANNEL & 0xff) * amount2))) & 0xff;
+        int b = ((int) (((float) (backgroundColor & 0xff) * amount1) +
+                ((float) (foregroundColor & 0xff) * amount2))) & 0xff;
 
         return a << ALPHA_CHANNEL | r << RED_CHANNEL | g << GREEN_CHANNEL | b << BLUE_CHANNEL;
     }
 
-    private boolean isColorDark(int color){
-        double darkness = 1-(0.299* Color.red(color) + 0.587*Color.green(color) + 0.114*Color.blue(color))/255;
-        return !(darkness < 0.5);
+    private boolean isColorDark(int color) {
+        double darkness = 1 -
+                (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color))
+                        / 255;
+        return ! (darkness < 0.5);
     }
 
-    private void makeLinkClickable(SpannableStringBuilder strBuilder, final URLSpan span, final Context context){
+    private void makeLinkClickable(SpannableStringBuilder strBuilder, final URLSpan span, final Context context) {
         int e = 0;
         String url = span.getURL();
-        if((url.endsWith(")") && !url.contains("(")) || url.endsWith("!"))
+        if ((url.endsWith(")") && ! url.contains("(")) || url.endsWith("!"))
             e = 1;
         int start = strBuilder.getSpanStart(span);
-        int end = strBuilder.getSpanEnd(span)-e;
+        int end = strBuilder.getSpanEnd(span) - e;
         int flags = strBuilder.getSpanFlags(span);
         ClickableSpan clickable = new ClickableSpan() {
             public void onClick(View view) {
                 try {
                     String url = span.getURL();
-                    if((url.endsWith(")") && !url.contains("(")) || url.endsWith("!"))
-                        url = url.substring(0, url.length()-1);
+                    if ((url.endsWith(")") && ! url.contains("(")) || url.endsWith("!"))
+                        url = url.substring(0, url.length() - 1);
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                     context.startActivity(browserIntent);
-                }catch (Exception e){
-                    Toast.makeText(context, context.getString(R.string.popup_error), Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Toast.makeText(context, context.getString(R.string.popup_error),
+                            Toast.LENGTH_LONG).show();
                 }
             }
         };
@@ -297,7 +291,7 @@ public class BottomPopup {
         strBuilder.removeSpan(span);
     }
 
-    private void setTextViewHTML(TextView text, Spanned html, Context context){
+    private void setTextViewHTML(TextView text, Spanned html, Context context) {
         try {
             SpannableStringBuilder strBuilder = new SpannableStringBuilder(html);
             URLSpan[] urls = strBuilder.getSpans(0, html.length(), URLSpan.class);
@@ -306,7 +300,8 @@ public class BottomPopup {
             }
             text.setText(strBuilder);
             text.setMovementMethod(LinkMovementMethod.getInstance());
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
     }
 
     private Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {

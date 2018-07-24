@@ -55,7 +55,7 @@ public class Utils {
 
     public static HashMap<String, App> apps = new HashMap<>();
 
-    public static BooleanUri download(int id, String url, String path, App.Listener listener){
+    public static BooleanUri download(int id, String url, String path, App.Listener listener) {
 
         try {
 
@@ -67,13 +67,13 @@ public class Utils {
 
             InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream(), 8192);
 
-            if (!dir.exists()) {
+            if (! dir.exists()) {
 
                 dir.mkdir();
 
             }
 
-            File downloadedfile = new File(dir, "download_app_"+id+".apk");
+            File downloadedfile = new File(dir, "download_app_" + id + ".apk");
 
             OutputStream outputStream = new FileOutputStream(downloadedfile);
 
@@ -85,11 +85,11 @@ public class Utils {
 
             listener.onStart();
 
-            while ((read = inputStream.read(buffer)) != -1) {
+            while ((read = inputStream.read(buffer)) != - 1) {
 
                 total += read;
 
-                if(fileSize > 0) {
+                if (fileSize > 0) {
                     listener.onUpdate((int) (total * 100 / fileSize));
                 }
 
@@ -117,49 +117,53 @@ public class Utils {
         }
     }
 
-    public static class BooleanUri{
+    public static class BooleanUri {
         private boolean value;
         private File uri;
-        public BooleanUri(boolean value, File uri){
-            this.value=value;
-            this.uri=uri;
+
+        public BooleanUri(boolean value, File uri) {
+            this.value = value;
+            this.uri = uri;
         }
+
         public File getUri() {
             return uri;
         }
-        public boolean getBoolean(){
+
+        public boolean getBoolean() {
             return value;
         }
     }
 
-    public static void saveHashMap(String fileName, HashMap<String, App> map){
+    public static void saveHashMap(String fileName, HashMap<String, App> map) {
         try {
             File dir = new File(Environment.getExternalStorageDirectory(), ".apkmirror");
-            if (!dir.exists())
+            if (! dir.exists())
                 dir.mkdirs();
             File file = new File(dir, fileName);
             ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
             outputStream.writeObject(map);
             outputStream.flush();
             outputStream.close();
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
     }
 
-    public static HashMap<String, App> loadHashMap(String fileName, HashMap hashMap){
-        try{
+    public static HashMap<String, App> loadHashMap(String fileName, HashMap hashMap) {
+        try {
             File dir = new File(Environment.getExternalStorageDirectory(), ".apkmirror");
             File file = new File(dir, fileName);
             ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file));
             HashMap<String, App> map = (HashMap<String, App>) inputStream.readObject();
             inputStream.close();
             return map;
-        }catch (Exception ignored){
+        } catch (Exception ignored) {
             return hashMap;
         }
     }
 
-    public static Bitmap getQrCode(String data, Context context){
-        String url = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+data;
+    public static Bitmap getQrCode(String data, Context context) {
+        String url = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + data;
         try {
             return new GetBitmapFromUrl().execute(url).get();
         } catch (InterruptedException | ExecutionException e) {
@@ -174,12 +178,12 @@ public class Utils {
             try {
                 URL url = new URL(urls[0]);
                 return BitmapFactory.decodeStream(url.openConnection().getInputStream());
-            }catch (Exception e){
+            } catch (Exception e) {
                 return null;
             }
         }
 
-        protected void onPostExecute(String string){
+        protected void onPostExecute(String string) {
 
         }
     }
@@ -210,7 +214,7 @@ public class Utils {
         Animation slide = null;
         slide = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
                 Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
-                0.0f, Animation.RELATIVE_TO_SELF, -5.0f);
+                0.0f, Animation.RELATIVE_TO_SELF, - 5.0f);
 
         slide.setDuration(400);
         slide.setFillAfter(true);
@@ -284,63 +288,66 @@ public class Utils {
 
     }
 
-    public static boolean isColorDark(int color){
-        double darkness = 1-(0.299* Color.red(color) + 0.587*Color.green(color) + 0.114*Color.blue(color))/255;
-        if(darkness<0.5){
+    public static boolean isColorDark(int color) {
+        double darkness = 1 -
+                (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color))
+                        / 255;
+        if (darkness < 0.5) {
             return false; // It's a light color
-        }else{
+        } else {
             return true; // It's a dark color
         }
     }
 
-    public static boolean hasNavBar (Resources resources) {
+    public static boolean hasNavBar(Resources resources) {
         int id = resources.getIdentifier("config_showNavigationBar", "bool", "android");
         return id > 0 && resources.getBoolean(id);
     }
 
     public static int MergeColors(int backgroundColor, int foregroundColor) {
         final byte ALPHA_CHANNEL = 24;
-        final byte RED_CHANNEL   = 16;
-        final byte GREEN_CHANNEL =  8;
-        final byte BLUE_CHANNEL  =  0;
+        final byte RED_CHANNEL = 16;
+        final byte GREEN_CHANNEL = 8;
+        final byte BLUE_CHANNEL = 0;
 
-        final double ap1 = (double)(backgroundColor >> ALPHA_CHANNEL & 0xff) / 255d;
-        final double ap2 = (double)(foregroundColor >> ALPHA_CHANNEL & 0xff) / 255d;
+        final double ap1 = (double) (backgroundColor >> ALPHA_CHANNEL & 0xff) / 255d;
+        final double ap2 = (double) (foregroundColor >> ALPHA_CHANNEL & 0xff) / 255d;
         final double ap = ap2 + (ap1 * (1 - ap2));
 
         final double amount1 = (ap1 * (1 - ap2)) / ap;
         final double amount2 = amount1 / ap;
 
-        int a = ((int)(ap * 255d)) & 0xff;
+        int a = ((int) (ap * 255d)) & 0xff;
 
-        int r = ((int)(((float)(backgroundColor >> RED_CHANNEL & 0xff )*amount1) +
-                ((float)(foregroundColor >> RED_CHANNEL & 0xff )*amount2))) & 0xff;
-        int g = ((int)(((float)(backgroundColor >> GREEN_CHANNEL & 0xff )*amount1) +
-                ((float)(foregroundColor >> GREEN_CHANNEL & 0xff )*amount2))) & 0xff;
-        int b = ((int)(((float)(backgroundColor & 0xff )*amount1) +
-                ((float)(foregroundColor & 0xff )*amount2))) & 0xff;
+        int r = ((int) (((float) (backgroundColor >> RED_CHANNEL & 0xff) * amount1) +
+                ((float) (foregroundColor >> RED_CHANNEL & 0xff) * amount2))) & 0xff;
+        int g = ((int) (((float) (backgroundColor >> GREEN_CHANNEL & 0xff) * amount1) +
+                ((float) (foregroundColor >> GREEN_CHANNEL & 0xff) * amount2))) & 0xff;
+        int b = ((int) (((float) (backgroundColor & 0xff) * amount1) +
+                ((float) (foregroundColor & 0xff) * amount2))) & 0xff;
 
         return a << ALPHA_CHANNEL | r << RED_CHANNEL | g << GREEN_CHANNEL | b << BLUE_CHANNEL;
     }
 
-    private static void makeLinkClickable(SpannableStringBuilder strBuilder, final URLSpan span, final Context context){
+    private static void makeLinkClickable(SpannableStringBuilder strBuilder, final URLSpan span, final Context context) {
         int e = 0;
         String url = span.getURL();
-        if((url.endsWith(")") && !url.contains("(")) || url.endsWith("!"))
+        if ((url.endsWith(")") && ! url.contains("(")) || url.endsWith("!"))
             e = 1;
         int start = strBuilder.getSpanStart(span);
-        int end = strBuilder.getSpanEnd(span)-e;
+        int end = strBuilder.getSpanEnd(span) - e;
         int flags = strBuilder.getSpanFlags(span);
         ClickableSpan clickable = new ClickableSpan() {
             public void onClick(View view) {
                 try {
                     String url = span.getURL();
-                    if((url.endsWith(")") && !url.contains("(")) || url.endsWith("!"))
-                        url = url.substring(0, url.length()-2);
+                    if ((url.endsWith(")") && ! url.contains("(")) || url.endsWith("!"))
+                        url = url.substring(0, url.length() - 2);
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                     context.startActivity(browserIntent);
-                }catch (Exception e){
-                    Toast.makeText(context, context.getString(R.string.popup_error), Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Toast.makeText(context, context.getString(R.string.popup_error),
+                            Toast.LENGTH_LONG).show();
                 }
             }
         };
@@ -348,7 +355,7 @@ public class Utils {
         strBuilder.removeSpan(span);
     }
 
-    public static void setTextViewHTML(TextView text, Spanned html, Context context){
+    public static void setTextViewHTML(TextView text, Spanned html, Context context) {
         try {
             SpannableStringBuilder strBuilder = new SpannableStringBuilder(html);
             URLSpan[] urls = strBuilder.getSpans(0, html.length(), URLSpan.class);
@@ -357,10 +364,11 @@ public class Utils {
             }
             text.setText(strBuilder);
             text.setMovementMethod(LinkMovementMethod.getInstance());
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
     }
 
-    public static String getCurrentTimeStamp(String format){
+    public static String getCurrentTimeStamp(String format) {
         try {
 
             @SuppressLint("SimpleDateFormat")
@@ -381,8 +389,9 @@ public class Utils {
                 if (fileNameArray[fileNameArray.length - 1].equals("apk")) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         Uri downloaded_apk = getFileUri(context, file);
-                        Intent intent = new Intent(Intent.ACTION_VIEW).setDataAndType(downloaded_apk,
-                                "application/vnd.android.package-archive");
+                        Intent intent =
+                                new Intent(Intent.ACTION_VIEW).setDataAndType(downloaded_apk,
+                                        "application/vnd.android.package-archive");
                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         context.startActivity(intent);
                     } else {
@@ -404,11 +413,11 @@ public class Utils {
                 context.getApplicationContext().getPackageName() + ".GenericFileProvider", file);
     }
 
-    public static String cutString(String string, int cutAt){
-        if(string.length()<cutAt)
+    public static String cutString(String string, int cutAt) {
+        if (string.length() < cutAt)
             return string;
         StringBuilder ret = new StringBuilder();
-        for(int i=0;i<cutAt;i++)
+        for (int i = 0; i < cutAt; i++)
             ret.append(string.charAt(i));
         ret.append("...");
         return ret.toString();

@@ -15,11 +15,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+
 import com.hacker.module.colorpicker.Color.Color;
 import com.hacker.module.colorpicker.ColorList;
 import com.hacker.module.colorpicker.ColorUtil;
 import com.hacker.module.colorpicker.R.id;
 import com.hacker.module.colorpicker.R.layout;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,20 +45,16 @@ public class ColorPresets extends Dialog {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(1);
         this.setContentView(layout.color_presets);
-        this.btn_ok = (Button)this.findViewById(id.btn_ok);
-        this.btn_cancel = (Button)this.findViewById(id.btn_cancel);
-        this.btn_back = (Button)this.findViewById(id.btn_back);
-        this.btn_ok.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                colorPicker.actionOK();
-                cancel();
-            }
+        this.btn_ok = this.findViewById(id.btn_ok);
+        this.btn_cancel = this.findViewById(id.btn_cancel);
+        this.btn_back = this.findViewById(id.btn_back);
+        this.btn_ok.setOnClickListener(v -> {
+            colorPicker.actionOK();
+            cancel();
         });
-        this.btn_cancel.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                colorPicker.actionCancel();
-                cancel();
-            }
+        this.btn_cancel.setOnClickListener(v -> {
+            colorPicker.actionCancel();
+            cancel();
         });
         this.colorViews.add(this.getView(id.colorViewPlate1));
         this.colorViews.add(this.getView(id.colorViewPlate2));
@@ -70,60 +68,51 @@ public class ColorPresets extends Dialog {
     }
 
     private void setViews() {
-        this.btn_back.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                colorPicker.show();
-                hide();
-            }
+        this.btn_back.setOnClickListener(v -> {
+            colorPicker.show();
+            hide();
         });
 
-        for(int i = 0; i < this.colorList.size(); ++i) {
+        for (int i = 0; i < this.colorList.size(); ++ i) {
             final int x = i;
-            ((GradientDrawable)((LayerDrawable)((View)this.colorViews.get(x)).getBackground()).findDrawableByLayerId(id.plate_color)).setColor(((ColorList)this.colorList.get(x)).getPrevColor());
-            ((View)this.colorViews.get(x)).setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    setViews(colorList.get(x));
-                }
-            });
+            ((GradientDrawable) ((LayerDrawable) this.colorViews.get(x).getBackground())
+                    .findDrawableByLayerId(id.plate_color)).setColor(
+                    this.colorList.get(x).getPrevColor());
+            this.colorViews.get(x).setOnClickListener(v -> setViews(colorList.get(x)));
         }
 
     }
 
     private void setViews(ColorList colorList) {
-        this.btn_back.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                setViews();
-            }
-        });
+        this.btn_back.setOnClickListener(v -> setViews());
 
-        for(int i = 0; i < colorList.getColors().size(); ++i) {
+        for (int i = 0; i < colorList.getColors().size(); ++ i) {
             final int x = i;
-            this.animateViewColor((View)this.colorViews.get(x), 400, (Integer)colorList.getColors().get(x));
-            ((View)this.colorViews.get(x)).setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    colorPicker.setColor(ColorUtil.getDominantColor(ColorUtil.drawableToBitmap(((LayerDrawable)((View) colorViews.get(x)).getBackground()).findDrawableByLayerId(id.plate_color))));
-                }
-            });
+            this.animateViewColor(this.colorViews.get(x), 400, colorList.getColors().get(x));
+            this.colorViews.get(x).setOnClickListener(v -> colorPicker.setColor(ColorUtil
+                    .getDominantColor(ColorUtil.drawableToBitmap(((LayerDrawable) colorViews.get(x)
+                            .getBackground()).findDrawableByLayerId(id.plate_color)))));
         }
 
     }
 
     private void animateViewColor(final View view, int time, final int color2) {
-        final int color1 = ColorUtil.getDominantColor(ColorUtil.drawableToBitmap(((LayerDrawable)view.getBackground()).findDrawableByLayerId(id.plate_color)));
+        final int color1 = ColorUtil.getDominantColor(ColorUtil.drawableToBitmap(
+                ((LayerDrawable) view.getBackground()).findDrawableByLayerId(id.plate_color)));
         ValueAnimator anim = ValueAnimator.ofInt(0, 100);
-        anim.setDuration((long)time);
-        anim.addUpdateListener(new AnimatorUpdateListener() {
-            public void onAnimationUpdate(ValueAnimator animation) {
-                int animProgress = (Integer)animation.getAnimatedValue();
-                ((GradientDrawable)((LayerDrawable)view.getBackground()).findDrawableByLayerId(id.plate_color)).setColor(ColorUtil.calculateColor(color1, color2, 100, animProgress));
-            }
+        anim.setDuration((long) time);
+        anim.addUpdateListener(animation -> {
+            int animProgress = (Integer) animation.getAnimatedValue();
+            ((GradientDrawable) ((LayerDrawable) view.getBackground())
+                    .findDrawableByLayerId(id.plate_color))
+                    .setColor(ColorUtil.calculateColor(color1, color2, 100, animProgress));
         });
         anim.start();
     }
 
     public void setTheme(ColorPicker.Theme theme) {
-        RelativeLayout ly = (RelativeLayout)this.findViewById(id.ly);
-        switch(theme) {
+        RelativeLayout ly = this.findViewById(id.ly);
+        switch (theme) {
             case LIGHT:
                 ly.setBackgroundColor(Color.MATERIAL_LIGHT);
                 this.btn_ok.setTextColor(Color.MATERIAL_DARK);

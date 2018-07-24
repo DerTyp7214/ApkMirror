@@ -14,11 +14,11 @@ public class Version {
     private String title, date, url;
     private Bitmap icon;
 
-    public Version(String title, String date, Bitmap icon, String url){
-        this.title=title;
-        this.date=date;
-        this.icon=icon;
-        this.url=url;
+    public Version(String title, String date, Bitmap icon, String url) {
+        this.title = title;
+        this.date = date;
+        this.icon = icon;
+        this.url = url;
     }
 
     public Bitmap getIcon() {

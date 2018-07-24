@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         final Toolbar toolbar = findViewById(R.id.toolbar);
         collapsingToolbar = findViewById(R.id.toolbar_layout);
-        appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
+        appBarLayout = findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -84,18 +84,18 @@ public class MainActivity extends AppCompatActivity {
 
         Bundle data = getIntent().getExtras();
 
-        if(notifyId<1&&notifyId!=0)
-            notifyId=0;
+        if (notifyId < 1 && notifyId != 0)
+            notifyId = 0;
 
         assert data != null;
-        if(data.isEmpty()){
+        if (data.isEmpty()) {
             super.onBackPressed();
         }
 
-        if(apps.containsKey(data.getString("url"))){
-            app=apps.get(data.getString("url"));
+        if (apps.containsKey(data.getString("url"))) {
+            app = apps.get(data.getString("url"));
         } else {
-            app = new App(data.getString("url"), (Bitmap) data.getParcelable("icon"), this);
+            app = new App(data.getString("url"), data.getParcelable("icon"), this);
             app.getData();
             apps.put(data.getString("url"), app);
         }
@@ -104,24 +104,19 @@ public class MainActivity extends AppCompatActivity {
 
         packageManager = getPackageManager();
         setTitle(app.getTitle());
-        packageName=app.getPackageName();
+        packageName = app.getPackageName();
 
-        if(appInstalled(packageName)){
+        if (appInstalled(packageName)) {
             open.setVisibility(View.INVISIBLE); //VISIBLE
             uninstall.setVisibility(View.INVISIBLE);
-            open.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = packageManager.getLaunchIntentForPackage(packageName);
-                    startActivity(intent);
-                }
+            open.setOnClickListener(v -> {
+                Intent intent = packageManager.getLaunchIntentForPackage(packageName);
+                startActivity(intent);
             });
-            uninstall.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(Intent.ACTION_DELETE, Uri.parse("package:"+packageName));
-                    startActivity(intent);
-                }
+            uninstall.setOnClickListener(v -> {
+                Intent intent =
+                        new Intent(Intent.ACTION_DELETE, Uri.parse("package:" + packageName));
+                startActivity(intent);
             });
         } else {
             open.setVisibility(View.INVISIBLE);
@@ -136,31 +131,34 @@ public class MainActivity extends AppCompatActivity {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(vibrantColor);
-            setTaskDescription(new ActivityManager.TaskDescription(getString(R.string.app_name)+" - "+app.getTitle(), app.getAppIcon(), vibrantColor));
-            if(getSharedPreferences("settings", MODE_PRIVATE).getBoolean("colored_navbar", false))
+            setTaskDescription(new ActivityManager.TaskDescription(
+                    getString(R.string.app_name) + " - " + app.getTitle(), app.getAppIcon(),
+                    vibrantColor));
+            if (getSharedPreferences("settings", MODE_PRIVATE).getBoolean("colored_navbar", false))
                 window.setNavigationBarColor(vibrantColor);
-        }catch (Exception e) {
-            Palette.from(app.getAppIcon()).generate(new Palette.PaletteAsyncListener() {
-                @SuppressWarnings("ResourceType")
-                @Override
-                public void onGenerated(@NonNull Palette palette) {
-                    int vibrantColor = palette.getDarkVibrantColor(R.color.colorPrimary);
-                    app.setAppColor(vibrantColor);
-                    collapsingToolbar.setContentScrimColor(vibrantColor);
-                    collapsingToolbar.setStatusBarScrimColor(vibrantColor);
-                    appBackground.setBackgroundColor(vibrantColor);
-                    Window window = getWindow();
-                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                    window.setStatusBarColor(vibrantColor);
-                    setTaskDescription(new ActivityManager.TaskDescription(getString(R.string.app_name)+" - "+app.getTitle(), app.getAppIcon(), vibrantColor));
-                    if(getSharedPreferences("settings", MODE_PRIVATE).getBoolean("colored_navbar", false))
-                        window.setNavigationBarColor(vibrantColor);
-                }
+        } catch (Exception e) {
+            Palette.from(app.getAppIcon()).generate(palette -> {
+                int vibrantColor = palette.getDarkVibrantColor(R.color.colorPrimary);
+                app.setAppColor(vibrantColor);
+                collapsingToolbar.setContentScrimColor(vibrantColor);
+                collapsingToolbar.setStatusBarScrimColor(vibrantColor);
+                appBackground.setBackgroundColor(vibrantColor);
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.setStatusBarColor(vibrantColor);
+                setTaskDescription(new ActivityManager.TaskDescription(
+                        getString(R.string.app_name) + " - " + app.getTitle(), app.getAppIcon(),
+                        vibrantColor));
+                if (getSharedPreferences("settings", MODE_PRIVATE)
+                        .getBoolean("colored_navbar", false))
+                    window.setNavigationBarColor(vibrantColor);
             });
         }
 
-        if(!Utils.isColorDark(getWindow().getNavigationBarColor()) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+        if (! Utils.isColorDark(getWindow().getNavigationBarColor())
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            getWindow().getDecorView()
+                    .setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
         else
             getWindow().getDecorView().setSystemUiVisibility(View.VISIBLE);
 
@@ -173,122 +171,114 @@ public class MainActivity extends AppCompatActivity {
 
         fab = findViewById(R.id.fab);
 
-        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+        appBarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
 
-                if (Math.abs(verticalOffset) > 200) {
-                    appBarExpanded = false;
-                    invalidateOptionsMenu();
-                } else {
-                    appBarExpanded = true;
-                    invalidateOptionsMenu();
-                }
+            if (Math.abs(verticalOffset) > 200) {
+                appBarExpanded = false;
+                invalidateOptionsMenu();
+            } else {
+                appBarExpanded = true;
+                invalidateOptionsMenu();
             }
         });
 
         recyclerView = findViewById(R.id.rv_versions);
 
         appVersionAdapter = new AppVersionAdapter(versions, this);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        RecyclerView.LayoutManager mLayoutManager =
+                new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(appVersionAdapter);
         recyclerView.setFocusable(false);
 
-        app.getVersions(new App.LoadListener() {
-            @Override
-            public void onLoadFinish(List<Version> vers) {
-                versions.clear();
-                versions.addAll(vers);
-                appVersionAdapter.notifyDataSetChanged();
-            }
+        app.getVersions(vers -> {
+            versions.clear();
+            versions.addAll(vers);
+            appVersionAdapter.notifyDataSetChanged();
         });
 
-        description.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                description_popup = new BottomPopup(app.getAppColor(), v, MainActivity.this, getSharedPreferences("settings", MODE_PRIVATE).getBoolean("blur_dialog", false));
-                description_popup.setText(app.getDescription());
-                description_popup.setUp(findViewById(R.id.main_layout), R.layout.description_popup);
-                description_popup.show();
-            }
+        description.setOnClickListener(v -> {
+            description_popup = new BottomPopup(app.getAppColor(), v, MainActivity.this,
+                    getSharedPreferences("settings", MODE_PRIVATE)
+                            .getBoolean("blur_dialog", false));
+            description_popup.setText(app.getDescription());
+            description_popup.setUp(findViewById(R.id.main_layout), R.layout.description_popup);
+            description_popup.show();
         });
 
         setUp();
         setUpTheme();
     }
 
-    private void setUpTheme(){
+    private void setUpTheme() {
         final ThemeManager themeManager = ThemeManager.getInstance(this);
         themeManager.isDarkTheme();
         publisher.setTextColor(themeManager.getSubTitleTextColor());
         version.setTextColor(themeManager.getSubTitleTextColor());
         description.setTextColor(themeManager.getSubTitleTextColor());
         findViewById(R.id.include).setBackgroundColor(themeManager.getBackgroundColor());
-        ((CardView) findViewById(R.id.cardDesc)).setCardBackgroundColor(themeManager.getElementColor());
-        ((CardView) findViewById(R.id.cardVer)).setCardBackgroundColor(themeManager.getElementColor());
+        ((CardView) findViewById(R.id.cardDesc))
+                .setCardBackgroundColor(themeManager.getElementColor());
+        ((CardView) findViewById(R.id.cardVer))
+                .setCardBackgroundColor(themeManager.getElementColor());
         ((TextView) findViewById(R.id.textView2)).setTextColor(themeManager.getSubTitleTextColor());
         ((TextView) findViewById(R.id.textView)).setTextColor(themeManager.getTitleTextColor());
     }
 
     private void setUp() {
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                download(MainActivity.this, app);
+        fab.setOnClickListener(view -> download(MainActivity.this, app));
+
+        uninstall.setOnClickListener(v -> {
+            try {
+                uninstall();
+            } catch (Exception e) {
+                setUp();
             }
         });
 
-        uninstall.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    uninstall();
-                } catch (Exception e) {
-                    setUp();
-                }
-            }
-        });
-
-        final Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage(app.getPackageName());
+        final Intent LaunchIntent =
+                getPackageManager().getLaunchIntentForPackage(app.getPackageName());
         if (LaunchIntent != null)
             launchable = true;
-        open.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    startActivity(LaunchIntent);
-                } catch (Exception e) {
-                    setUp();
-                }
+        open.setOnClickListener(v -> {
+            try {
+                startActivity(LaunchIntent);
+            } catch (Exception e) {
+                setUp();
             }
         });
 
         if (appInstalled(app.getPackageName())) {
-            if(!isNewerVersion(app))
+            if (! isNewerVersion(app))
                 fab.setVisibility(View.INVISIBLE);
             if (launchable)
                 open.setVisibility(View.VISIBLE);
-            if (!isSystem(app.getPackageName()))
+            if (! isSystem(app.getPackageName()))
                 uninstall.setVisibility(View.VISIBLE);
         }
     }
 
-    private boolean isNewerVersion(App app){
+    private boolean isNewerVersion(App app) {
         try {
-            return !app.getVersion().split(" \\(")[0].equals(getPackageManager().getPackageInfo(app.getPackageName(), 0).versionName);
-        }catch (Exception e){
+            return ! app.getVersion().split(" \\(")[0].equals(getPackageManager()
+                    .getPackageInfo(app.getPackageName(), 0).versionName);
+        } catch (Exception e) {
             return true;
         }
     }
 
     private void download(Activity context, App app) {
-        Toast.makeText(context, getString(R.string.notification_downloading)+" "+app.getTitle(), Toast.LENGTH_LONG).show();
+        Toast.makeText(context, getString(R.string.notification_downloading) + " " + app.getTitle(),
+                Toast.LENGTH_LONG).show();
         notifyId++;
-        Log.d("NOTIFYID", notifyId+"");
-        final Notifications notifications = new Notifications(context, notifyId, app.getTitle(), getString(R.string.notification_download), "", app.getAppIcon(), true);
-        notifications.addButton(R.drawable.ic_file_download_white_24dp, getString(R.string.notification_cancel), new Intent(context, Reciever.class).putExtra(Reciever.ACTION, Reciever.CANCEL_DOWNLOAD).putExtra(Reciever.ID, notifyId));
+        Log.d("NOTIFYID", notifyId + "");
+        final Notifications notifications = new Notifications(context, notifyId, app.getTitle(),
+                getString(R.string.notification_download), "", app.getAppIcon(), true);
+        notifications.addButton(R.drawable.ic_file_download_white_24dp,
+                getString(R.string.notification_cancel), new Intent(context, Reciever.class)
+                        .putExtra(Reciever.ACTION, Reciever.CANCEL_DOWNLOAD)
+                        .putExtra(Reciever.ID, notifyId));
         notifications.showNotification();
         app.download(context, notifyId, new App.Listener() {
             @Override
@@ -308,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancel(String message){
+            public void onCancel(String message) {
                 notifications.setCanceled(message);
             }
         });
@@ -316,13 +306,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void uninstall() {
         Intent intent = new Intent(Intent.ACTION_DELETE);
-        intent.setData(Uri.parse("package:"+app.getPackageName()));
+        intent.setData(Uri.parse("package:" + app.getPackageName()));
         startActivityForResult(intent, 1);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (collapsedMenu != null && (!appBarExpanded || collapsedMenu.size() != 1) && (!appInstalled(app.getPackageName()) || isNewerVersion(app))) {
+        if (collapsedMenu != null && (! appBarExpanded || collapsedMenu.size() != 1) && (
+                ! appInstalled(app.getPackageName()) || isNewerVersion(app))) {
             collapsedMenu.add(getString(R.string.notification_download))
                     .setIcon(R.drawable.ic_file_download_white_24dp)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
@@ -332,8 +323,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == 1){
-            try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+        if (requestCode == 1) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ignored) {
+            }
             setUp();
         }
     }
@@ -347,12 +341,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(description_popup!=null) {
-            if (!description_popup.isShowing())
+        if (description_popup != null) {
+            if (! description_popup.isShowing())
                 super.onBackPressed();
             else
                 description_popup.dismiss();
-        }else{
+        } else {
             super.onBackPressed();
         }
     }
@@ -387,13 +381,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isSystem(String packageName){
+    private boolean isSystem(String packageName) {
         PackageManager pm = getPackageManager();
         try {
-            if((pm.getApplicationInfo(packageName, 0).flags & ApplicationInfo.FLAG_SYSTEM) != 0)
-                return true;
-            else
-                return false;
+            return (pm.getApplicationInfo(packageName, 0).flags & ApplicationInfo.FLAG_SYSTEM) != 0;
         } catch (PackageManager.NameNotFoundException e) {
             return false;
         }

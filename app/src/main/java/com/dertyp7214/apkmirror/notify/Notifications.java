@@ -38,76 +38,86 @@ public class Notifications {
     public final long UUID;
     private BottomPopup notificationPopup;
 
-    public Notifications(String title, String subTitle, String time){
+    public Notifications(String title, String subTitle, String time) {
         this(title, subTitle, time, new Random().nextLong());
     }
 
-    public Notifications(String title, String subTitle, String time, long UUID){
-        this.TITLE=title;
-        this.SUBTITLE=subTitle;
-        this.TIME=time;
-        this.UUID=UUID;
+    public Notifications(String title, String subTitle, String time, long UUID) {
+        this.TITLE = title;
+        this.SUBTITLE = subTitle;
+        this.TIME = time;
+        this.UUID = UUID;
     }
 
-    public static List<Notifications> getNotificationsList(Context context){
+    public static List<Notifications> getNotificationsList(Context context) {
         SharedPreferences preferences = context.getSharedPreferences("notify", MODE_PRIVATE);
         try {
             List<Notifications> notifications = new ArrayList<>();
             JSONArray jsonArray = new JSONArray(preferences.getString("notiJSON", "[]"));
-            for(int i=0;i<jsonArray.length();i++){
+            for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject object = jsonArray.getJSONObject(i);
-                notifications.add(new Notifications(object.getString("title"), object.getString("sub_title"), object.getString("time"), Long.parseLong(object.getString("UUID"))));
+                notifications.add(new Notifications(object.getString("title"),
+                        object.getString("sub_title"), object.getString("time"),
+                        Long.parseLong(object.getString("UUID"))));
             }
             return notifications;
-        } catch (JSONException ignored) {}
+        } catch (JSONException ignored) {
+        }
         return new ArrayList<>();
     }
 
-    public static void addNotification(Notifications notifications, final Activity context, final RecyclerView.Adapter adapter){
+    public static void addNotification(Notifications notifications, final Activity context, final RecyclerView.Adapter adapter) {
         addNotification(notifications, context);
-        context.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (context){
-                    adapter.notifyDataSetChanged();
-                }
+        context.runOnUiThread(() -> {
+            synchronized (context) {
+                adapter.notifyDataSetChanged();
             }
         });
     }
 
-    public static void addNotification(Notifications notifications, Context context){
+    public static void addNotification(Notifications notifications, Context context) {
         List<Notifications> notificationsList = getNotificationsList(context);
         notificationsList.add(notifications);
         setNotifications(notificationsList, context);
     }
 
-    public static void setNotifications(List<Notifications> notifications, Context context){
+    public static void setNotifications(List<Notifications> notifications, Context context) {
         Log.d("NOT", "GEHT======================================================================");
         StringBuilder json = new StringBuilder("[");
-        for(int i=0;i<notifications.size();i++){
-            json.append("{\"title\":\"").append(notifications.get(i).TITLE).append("\",\"sub_title\":\"").append(notifications.get(i).SUBTITLE).append("\",\"time\":\"").append(notifications.get(i).TIME).append("\",\"UUID\":\"").append(notifications.get(i).UUID).append("\"}");
-            if(i<notifications.size()-1)
+        for (int i = 0; i < notifications.size(); i++) {
+            json.append("{\"title\":\"").append(notifications.get(i).TITLE)
+                    .append("\",\"sub_title\":\"").append(notifications.get(i).SUBTITLE)
+                    .append("\",\"time\":\"").append(notifications.get(i).TIME)
+                    .append("\",\"UUID\":\"").append(notifications.get(i).UUID).append("\"}");
+            if (i < notifications.size() - 1)
                 json.append(",");
             Log.d("JSON", json.toString());
         }
         json.append("]");
-        context.getSharedPreferences("notify", MODE_PRIVATE).edit().putString("notiJSON", json.toString()).apply();
+        context.getSharedPreferences("notify", MODE_PRIVATE).edit()
+                .putString("notiJSON", json.toString()).apply();
     }
 
-    public static void removeNotification(Notifications notifications, Context context){
+    public static void removeNotification(Notifications notifications, Context context) {
         List<Notifications> notificationsList = new ArrayList<>();
         for (Notifications notification : getNotificationsList(context))
-            if (notification.UUID!=notifications.UUID)
+            if (notification.UUID != notifications.UUID)
                 notificationsList.add(notification);
         setNotifications(notificationsList, context);
     }
 
-    public void onClick(int currentColor, Activity activity, View parent, View root_layout){
-        notificationPopup = new BottomPopup(currentColor, parent, activity, activity.getSharedPreferences("settings", MODE_PRIVATE).getBoolean("blur_dialog", false));
+    public void onClick(int currentColor, Activity activity, View parent, View root_layout) {
+        notificationPopup = new BottomPopup(currentColor, parent, activity,
+                activity.getSharedPreferences("settings", MODE_PRIVATE)
+                        .getBoolean("blur_dialog", false));
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
-            notificationPopup.setText(Html.fromHtml("<h2>"+TITLE+"</h2><p>"+SUBTITLE+"</p><p><small>"+TIME+"</small></p>", Html.FROM_HTML_MODE_LEGACY));
+            notificationPopup.setText(Html.fromHtml(
+                    "<h2>" + TITLE + "</h2><p>" + SUBTITLE + "</p><p><small>" + TIME
+                            + "</small></p>", Html.FROM_HTML_MODE_LEGACY));
         else
-            notificationPopup.setText(Html.fromHtml("<h2>"+TITLE+"</h2><p>"+SUBTITLE+"</p><p><small>"+TIME+"</small></p>"));
+            notificationPopup.setText(Html.fromHtml(
+                    "<h2>" + TITLE + "</h2><p>" + SUBTITLE + "</p><p><small>" + TIME
+                            + "</small></p>"));
         notificationPopup.setUp(root_layout, R.layout.notification_popup);
         notificationPopup.show();
     }

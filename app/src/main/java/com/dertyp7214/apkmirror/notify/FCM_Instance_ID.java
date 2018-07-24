@@ -23,7 +23,8 @@ public class FCM_Instance_ID extends FirebaseInstanceIdService {
         super.onTokenRefresh();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.edit().putString(tokenPreferenceKey, FirebaseInstanceId.getInstance().getToken()).apply();
+        sharedPreferences.edit()
+                .putString(tokenPreferenceKey, FirebaseInstanceId.getInstance().getToken()).apply();
 
         FirebaseMessaging.getInstance().subscribeToTopic(infoTopicName);
 

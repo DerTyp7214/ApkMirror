@@ -14,8 +14,8 @@ public class InputDialog {
     private Listener listener;
     private AlertDialog.Builder builder;
 
-    public InputDialog(String title, String text, String hint, Context context){
-        this.context=context;
+    public InputDialog(String title, String text, String hint, Context context) {
+        this.context = context;
         builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
 
@@ -25,31 +25,25 @@ public class InputDialog {
         input.setMaxLines(1);
         builder.setView(input);
 
-        builder.setPositiveButton(context.getString(R.string.popup_ok), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                listener.onSubmit(input.getText().toString());
-                dialog.cancel();
-            }
+        builder.setPositiveButton(context.getString(R.string.popup_ok), (dialog, which) -> {
+            listener.onSubmit(input.getText().toString());
+            dialog.cancel();
         });
-        builder.setNegativeButton(context.getString(R.string.popup_close), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
+        builder.setNegativeButton(context.getString(R.string.popup_close),
+                (dialog, which) -> dialog.cancel());
     }
 
-    public void setListener(Listener listener){
-        this.listener=listener;
+    public void setListener(Listener listener) {
+        this.listener = listener;
     }
 
-    public void show(){
+    public void show() {
         builder.show();
     }
 
-    public interface Listener{
+    public interface Listener {
         void onSubmit(String text);
+
         void onCancel();
     }
 }

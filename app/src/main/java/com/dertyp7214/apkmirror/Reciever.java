@@ -23,14 +23,14 @@ public class Reciever extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle extras = getIntent().getExtras();
-        if(!extras.isEmpty()) {
+        if (! extras.isEmpty()) {
             String action = extras.getString(ACTION);
             assert action != null;
-            if(action.equals(CANCEL_DOWNLOAD)){
+            if (action.equals(CANCEL_DOWNLOAD)) {
                 App.cancel(extras.getInt(ID));
                 Set<String> keys = extras.keySet();
-                for(String key : keys)
-                    Log.d("RECIEVER", extras.get(key)+"     "+key);
+                for (String key : keys)
+                    Log.d("RECIEVER", extras.get(key) + "     " + key);
             }
         }
         finish();

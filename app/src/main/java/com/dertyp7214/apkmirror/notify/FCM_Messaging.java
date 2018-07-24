@@ -27,17 +27,16 @@ public class FCM_Messaging extends FirebaseMessagingService {
         String title = remoteMessage.getData().get("title");
         String content = remoteMessage.getData().get("content");
 
-        Notifications.addNotification(new Notifications(title, content, Utils.getCurrentTimeStamp("HH:mm")), this);
+        Notifications.addNotification(
+                new Notifications(title, content, Utils.getCurrentTimeStamp("HH:mm")), this);
         if (Home.instance != null) {
-            com.dertyp7214.apkmirror.Notifications notification = new com.dertyp7214.apkmirror.Notifications(getApplicationContext(), 1, title, title, content, null, false);
+            com.dertyp7214.apkmirror.Notifications notification =
+                    new com.dertyp7214.apkmirror.Notifications(getApplicationContext(), 1, title,
+                            title, content, null, false);
             notification.setSmallIcon(R.mipmap.ic_launcher_foreground);
             notification.showNotification();
-            Home.instance.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Home.instance.notificationsAdapter.notifyDataSetChanged();
-                }
-            });
+            Home.instance.runOnUiThread(
+                    () -> Home.instance.notificationsAdapter.notifyDataSetChanged());
         }
     }
 
