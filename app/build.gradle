@@ -9,7 +9,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
-        versionName "2.7"
+        versionName "2.8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         renderscriptTargetApi 21
         renderscriptSupportModeEnabled true
@@ -33,6 +33,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation(name: 'lib', ext: 'aar')
     implementation(name: 'colorlib', ext: 'aar')
+    implementation(name: 'GitHubSource', ext: 'aar')
     implementation "com.android.support:appcompat-v7:$ver"
     implementation "com.android.support:design:$ver"
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'

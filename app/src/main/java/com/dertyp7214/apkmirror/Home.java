@@ -54,6 +54,9 @@ import com.dertyp7214.apkmirror.settings.SettingCheckBox;
 import com.dertyp7214.apkmirror.settings.SettingPlaceholder;
 import com.dertyp7214.apkmirror.settings.SettingSwitch;
 import com.dertyp7214.apkmirror.settings.SettingsAdapter;
+import com.dertyp7214.githubsource.GitHubSource;
+import com.dertyp7214.githubsource.github.Repository;
+import com.dertyp7214.githubsource.helpers.ColorStyle;
 
 import org.json.JSONObject;
 
@@ -302,8 +305,18 @@ public class Home extends AppCompatActivity implements
                 new Setting("sourcecode", "Sourcecode", this)
                         .setSubTitle(getString(R.string.text_sourcecode))
                         .addSettingsOnClick(
-                                (name, setting, subTitle, imageRight) -> openUrl(
-                                        "http://github.com/DerTyp7214/ApkMirror")),
+                                (name, setting, subTitle, imageRight) -> new Thread(() -> {
+                                    GitHubSource.getInstance(
+                                            this,
+                                            new Repository("DerTyp7214", "ApkMirror",
+                                                    getSharedPreferences("settings", MODE_PRIVATE)
+                                                            .getString("API_KEY", null))
+                                    ).setColorStyle(new ColorStyle(
+                                            getResources().getColor(R.color.colorPrimary),
+                                            getResources().getColor(R.color.colorPrimaryDark),
+                                            getResources().getColor(R.color.colorAccent)
+                                    )).open();
+                                }).start()),
                 new SettingPlaceholder("preferences", getString(R.string.text_prefs), this),
                 new SettingCheckBox("search_at_start", getString(R.string.text_search_at_start),
                         this, false),
