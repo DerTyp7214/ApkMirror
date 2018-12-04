@@ -1,52 +1,39 @@
 apply plugin: 'com.android.application'
 
+apply plugin: 'kotlin-android'
+
+apply plugin: 'kotlin-android-extensions'
+
 android {
     compileSdkVersion 28
-    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "com.dertyp7214.apkmirror"
-        useLibrary 'org.apache.http.legacy'
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
-        versionName "3.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        renderscriptTargetApi 21
-        renderscriptSupportModeEnabled true
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    compileOptions {
-        sourceCompatibility = '1.8'
-        targetCompatibility = '1.8'
-    }
 }
-
-def ver = '27.1.1'
-def ver2 = '15.0.2'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation(name: 'lib', ext: 'aar')
-    implementation(name: 'colorlib', ext: 'aar')
-    implementation(name: 'GitHubSource', ext: 'aar')
-    implementation "com.android.support:appcompat-v7:$ver"
-    implementation "com.android.support:design:$ver"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.core:core-ktx:1.0.1'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'com.github.DerTyp7214:ThemeableComponents:2.4'
+    implementation 'com.github.DerTyp7214:ChangeLogLib:v1.4'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation "com.android.support:palette-v7:$ver"
-    implementation "com.android.support:cardview-v7:$ver"
-    implementation 'org.apache.commons:commons-lang3:3.6'
-    implementation "com.google.firebase:firebase-core:$ver2"
-    implementation "com.google.firebase:firebase-messaging:$ver2"
+    androidTestImplementation 'androidx.test:runner:1.1.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
 }
-
-apply plugin: 'com.google.gms.google-services'
-
-//release ApkMirror $verName $prerelease
