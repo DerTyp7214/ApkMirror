@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/drawer_layout"
+        android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
-    <androidx.appcompat.widget.Toolbar
+    <com.dertyp7214.themeablecomponents.components.ThemeableToolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
@@ -14,5 +14,14 @@
     <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent" android:id="@+id/rv"
-            android:layout_below="@+id/toolbar"/>
+            android:layout_below="@+id/toolbar" android:layout_above="@+id/progressBar">
+    </androidx.recyclerview.widget.RecyclerView>
+    <com.dertyp7214.themeablecomponents.components.ThemeableProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:max="100"
+            android:id="@+id/progressBar"
+            android:layout_alignParentBottom="true"
+            android:visibility="gone"
+            style="?android:attr/progressBarStyleHorizontal"/>
 </RelativeLayout>

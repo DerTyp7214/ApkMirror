@@ -6,7 +6,7 @@ import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import android.widget.TextView
 
-class AppScreenData(private val description: String, val versions: List<App>, val variants: List<AppVariant>) {
+class AppScreenData(private val app: App, private val description: String, val versions: List<App>, val variants: List<AppVariant>) {
 
     fun getDescription(): Spanned? {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
