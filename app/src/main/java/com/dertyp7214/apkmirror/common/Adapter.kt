@@ -20,6 +20,7 @@ import com.dertyp7214.apkmirror.common.NetworkTools.Companion.fastLoadImage
 import com.dertyp7214.apkmirror.objects.App
 import com.dertyp7214.apkmirror.objects.AppScreenData
 import com.dertyp7214.apkmirror.screens.AppDataScreen
+import com.dertyp7214.themeablecomponents.components.ThemeableProgressBar
 
 class Adapter(private val activity: Activity, private var items: ArrayList<App>) :
     RecyclerView.Adapter<Adapter.ViewHolder>() {
@@ -53,10 +54,12 @@ class Adapter(private val activity: Activity, private var items: ArrayList<App>)
         if (img != null) {
             holder.progressBar.visibility = View.INVISIBLE
         } else {
+            holder.icon.visibility = View.INVISIBLE
             Thread {
                 val image = drawableFromUrl(activity, app.imageUrl)
                 activity.runOnUiThread {
                     holder.icon.setImageDrawable(image)
+                    holder.icon.visibility = View.VISIBLE
                     holder.progressBar.visibility = View.INVISIBLE
                 }
             }.start()
@@ -64,6 +67,7 @@ class Adapter(private val activity: Activity, private var items: ArrayList<App>)
 
         holder.ly.setOnClickListener {
             progressDialog = ProgressDialog.show(activity, "", "Loading data...")
+            progressDialog!!.setIndeterminateDrawable(ThemeableProgressBar(activity).indeterminateDrawable)
             Thread {
                 apps[app.url] = HtmlParser(activity).getAppScreenData(app)
                 activity.runOnUiThread {

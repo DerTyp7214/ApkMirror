@@ -1,5 +1,7 @@
 package com.dertyp7214.apkmirror
 
+import android.Manifest
+import android.app.ProgressDialog
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
@@ -10,13 +12,16 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dertyp7214.apkmirror.common.Adapter
 import com.dertyp7214.apkmirror.common.Helper
 import com.dertyp7214.apkmirror.common.HtmlParser
 import com.dertyp7214.apkmirror.objects.App
+import com.dertyp7214.themeablecomponents.components.ThemeableProgressBar
 import com.dertyp7214.themeablecomponents.utils.ThemeManager
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -25,15 +30,27 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: Adapter
     private lateinit var htmlParser: HtmlParser
     private var thread: Thread? = null
+    private var progressDialog: ProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        ActivityCompat.requestPermissions(
+            this,
+            Arrays.asList(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ).toTypedArray(),
+            10
+        )
+
         val themeManager = ThemeManager.getInstance(this)
         themeManager.enableStatusAndNavBar(this)
         themeManager.darkMode = true
+        themeManager.setDefaultAccent(Color.RED)
+        themeManager.setDefaultPrimary(Color.parseColor("#66AD21"))
         themeManager.changeAccentColor(Color.RED)
         themeManager.changePrimaryColor(Color.parseColor("#66AD21"))
 
@@ -66,6 +83,7 @@ class MainActivity : AppCompatActivity() {
                         progressBar.setProgress((i * 1.5).toInt(), true)
                     else progressBar.progress = i
                     adapter.notifyDataSetChanged()
+                    progressDialog!!.dismiss()
                 }
             }
             runOnUiThread {
@@ -92,6 +110,8 @@ class MainActivity : AppCompatActivity() {
                     searchView.isIconified = true
                 }
                 myActionMenuItem.collapseActionView()
+                progressDialog = ProgressDialog.show(this@MainActivity, "", "Loading data...")
+                progressDialog!!.setIndeterminateDrawable(ThemeableProgressBar(this@MainActivity).indeterminateDrawable)
                 search(query ?: "")
                 return false
             }
