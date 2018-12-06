@@ -41,17 +41,15 @@ class SplashScreen : AppCompatActivity() {
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        var close = false
         if (requestCode == PERMISSIONS) {
             for (permission in permissions) {
-                if (ContextCompat.checkSelfPermission(
-                        this,
-                        permission
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
+                if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                    close = true
                     finish()
                 }
             }
-            startAnimations()
+            if (!close) startAnimations()
         }
     }
 
