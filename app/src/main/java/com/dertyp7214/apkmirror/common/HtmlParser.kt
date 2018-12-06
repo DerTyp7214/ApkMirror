@@ -3,12 +3,24 @@
 package com.dertyp7214.apkmirror.common
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
 import android.os.StrictMode
 import android.util.Log
+import androidx.core.content.FileProvider
 import com.dertyp7214.apkmirror.common.NetworkTools.Companion.getWebContent
 import com.dertyp7214.apkmirror.objects.App
 import com.dertyp7214.apkmirror.objects.AppScreenData
 import com.dertyp7214.apkmirror.objects.AppVariant
+import com.dertyp7214.apkmirror.objects.DownloadData
+import com.downloader.Error
+import com.downloader.OnDownloadListener
+import com.downloader.PRDownloader
+import java.io.File
+import java.util.*
+import java.util.regex.Pattern
 
 class HtmlParser(private val context: Context) {
 
@@ -95,6 +107,11 @@ class HtmlParser(private val context: Context) {
                                     .forEachIndexed { index, s ->
                                         if (index > 0) {
                                             try {
+                                                val url = s.split("class=\"table-cell")[1]
+                                                    .split("class=\"colorLightBlack\"")[1]
+                                                    .split("<a")[1]
+                                                    .split("href=\"")[1]
+                                                    .split("\">")[0]
                                                 val version = s.split("class=\"table-cell")[1]
                                                     .split("class=\"colorLightBlack\"")[1]
                                                     .split("<a")[1]
@@ -112,7 +129,16 @@ class HtmlParser(private val context: Context) {
                                                     .split("<a")[1]
                                                     .split("\">")[1]
                                                     .split("</a")[0]
-                                                variants.add(AppVariant(version, androidVersion, arch, dpi))
+                                                variants.add(
+                                                    AppVariant(
+                                                        app,
+                                                        "$baseUrl$url",
+                                                        version,
+                                                        androidVersion,
+                                                        arch,
+                                                        dpi
+                                                    )
+                                                )
                                             } catch (e: Exception) {
                                                 Log.wtf("Error", "$index: $s\n\n${e.message}")
                                             }
@@ -162,5 +188,146 @@ class HtmlParser(private val context: Context) {
             appMap[app.url] = AppScreenData(app, description, versions, variants)
         }
         return appMap[app.url]!!
+    }
+
+    fun getDownloadPage(app: AppVariant): DownloadData {
+        return getDownloadPage(app.app, app.url)
+    }
+
+    fun getDownloadPage(app: App, url: String): DownloadData {
+
+        val content = getWebContent(url) ?: ""
+        val variants = ArrayList<AppVariant>()
+
+        try {
+            content.split("class=\"table topmargin")[1]
+                .split("class=\"table-row headerFont\"")
+                .forEachIndexed { index, s ->
+                    if (index > 0) {
+                        try {
+                            val url = s.split("class=\"table-cell")[1]
+                                .split("<a")[1]
+                                .split("href=\"")[1]
+                                .split("\">")[0]
+                            val version = s.split("class=\"table-cell")[1]
+                                .split("<a")[1]
+                                .split("svg>")[1]
+                                .split("</a")[0]
+                            val androidVersion = s.split("class=\"table-cell")[3]
+                                .split(">")[1]
+                                .split("</div")[0]
+                            val arch = s.split("class=\"table-cell")[2]
+                                .split(">")[1]
+                                .split("</div")[0]
+                            val dpi = s.split("class=\"table-cell")[4]
+                                .split(">")[1]
+                                .split("</div")[0]
+                            variants.add(AppVariant(app, "$baseUrl$url", version, androidVersion, arch, dpi))
+                        } catch (e: Exception) {
+                            Log.wtf("Error", "$index: $s\n\n${e.message}")
+                        }
+                    }
+                }
+        } catch (e: Exception) {
+            Log.wtf("ERROR", "${content.split("class=\"table topmargin\">").size} ${e.message}")
+        }
+
+        return DownloadData(app, variants)
+    }
+
+    fun getApkUrl(url: String): String {
+        val content = getWebContent(url) ?: ""
+
+        return baseUrl + try {
+            val url = content.split("class=\"btn btn-flat downloadButton\"")[1]
+                .split("href=\"")[1]
+                .split("\"")[0]
+            if (url.contains("download.php")) url
+            else {
+                val apkPage = getWebContent(baseUrl + url) ?: ""
+                apkPage.split("<h3>Your download")[1]
+                    .split("<a")[1]
+                    .split("href=\"")[1]
+                    .split("\"")[0]
+            }
+        } catch (e: Exception) {
+            Log.wtf("Error", e.message)
+            ""
+        }
+    }
+
+    fun openInstaller(url: String, listener: Listener) {
+        val folder = File(Environment.getExternalStorageDirectory(), ".apkmirror")
+        if (!folder.exists()) folder.mkdirs()
+        val path = folder.absolutePath
+        PRDownloader.download(url, path, "app.apk")
+            .build()
+            .setOnProgressListener {
+                listener.run(((it.currentBytes * 100L) / it.totalBytes).toInt())
+            }
+            .setOnCancelListener {
+                listener.cancel()
+            }
+            .start(object : OnDownloadListener {
+                override fun onDownloadComplete() {
+                    listener.stop(File(path, "app.apk"))
+                }
+
+                override fun onError(error: Error?) {
+                    listener.cancel()
+                }
+            })
+    }
+
+    fun humanReadableByteCount(bytes:Long, si:Boolean):String {
+        val unit = if (si) 1000 else 1024
+        if (bytes < unit) return "$bytes B"
+        val exp = (Math.log(bytes.toDouble()) / Math.log(unit.toDouble())).toInt()
+        val pre = (if (si) "kMGTPE" else "KMGTPE")[exp - 1] + (if (si) "" else "i")
+        return String.format("%.1f %sB", bytes / Math.pow(unit.toDouble(), exp.toDouble()), pre)
+    }
+
+    fun installApk(file: File?) {
+        try {
+            if (file!!.exists()) {
+                val fileNameArray =
+                    file.name.split(Pattern.quote(".").toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                if (fileNameArray[fileNameArray.size - 1] == "apk") {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        val downloadedApk = getFileUri(context, file)
+                        val intent = Intent(Intent.ACTION_VIEW).setDataAndType(
+                            downloadedApk,
+                            "application/vnd.android.package-archive"
+                        )
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        context.startActivity(intent)
+                    } else {
+                        val intent = Intent(Intent.ACTION_VIEW)
+                        intent.setDataAndType(
+                            Uri.fromFile(file),
+                            "application/vnd.android.package-archive"
+                        )
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        context.startActivity(intent)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun getFileUri(context: Context, file: File): Uri {
+        return FileProvider.getUriForFile(
+            context,
+            context.applicationContext
+                .packageName + ".GenericFileProvider", file
+        )
+    }
+
+    interface Listener {
+        fun run(progress: Int)
+        fun cancel()
+        fun stop(file: File)
     }
 }
