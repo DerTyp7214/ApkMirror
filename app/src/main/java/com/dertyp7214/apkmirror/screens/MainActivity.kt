@@ -1,4 +1,4 @@
-package com.dertyp7214.apkmirror
+package com.dertyp7214.apkmirror.screens
 
 import android.Manifest
 import android.app.ProgressDialog
@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.dertyp7214.apkmirror.R
 import com.dertyp7214.apkmirror.common.Adapter
 import com.dertyp7214.apkmirror.common.Helper
 import com.dertyp7214.apkmirror.common.HtmlParser
@@ -37,20 +38,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        ActivityCompat.requestPermissions(
-            this,
-            Arrays.asList(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ).toTypedArray(),
-            10
-        )
-
         val themeManager = ThemeManager.getInstance(this)
         themeManager.enableStatusAndNavBar(this)
         themeManager.darkMode = true
-        themeManager.setDefaultAccent(Color.RED)
+        themeManager.changeAccentColor(Color.RED)
         themeManager.changePrimaryColor(Color.parseColor("#FF8B14"))
+        themeManager.setDefaultAccent(Color.RED)
+        themeManager.setDefaultPrimary(Color.parseColor("#FF8B14"))
 
         Helper.changeLogs(this).showDialogOnVersionChange()
 
