@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         themeManager.enableStatusAndNavBar(this)
         themeManager.darkMode = true
         themeManager.changeAccentColor(Color.RED)
-        themeManager.changePrimaryColor(Color.parseColor("#66AD21"))
+        themeManager.changePrimaryColor(Color.parseColor("#FF8B14"))
 
         Helper.changeLogs(this).showDialogOnVersionChange()
 
