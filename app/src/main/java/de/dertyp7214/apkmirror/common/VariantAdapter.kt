@@ -1,4 +1,4 @@
-package com.dertyp7214.apkmirror.common
+package de.dertyp7214.apkmirror.common
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -14,12 +14,11 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
-import com.dertyp7214.apkmirror.R
-import com.dertyp7214.apkmirror.common.NetworkTools.Companion.drawableFromUrl
-import com.dertyp7214.apkmirror.objects.AppVariant
+import de.dertyp7214.apkmirror.R
+import de.dertyp7214.apkmirror.common.NetworkTools.Companion.drawableFromUrl
+import de.dertyp7214.apkmirror.objects.AppVariant
 import com.dertyp7214.themeablecomponents.components.ThemeableProgressBar
 import java.io.File
-
 
 class VariantAdapter(private var context: Activity, private var items: ArrayList<AppVariant>) :
     RecyclerView.Adapter<VariantAdapter.ViewHolder>() {

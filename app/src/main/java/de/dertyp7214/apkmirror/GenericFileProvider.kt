@@ -1,4 +1,4 @@
-package com.dertyp7214.apkmirror
+package de.dertyp7214.apkmirror
 
 import androidx.core.content.FileProvider
 

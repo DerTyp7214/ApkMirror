@@ -1,4 +1,4 @@
-package com.dertyp7214.apkmirror.common
+package de.dertyp7214.apkmirror.common
 
 import android.annotation.SuppressLint
 import android.app.ProgressDialog
@@ -14,12 +14,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
-import com.dertyp7214.apkmirror.R
-import com.dertyp7214.apkmirror.common.NetworkTools.Companion.drawableFromUrl
-import com.dertyp7214.apkmirror.objects.App
+import de.dertyp7214.apkmirror.R
+import de.dertyp7214.apkmirror.common.NetworkTools.Companion.drawableFromUrl
+import de.dertyp7214.apkmirror.objects.App
 import com.dertyp7214.themeablecomponents.components.ThemeableProgressBar
 import java.io.File
-
 
 class VersionAdapter(private var context: AppCompatActivity, private var items: ArrayList<App>) :
     RecyclerView.Adapter<VersionAdapter.ViewHolder>() {

@@ -1,6 +1,6 @@
 @file:Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 
-package com.dertyp7214.apkmirror.screens
+package de.dertyp7214.apkmirror.screens
 
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -12,13 +12,13 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.ColorUtils
 import androidx.palette.graphics.Palette
-import com.dertyp7214.apkmirror.R
-import com.dertyp7214.apkmirror.common.*
-import com.dertyp7214.apkmirror.common.NetworkTools.Companion.drawableFromUrl
 import com.dertyp7214.themeablecomponents.utils.ThemeManager
+import de.dertyp7214.apkmirror.R
+import de.dertyp7214.apkmirror.common.*
+import de.dertyp7214.apkmirror.common.NetworkTools.Companion.drawableFromUrl
 import kotlinx.android.synthetic.main.activity_app_data_screen.*
 import java.util.*
-
+import kotlin.collections.ArrayList
 
 class AppDataScreen : AppCompatActivity() {
 
@@ -56,12 +56,22 @@ class AppDataScreen : AppCompatActivity() {
         txt_description.setLinkTextColor(themeManager.colorAccent)
         appData.applyDescriptionToTextView(txt_description)
 
+        appData.variants.sortWith(Comparator { o1, o2 ->
+            Comparators.compareVersion(o1.version, o2.version)
+        })
+        appData.variants.reverse()
+
         val variantAdapter = VariantAdapter(this, appData.variants)
         val variantBottomSheet = BottomSheet(getString(R.string.titleVariants), variantAdapter)
         btn_vars.visibility = if (appData.variants.size > 0) View.VISIBLE else View.INVISIBLE
         btn_vars.setOnClickListener {
             variantBottomSheet.show(supportFragmentManager, "Variants")
         }
+
+        appData.versions.sortWith(Comparator { o1, o2 ->
+            Comparators.compareVersion(o1.version, o2.version)
+        })
+        appData.versions.reverse()
 
         val versionAdapter = VersionAdapter(this, appData.versions)
         val versionBottomSheet = BottomSheet(getString(R.string.titleVersions), versionAdapter)

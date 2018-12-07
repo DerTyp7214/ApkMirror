@@ -1,28 +1,29 @@
-package com.dertyp7214.apkmirror.screens
+@file:Suppress("DEPRECATION")
+
+package de.dertyp7214.apkmirror.screens
 
 import android.Manifest
 import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
+import android.graphics.Point
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.util.DisplayMetrics
 import android.view.View
-import android.view.animation.OvershootInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.drawable.DrawableCompat
-import com.dertyp7214.apkmirror.R
+import de.dertyp7214.apkmirror.R
 import kotlinx.android.synthetic.main.activity_splash_screen.*
 import java.util.*
 
 class SplashScreen : AppCompatActivity() {
 
     private val PERMISSIONS = 10
+    private var width = 0F
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,14 +31,33 @@ class SplashScreen : AppCompatActivity() {
         changeNavColor(resources.getColor(R.color.ic_launcher_background))
         changeStatusColor(resources.getColor(R.color.ic_launcher_background))
 
-        ActivityCompat.requestPermissions(
-            this,
-            Arrays.asList(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ).toTypedArray(),
-            PERMISSIONS
-        )
+        val display = windowManager.defaultDisplay
+        val size = Point()
+        display.getSize(size)
+        width = size.x - convertDpToPixel(60F)
+
+        progressView.background = resources.getDrawable(R.drawable.progress_shape)
+        progressView.layoutParams.width = 0
+
+        val animator = ValueAnimator.ofFloat(0F, 1F)
+        animator.duration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+        animator.addUpdateListener {
+            logo.alpha = it.animatedValue as Float
+            progressView.elevation = it.animatedValue as Float * 10
+            if (it.animatedValue as Float == 1F) {
+                Handler().postDelayed({
+                    ActivityCompat.requestPermissions(
+                        this,
+                        Arrays.asList(
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                        ).toTypedArray(),
+                        PERMISSIONS
+                    )
+                }, resources.getInteger(android.R.integer.config_longAnimTime).toLong())
+            }
+        }
+        animator.start()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -55,26 +75,28 @@ class SplashScreen : AppCompatActivity() {
 
     private fun startAnimations() {
         val maxValue = 60
-        var animating = true
         Handler().postDelayed({
             val animator = ValueAnimator.ofInt(0, maxValue)
-            animator.duration = 1000
-            animator.interpolator = OvershootInterpolator()
+            animator.duration = (resources.getInteger(android.R.integer.config_longAnimTime) * 2).toLong()
             animator.addUpdateListener {
                 icon.elevation = it.animatedValue as Int + 0F
-                if (it.animatedValue as Int == maxValue) animating = false
+                progressView.layoutParams.width = ((width / 100) * it.animatedValue as Int).toInt()
+                progressView.requestLayout()
             }
             animator.start()
-        }, 1000)
-        Thread {
-            while (animating);
-            runOnUiThread {
-                Handler().postDelayed({
+            val animator2 = ValueAnimator.ofInt(maxValue, 100)
+            animator2.duration = resources.getInteger(android.R.integer.config_longAnimTime).toLong()
+            animator2.addUpdateListener {
+                progressView.layoutParams.width = (width / 100 * it.animatedValue as Int).toInt()
+                progressView.requestLayout()
+                if (it.animatedValue as Int == 100) {
                     startActivity(Intent(this, MainActivity::class.java))
                     finish()
-                }, 500)
+                }
             }
-        }.start()
+            animator2.startDelay = (resources.getInteger(android.R.integer.config_longAnimTime) * 2).toLong()
+            animator2.start()
+        }, resources.getInteger(android.R.integer.config_mediumAnimTime).toLong())
     }
 
     private fun changeStatusColor(color: Int) {
@@ -101,18 +123,8 @@ class SplashScreen : AppCompatActivity() {
         window.decorView.systemUiVisibility = tmp
     }
 
-    private fun getBitmapFromVectorDrawable(drawableId: Int): Bitmap {
-        var drawable = ContextCompat.getDrawable(this, drawableId)
-        drawable = DrawableCompat.wrap(drawable!!).mutate()
-
-        val bitmap = Bitmap.createBitmap(
-            drawable!!.intrinsicWidth + 20,
-            drawable.intrinsicHeight + 20, Bitmap.Config.ARGB_8888
-        )
-        val canvas = Canvas(bitmap)
-        drawable.setBounds(10, 10, canvas.width - 10, canvas.height - 10)
-        drawable.draw(canvas)
-
-        return bitmap
+    private fun convertDpToPixel(dp: Float): Float {
+        val metrics = resources.displayMetrics
+        return dp * (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
     }
 }

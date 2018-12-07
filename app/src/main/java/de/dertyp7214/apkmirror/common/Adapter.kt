@@ -1,4 +1,4 @@
-package com.dertyp7214.apkmirror.common
+package de.dertyp7214.apkmirror.common
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -14,13 +14,13 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.dertyp7214.apkmirror.R
-import com.dertyp7214.apkmirror.common.NetworkTools.Companion.drawableFromUrl
-import com.dertyp7214.apkmirror.common.NetworkTools.Companion.fastLoadImage
-import com.dertyp7214.apkmirror.objects.App
-import com.dertyp7214.apkmirror.objects.AppScreenData
-import com.dertyp7214.apkmirror.screens.AppDataScreen
 import com.dertyp7214.themeablecomponents.components.ThemeableProgressBar
+import de.dertyp7214.apkmirror.R
+import de.dertyp7214.apkmirror.common.NetworkTools.Companion.drawableFromUrl
+import de.dertyp7214.apkmirror.common.NetworkTools.Companion.fastLoadImage
+import de.dertyp7214.apkmirror.objects.App
+import de.dertyp7214.apkmirror.objects.AppScreenData
+import de.dertyp7214.apkmirror.screens.AppDataScreen
 
 class Adapter(private val activity: Activity, private var items: ArrayList<App>) :
     RecyclerView.Adapter<Adapter.ViewHolder>() {
@@ -66,10 +66,12 @@ class Adapter(private val activity: Activity, private var items: ArrayList<App>)
         }
 
         holder.ly.setOnClickListener {
-            progressDialog = ProgressDialog.show(activity, "", "Loading data...")
-            progressDialog!!.setIndeterminateDrawable(ThemeableProgressBar(activity).indeterminateDrawable)
+            if (!apps.containsKey(app.url)) {
+                progressDialog = ProgressDialog.show(activity, "", "Loading data...")
+                progressDialog!!.setIndeterminateDrawable(ThemeableProgressBar(activity).indeterminateDrawable)
+            }
             Thread {
-                apps[app.url] = HtmlParser(activity).getAppScreenData(app)
+                if (!apps.containsKey(app.url)) apps[app.url] = HtmlParser(activity).getAppScreenData(app)
                 activity.runOnUiThread {
                     val intent = Intent(activity, AppDataScreen::class.java)
                     intent.putExtra("url", app.url)

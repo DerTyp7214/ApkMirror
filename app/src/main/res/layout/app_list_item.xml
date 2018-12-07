@@ -44,7 +44,7 @@
                     android:id="@+id/txt_title"
                     android:layout_weight="0"
                     android:textSize="18sp"
-                    android:maxLines="2"/>
+                    android:maxLines="2" android:paddingTop="3dp"/>
             <TextView
                     android:text="TextView"
                     android:layout_width="match_parent"

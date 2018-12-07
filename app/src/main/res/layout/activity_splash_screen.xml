@@ -12,7 +12,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content" android:id="@+id/frameLayout">
         <ImageView
                 android:layout_width="120dp"
                 android:layout_height="120dp"
@@ -24,6 +24,32 @@
                 android:layout_height="180dp"
                 app:srcCompat="@mipmap/ic_launcher_foreground"
                 android:elevation="100dp"
-                android:id="@+id/logo"/>
+                android:id="@+id/logo" android:alpha="0"/>
     </FrameLayout>
+    <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            app:layout_constraintTop_toBottomOf="@+id/frameLayout"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
+            android:id="@+id/layout">
+        <View android:id="@+id/progressView"
+              android:layout_width="wrap_content"
+              android:layout_height="6dp" android:layout_marginTop="7dp" android:layout_marginStart="30dp"
+              android:layout_marginEnd="30dp" android:layout_marginBottom="7dp"/>
+    </RelativeLayout>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:textSize="12sp"
+            android:maxLines="1"
+            android:textStyle="bold"
+            android:textColor="@color/ic_launcher_background"
+            android:shadowColor="#000000"
+            android:shadowRadius="2"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/layout"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

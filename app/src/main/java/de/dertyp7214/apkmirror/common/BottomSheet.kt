@@ -1,4 +1,4 @@
-package com.dertyp7214.apkmirror.common
+package de.dertyp7214.apkmirror.common
 
 import android.annotation.SuppressLint
 import android.app.Dialog
@@ -8,9 +8,9 @@ import android.widget.TextView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.dertyp7214.apkmirror.R
 import com.dertyp7214.themeablecomponents.utils.ThemeManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import de.dertyp7214.apkmirror.R
 
 class BottomSheet(private var title: String, private var adapter: RecyclerView.Adapter<*>) : BottomSheetDialogFragment() {
 

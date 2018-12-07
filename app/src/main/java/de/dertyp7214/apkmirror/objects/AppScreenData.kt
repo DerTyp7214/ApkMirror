@@ -1,4 +1,4 @@
-package com.dertyp7214.apkmirror.objects
+package de.dertyp7214.apkmirror.objects
 
 import android.os.Build
 import android.text.Html

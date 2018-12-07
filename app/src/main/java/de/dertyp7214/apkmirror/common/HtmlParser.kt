@@ -1,6 +1,6 @@
 @file:Suppress("NAME_SHADOWING")
 
-package com.dertyp7214.apkmirror.common
+package de.dertyp7214.apkmirror.common
 
 import android.content.Context
 import android.content.Intent
@@ -10,11 +10,11 @@ import android.os.Environment
 import android.os.StrictMode
 import android.util.Log
 import androidx.core.content.FileProvider
-import com.dertyp7214.apkmirror.common.NetworkTools.Companion.getWebContent
-import com.dertyp7214.apkmirror.objects.App
-import com.dertyp7214.apkmirror.objects.AppScreenData
-import com.dertyp7214.apkmirror.objects.AppVariant
-import com.dertyp7214.apkmirror.objects.DownloadData
+import de.dertyp7214.apkmirror.common.NetworkTools.Companion.getWebContent
+import de.dertyp7214.apkmirror.objects.App
+import de.dertyp7214.apkmirror.objects.AppScreenData
+import de.dertyp7214.apkmirror.objects.AppVariant
+import de.dertyp7214.apkmirror.objects.DownloadData
 import com.downloader.Error
 import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader

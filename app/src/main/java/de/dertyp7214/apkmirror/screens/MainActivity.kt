@@ -1,6 +1,5 @@
-package com.dertyp7214.apkmirror.screens
+package de.dertyp7214.apkmirror.screens
 
-import android.Manifest
 import android.app.ProgressDialog
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -12,18 +11,16 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.dertyp7214.apkmirror.R
-import com.dertyp7214.apkmirror.common.Adapter
-import com.dertyp7214.apkmirror.common.Helper
-import com.dertyp7214.apkmirror.common.HtmlParser
-import com.dertyp7214.apkmirror.objects.App
 import com.dertyp7214.themeablecomponents.components.ThemeableProgressBar
 import com.dertyp7214.themeablecomponents.utils.ThemeManager
+import de.dertyp7214.apkmirror.R
+import de.dertyp7214.apkmirror.common.Adapter
+import de.dertyp7214.apkmirror.common.Helper.Companion.showChangeDialog
+import de.dertyp7214.apkmirror.common.HtmlParser
+import de.dertyp7214.apkmirror.objects.App
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,20 +39,25 @@ class MainActivity : AppCompatActivity() {
         themeManager.enableStatusAndNavBar(this)
         themeManager.darkMode = true
         themeManager.changeAccentColor(Color.RED)
-        themeManager.changePrimaryColor(Color.parseColor("#FF8B14"))
+        themeManager.changePrimaryColor(resources.getColor(R.color.ic_launcher_background))
         themeManager.setDefaultAccent(Color.RED)
-        themeManager.setDefaultPrimary(Color.parseColor("#FF8B14"))
-
-        Helper.changeLogs(this).showDialogOnVersionChange()
+        themeManager.setDefaultPrimary(resources.getColor(R.color.ic_launcher_background))
 
         htmlParser = HtmlParser(this)
         appList = ArrayList()
         adapter = Adapter(this, appList)
         rv.layoutManager = LinearLayoutManager(this)
         rv.adapter = adapter
+
+        showChangeDialog(this) {
+            progressDialog = ProgressDialog.show(this@MainActivity, "", "Loading data...")
+            progressDialog?.setIndeterminateDrawable(ThemeableProgressBar(this@MainActivity).indeterminateDrawable)
+            search("ApkMirror")
+        }
     }
 
-    private fun search(query: String) {
+    private fun search(query: String, callBack: () -> Unit = {}) {
+        title = query
         progressBar.visibility = View.VISIBLE
         progressBar.progress = 0
         appList.clear()
@@ -70,24 +72,29 @@ class MainActivity : AppCompatActivity() {
                 val list = htmlParser.getAppList(query)
                 loading = list.size == 10
                 appList.addAll(list)
-                runOnUiThread {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                        progressBar.setProgress((i * 1.5).toInt(), true)
-                    else progressBar.progress = i
-                    adapter.notifyDataSetChanged()
-                    progressDialog!!.dismiss()
+                this@MainActivity.runOnUiThread {
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                            progressBar.setProgress((i * 1.5).toInt(), true)
+                        else progressBar.progress = i
+                        adapter.notifyDataSetChanged()
+                        progressDialog?.dismiss()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
             }
-            runOnUiThread {
+            this@MainActivity.runOnUiThread {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                     progressBar.setProgress(100, true)
                 else progressBar.progress = 100
                 Handler().postDelayed({
                     progressBar.visibility = View.GONE
+                    callBack()
                 }, 100)
             }
         }
-        thread!!.start()
+        thread?.start()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
