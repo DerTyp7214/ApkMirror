@@ -17,6 +17,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import de.dertyp7214.apkmirror.R
+import de.dertyp7214.apkmirror.common.Config
 import kotlinx.android.synthetic.main.activity_splash_screen.*
 import java.util.*
 
@@ -30,6 +31,8 @@ class SplashScreen : AppCompatActivity() {
         setContentView(R.layout.activity_splash_screen)
         changeNavColor(resources.getColor(R.color.ic_launcher_background))
         changeStatusColor(resources.getColor(R.color.ic_launcher_background))
+
+        Config.application = application
 
         val display = windowManager.defaultDisplay
         val size = Point()

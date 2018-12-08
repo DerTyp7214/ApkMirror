@@ -25,12 +25,13 @@
                     android:layout_height="65dp"
                     android:id="@+id/progressBar"/>
             <ImageView
-                    android:layout_width="65dp"
-                    android:layout_height="65dp"
+                    android:transitionName="icon"
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
                     android:id="@+id/img_icon"
                     android:layout_weight="0"
                     android:visibility="visible"
-                    android:padding="5dp"/>
+                    android:layout_margin="5dp"/>
         </FrameLayout>
         <LinearLayout
                 android:orientation="vertical"

@@ -1,5 +1,6 @@
 package de.dertyp7214.apkmirror.screens
 
+import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -14,12 +15,14 @@ import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dertyp7214.themeablecomponents.components.ThemeableProgressBar
 import com.dertyp7214.themeablecomponents.utils.ThemeManager
+import de.dertyp7214.apkmirror.BuildConfig
 import de.dertyp7214.apkmirror.R
 import de.dertyp7214.apkmirror.common.Adapter
 import de.dertyp7214.apkmirror.common.Helper.Companion.showChangeDialog
 import de.dertyp7214.apkmirror.common.HtmlParser
 import de.dertyp7214.apkmirror.objects.App
 import kotlinx.android.synthetic.main.activity_main.*
+import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -56,12 +59,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
     private fun search(query: String, callBack: () -> Unit = {}) {
         title = query
         progressBar.visibility = View.VISIBLE
         progressBar.progress = 0
         appList.clear()
         adapter.notifyDataSetChanged()
+        if (query.toLowerCase() == "apkmirror" || query.toLowerCase() == "apk mirror")
+            appList.add(App(
+                getString(R.string.app_name),
+                getString(R.string.dev),
+                BuildConfig.VERSION_NAME,
+                SimpleDateFormat("yyyy-MM-dd").format(Date()),
+                "NaN",
+                getString(R.string.dev_url),
+                "self:launcher_icon"))
         if (thread != null) thread!!.interrupt()
         thread = Thread {
             var loading = true

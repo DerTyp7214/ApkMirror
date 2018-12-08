@@ -10,14 +10,16 @@ import android.os.Environment
 import android.os.StrictMode
 import android.util.Log
 import androidx.core.content.FileProvider
+import com.downloader.Error
+import com.downloader.OnDownloadListener
+import com.downloader.PRDownloader
+import de.dertyp7214.apkmirror.BuildConfig
 import de.dertyp7214.apkmirror.common.NetworkTools.Companion.getWebContent
 import de.dertyp7214.apkmirror.objects.App
 import de.dertyp7214.apkmirror.objects.AppScreenData
 import de.dertyp7214.apkmirror.objects.AppVariant
 import de.dertyp7214.apkmirror.objects.DownloadData
-import com.downloader.Error
-import com.downloader.OnDownloadListener
-import com.downloader.PRDownloader
+import org.json.JSONObject
 import java.io.File
 import java.util.*
 import java.util.regex.Pattern
@@ -256,11 +258,11 @@ class HtmlParser(private val context: Context) {
         }
     }
 
-    fun openInstaller(url: String, listener: Listener) {
+    fun openInstaller(url: String, listener: Listener): Int {
         val folder = File(Environment.getExternalStorageDirectory(), ".apkmirror")
         if (!folder.exists()) folder.mkdirs()
         val path = folder.absolutePath
-        PRDownloader.download(url, path, "app.apk")
+        return PRDownloader.download(url, path, "app.apk")
             .build()
             .setOnProgressListener {
                 listener.run(((it.currentBytes * 100L) / it.totalBytes).toInt())
@@ -279,7 +281,16 @@ class HtmlParser(private val context: Context) {
             })
     }
 
-    fun humanReadableByteCount(bytes:Long, si:Boolean):String {
+    fun getJson(url: String): JSONObject {
+        return try {
+            JSONObject(getWebContent(url))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            JSONObject("{\"tag_name\": \"null\", \"assets\": [{\"browser_download_url\": \"https://github.com/DerTyp7214/ApkMirror/releases/download/${BuildConfig.VERSION_NAME}/app-release.apk\"}]}")
+        }
+    }
+
+    fun humanReadableByteCount(bytes: Long, si: Boolean): String {
         val unit = if (si) 1000 else 1024
         if (bytes < unit) return "$bytes B"
         val exp = (Math.log(bytes.toDouble()) / Math.log(unit.toDouble())).toInt()

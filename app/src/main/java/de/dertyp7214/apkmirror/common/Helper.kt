@@ -11,6 +11,14 @@ class Helper {
             return ChangeLog.Builder(context)
                 .addVersion(
                     Version.Builder(context)
+                        .setVersionName("1.1")
+                        .setVersionCode("1")
+                        .addChange(Version.Change(Version.Change.ChangeType.ADD, "Updater for ApkMirror"))
+                        .addChange(Version.Change(Version.Change.ChangeType.IMPROVEMENT, "Improved some animations"))
+                        .build()
+                )
+                .addVersion(
+                    Version.Builder(context)
                         .setVersionName("1.0")
                         .setVersionCode("1")
                         .addChange(Version.Change(Version.Change.ChangeType.ADD, "Created the App"))

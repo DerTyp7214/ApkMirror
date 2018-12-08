@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">ApkMirror</string>
+    <string name="dev">DerTyp7214</string>
+    <string name="dev_url">https://github.com/DerTyp7214</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>

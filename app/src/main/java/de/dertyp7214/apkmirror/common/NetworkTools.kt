@@ -4,6 +4,9 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.util.Log
+import androidx.core.content.ContextCompat
+import de.dertyp7214.apkmirror.R
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
@@ -26,17 +29,19 @@ class NetworkTools {
                     while ({ line = reader.readLine(); line }() != null)
                         ret.append(line!!)
 
+                    if (url == "http://api.github.com/repos/DerTyp7214/ApkMirror/releases/latest") Log.d("RET", ret.toString())
                     reader.close()
                     ret.toString()
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    Log.d("ERROR", e.message)
                     ""
                 }
             return contentMap[url] as String
         }
 
         fun fastLoadImage(url: String): Drawable? {
-            return if (contentMap.containsKey(url)) contentMap[url] as Drawable else null
+            return if (url == "self:launcher_icon" && Config.application != null) ContextCompat.getDrawable(Config.application!!, R.mipmap.ic_launcher)
+            else if (contentMap.containsKey(url)) contentMap[url] as Drawable else null
         }
 
         fun drawableFromUrl(context: Context, url: String): Drawable {

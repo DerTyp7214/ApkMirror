@@ -2,9 +2,11 @@ package de.dertyp7214.apkmirror.common
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityOptions
 import android.app.ProgressDialog
 import android.content.Intent
 import android.util.DisplayMetrics
+import android.util.Pair
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +23,7 @@ import de.dertyp7214.apkmirror.common.NetworkTools.Companion.fastLoadImage
 import de.dertyp7214.apkmirror.objects.App
 import de.dertyp7214.apkmirror.objects.AppScreenData
 import de.dertyp7214.apkmirror.screens.AppDataScreen
+import de.dertyp7214.apkmirror.screens.Update
 
 class Adapter(private val activity: Activity, private var items: ArrayList<App>) :
     RecyclerView.Adapter<Adapter.ViewHolder>() {
@@ -66,18 +69,24 @@ class Adapter(private val activity: Activity, private var items: ArrayList<App>)
         }
 
         holder.ly.setOnClickListener {
-            if (!apps.containsKey(app.url)) {
-                progressDialog = ProgressDialog.show(activity, "", "Loading data...")
-                progressDialog!!.setIndeterminateDrawable(ThemeableProgressBar(activity).indeterminateDrawable)
-            }
-            Thread {
-                if (!apps.containsKey(app.url)) apps[app.url] = HtmlParser(activity).getAppScreenData(app)
-                activity.runOnUiThread {
-                    val intent = Intent(activity, AppDataScreen::class.java)
-                    intent.putExtra("url", app.url)
-                    activity.startActivity(intent)
+            if (app.imageUrl == "self:launcher_icon") {
+                val icon = Pair.create<View, String>(holder.icon, "icon")
+                val options = ActivityOptions.makeSceneTransitionAnimation(activity, icon)
+                activity.startActivity(Intent(activity, Update::class.java), options.toBundle())
+            } else {
+                if (!apps.containsKey(app.url)) {
+                    progressDialog = ProgressDialog.show(activity, "", "Loading data...")
+                    progressDialog!!.setIndeterminateDrawable(ThemeableProgressBar(activity).indeterminateDrawable)
                 }
-            }.start()
+                Thread {
+                    if (!apps.containsKey(app.url)) apps[app.url] = HtmlParser(activity).getAppScreenData(app)
+                    activity.runOnUiThread {
+                        val intent = Intent(activity, AppDataScreen::class.java)
+                        intent.putExtra("url", app.url)
+                        activity.startActivity(intent)
+                    }
+                }.start()
+            }
         }
     }
 
