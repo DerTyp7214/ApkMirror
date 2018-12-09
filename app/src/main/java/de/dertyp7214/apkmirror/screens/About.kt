@@ -1,7 +1,6 @@
 package de.dertyp7214.apkmirror.screens
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -12,7 +11,6 @@ import com.downloader.PRDownloader
 import de.dertyp7214.apkmirror.BuildConfig
 import de.dertyp7214.apkmirror.R
 import de.dertyp7214.apkmirror.common.Adapter
-import de.dertyp7214.apkmirror.common.Helper
 import de.dertyp7214.apkmirror.common.HtmlParser
 import kotlinx.android.synthetic.main.activity_about.*
 import java.io.File
@@ -61,7 +59,6 @@ class About : AppCompatActivity() {
         themeManager.changePrimaryColor(resources.getColor(R.color.ic_launcher_background))
 
         fab.isFinished = true
-        getAppSize()
         checkUpdate {
             if (update) {
                 fab.isFinished = false
@@ -93,24 +90,6 @@ class About : AppCompatActivity() {
             }
         }
     }
-
-    @SuppressLint("SdCardPath")
-    private fun getAppSize(): String {
-        val folder = File("/data/data/${BuildConfig.APPLICATION_ID}")
-        return Helper.humanReadableByteCount(Helper.folderSize(getApkDir()) + Helper.folderSize(folder))
-    }
-
-    private fun getApkDir(): File {
-        val mainIntent = Intent(Intent.ACTION_MAIN, null)
-        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
-        val apps = packageManager.queryIntentActivities(mainIntent, 0)
-        apps.forEach {
-            if (it.activityInfo.packageName == BuildConfig.APPLICATION_ID)
-                return File(it.activityInfo.applicationInfo.publicSourceDir.replace("/base.apk", ""))
-        }
-        return File("")
-    }
-
     private fun checkUpdate(unit: () -> Unit) {
         if (version == "") {
             Thread {

@@ -70,8 +70,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SimpleDateFormat")
     private fun search(query: String, callBack: () -> Unit = {}) {
         title = query
-        progressBar.visibility = View.VISIBLE
-        progressBar.progress = 0
+        if (thread != null) thread!!.interrupt()
         appList.clear()
         adapter.notifyDataSetChanged()
         if (Config.knownNames.contains(query.toLowerCase())) {
@@ -90,8 +89,9 @@ class MainActivity : AppCompatActivity() {
             )
             adapter.notifyDataSetChanged()
         } else {
+            progressBar.visibility = View.VISIBLE
+            progressBar.progress = 0
             title = query
-            if (thread != null) thread!!.interrupt()
             thread = Thread {
                 var loading = true
                 var i = 0

@@ -29,19 +29,25 @@ class Helper {
                 .setLinkColor(Color.GREEN)
                 .build().buildDialog("Changes")
         }
+
         fun showChangeDialog(context: Context, function: () -> Unit) {
             if (!changeLogs(context, function).showDialogOnVersionChange()) function()
         }
+
         fun folderSize(dir: File): Long {
             var length = 0L
-            if (dir.isFile) return dir.length()
-            for (file in dir.listFiles()) {
-                length += if (file.isFile) file.length()
-                else folderSize(file)
+            try {
+                if (dir.isFile) return dir.length()
+                for (file in dir.listFiles()) {
+                    length += if (file.isFile) file.length()
+                    else folderSize(file)
+                }
+            } catch (e: Exception) {
             }
             return length
         }
-        fun humanReadableByteCount(bytes:Long, si:Boolean = true):String {
+
+        fun humanReadableByteCount(bytes: Long, si: Boolean = true): String {
             val unit = if (si) 1000 else 1024
             if (bytes < unit) return "$bytes B"
             val exp = (Math.log(bytes.toDouble()) / Math.log(unit.toDouble())).toInt()

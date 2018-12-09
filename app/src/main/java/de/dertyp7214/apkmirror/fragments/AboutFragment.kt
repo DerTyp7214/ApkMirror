@@ -1,10 +1,12 @@
 package de.dertyp7214.apkmirror.fragments
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
+import android.os.Handler
 import android.util.DisplayMetrics
 import android.view.ViewGroup
 import com.danielstone.materialaboutlibrary.MaterialAboutFragment
@@ -24,13 +26,33 @@ import de.dertyp7214.apkmirror.common.NetworkTools.Companion.drawableFromUrl
 import java.io.File
 
 class AboutFragment : MaterialAboutFragment() {
+    override fun onResume() {
+        super.onResume()
+
+        val displayMetrics = DisplayMetrics()
+        activity!!.windowManager.defaultDisplay.getMetrics(displayMetrics)
+
+        Handler().postDelayed({
+            val animator = ValueAnimator.ofInt(displayMetrics.heightPixels, 0)
+            animator.duration = resources.getInteger(android.R.integer.config_longAnimTime).toLong() * 2
+            animator.addUpdateListener {
+                (view as ViewGroup).setPadding(0, it.animatedValue as Int, 0, 0)
+            }
+            animator.start()
+        }, resources.getInteger(android.R.integer.config_shortAnimTime).toLong())
+    }
+
     override fun getMaterialAboutList(activityContext: Context): MaterialAboutList {
 
         val themeManager = ThemeManager.getInstance(context!!)
         val iconColor = if (themeManager.darkMode) Color.WHITE else Color.BLACK
         val icon = { iconId: IIcon -> IconicsDrawable(context!!).icon(iconId).color(iconColor) }
 
-        (view!! as ViewGroup).getChildAt(0).setPadding(0, convertDpToPixel(130F).toInt(), 0, convertDpToPixel(7F).toInt())
+        val displayMetrics = DisplayMetrics()
+        activity!!.windowManager.defaultDisplay.getMetrics(displayMetrics)
+
+        (view as ViewGroup).getChildAt(0).setPadding(0, convertDpToPixel(130F).toInt(), 0, convertDpToPixel(7F).toInt())
+        (view as ViewGroup).setPadding(0, displayMetrics.heightPixels, 0, 0)
 
         val applicationInfo = MaterialAboutCard.Builder()
             .title(R.string.app_name)
