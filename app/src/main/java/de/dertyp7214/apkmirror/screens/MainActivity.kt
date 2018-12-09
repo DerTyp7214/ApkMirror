@@ -10,6 +10,7 @@ import android.os.Handler
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +19,7 @@ import com.dertyp7214.themeablecomponents.utils.ThemeManager
 import de.dertyp7214.apkmirror.BuildConfig
 import de.dertyp7214.apkmirror.R
 import de.dertyp7214.apkmirror.common.Adapter
+import de.dertyp7214.apkmirror.common.Config
 import de.dertyp7214.apkmirror.common.Helper.Companion.showChangeDialog
 import de.dertyp7214.apkmirror.common.HtmlParser
 import de.dertyp7214.apkmirror.objects.App
@@ -32,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var htmlParser: HtmlParser
     private var thread: Thread? = null
     private var progressDialog: ProgressDialog? = null
+    private var lastTimeStamp = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,10 +56,15 @@ class MainActivity : AppCompatActivity() {
         rv.adapter = adapter
 
         showChangeDialog(this) {
-            progressDialog = ProgressDialog.show(this@MainActivity, "", "Loading data...")
-            progressDialog?.setIndeterminateDrawable(ThemeableProgressBar(this@MainActivity).indeterminateDrawable)
             search("ApkMirror")
         }
+    }
+
+    override fun onBackPressed() {
+        if (System.currentTimeMillis() - lastTimeStamp > 4000) {
+            Toast.makeText(this, "Press back again to close the app.", Toast.LENGTH_LONG).show()
+            lastTimeStamp = System.currentTimeMillis()
+        } else super.onBackPressed()
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -66,48 +74,57 @@ class MainActivity : AppCompatActivity() {
         progressBar.progress = 0
         appList.clear()
         adapter.notifyDataSetChanged()
-        if (query.toLowerCase() == "apkmirror" || query.toLowerCase() == "apk mirror")
-            appList.add(App(
-                getString(R.string.app_name),
-                getString(R.string.dev),
-                BuildConfig.VERSION_NAME,
-                SimpleDateFormat("yyyy-MM-dd").format(Date()),
-                "NaN",
-                getString(R.string.dev_url),
-                "self:launcher_icon"))
-        if (thread != null) thread!!.interrupt()
-        thread = Thread {
-            var loading = true
-            var i = 0
-            while (loading) {
-                i++
-                htmlParser.page = i
-                val list = htmlParser.getAppList(query)
-                loading = list.size == 10
-                appList.addAll(list)
-                this@MainActivity.runOnUiThread {
-                    try {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                            progressBar.setProgress((i * 1.5).toInt(), true)
-                        else progressBar.progress = i
-                        adapter.notifyDataSetChanged()
-                        progressDialog?.dismiss()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
+        if (Config.knownNames.contains(query.toLowerCase())) {
+            title = getString(R.string.app_name)
+            progressDialog?.dismiss()
+            appList.add(
+                App(
+                    getString(R.string.app_name),
+                    getString(R.string.dev),
+                    BuildConfig.VERSION_NAME,
+                    SimpleDateFormat("yyyy-MM-dd").format(Date()),
+                    "NaN",
+                    getString(R.string.dev_url),
+                    "self:launcher_icon"
+                )
+            )
+            adapter.notifyDataSetChanged()
+        } else {
+            title = query
+            if (thread != null) thread!!.interrupt()
+            thread = Thread {
+                var loading = true
+                var i = 0
+                while (loading) {
+                    i++
+                    htmlParser.page = i
+                    val list = htmlParser.getAppList(query)
+                    loading = list.size == 10
+                    appList.addAll(list)
+                    this@MainActivity.runOnUiThread {
+                        try {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                                progressBar.setProgress((i * 1.5).toInt(), true)
+                            else progressBar.progress = i
+                            adapter.notifyDataSetChanged()
+                            progressDialog?.dismiss()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
                 }
+                this@MainActivity.runOnUiThread {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                        progressBar.setProgress(100, true)
+                    else progressBar.progress = 100
+                    Handler().postDelayed({
+                        progressBar.visibility = View.GONE
+                        callBack()
+                    }, 100)
+                }
             }
-            this@MainActivity.runOnUiThread {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                    progressBar.setProgress(100, true)
-                else progressBar.progress = 100
-                Handler().postDelayed({
-                    progressBar.visibility = View.GONE
-                    callBack()
-                }, 100)
-            }
+            thread?.start()
         }
-        thread?.start()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

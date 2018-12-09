@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import com.dertyp7214.changelogs.ChangeLog
 import com.dertyp7214.changelogs.Version
+import java.io.File
 
 class Helper {
     companion object {
@@ -30,6 +31,22 @@ class Helper {
         }
         fun showChangeDialog(context: Context, function: () -> Unit) {
             if (!changeLogs(context, function).showDialogOnVersionChange()) function()
+        }
+        fun folderSize(dir: File): Long {
+            var length = 0L
+            if (dir.isFile) return dir.length()
+            for (file in dir.listFiles()) {
+                length += if (file.isFile) file.length()
+                else folderSize(file)
+            }
+            return length
+        }
+        fun humanReadableByteCount(bytes:Long, si:Boolean = true):String {
+            val unit = if (si) 1000 else 1024
+            if (bytes < unit) return "$bytes B"
+            val exp = (Math.log(bytes.toDouble()) / Math.log(unit.toDouble())).toInt()
+            val pre = (if (si) "kMGTPE" else "KMGTPE")[exp - 1] + (if (si) "" else "i")
+            return String.format("%.1f %sB", bytes / Math.pow(unit.toDouble(), exp.toDouble()), pre)
         }
     }
 }

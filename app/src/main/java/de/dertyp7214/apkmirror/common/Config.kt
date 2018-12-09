@@ -6,4 +6,5 @@ import android.app.Application
 @SuppressLint("StaticFieldLeak")
 object Config {
     var application: Application? = null
+    val knownNames = ArrayList<String>()
 }

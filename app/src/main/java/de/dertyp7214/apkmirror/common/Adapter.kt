@@ -22,8 +22,8 @@ import de.dertyp7214.apkmirror.common.NetworkTools.Companion.drawableFromUrl
 import de.dertyp7214.apkmirror.common.NetworkTools.Companion.fastLoadImage
 import de.dertyp7214.apkmirror.objects.App
 import de.dertyp7214.apkmirror.objects.AppScreenData
+import de.dertyp7214.apkmirror.screens.About
 import de.dertyp7214.apkmirror.screens.AppDataScreen
-import de.dertyp7214.apkmirror.screens.Update
 
 class Adapter(private val activity: Activity, private var items: ArrayList<App>) :
     RecyclerView.Adapter<Adapter.ViewHolder>() {
@@ -37,6 +37,7 @@ class Adapter(private val activity: Activity, private var items: ArrayList<App>)
         @SuppressLint("StaticFieldLeak")
         var progressDialog: ProgressDialog? = null
         val apps = HashMap<String, AppScreenData>()
+        var clicked = false
     }
 
     override fun getItemCount(): Int = items.size
@@ -69,23 +70,26 @@ class Adapter(private val activity: Activity, private var items: ArrayList<App>)
         }
 
         holder.ly.setOnClickListener {
-            if (app.imageUrl == "self:launcher_icon") {
-                val icon = Pair.create<View, String>(holder.icon, "icon")
-                val options = ActivityOptions.makeSceneTransitionAnimation(activity, icon)
-                activity.startActivity(Intent(activity, Update::class.java), options.toBundle())
-            } else {
-                if (!apps.containsKey(app.url)) {
-                    progressDialog = ProgressDialog.show(activity, "", "Loading data...")
-                    progressDialog!!.setIndeterminateDrawable(ThemeableProgressBar(activity).indeterminateDrawable)
-                }
-                Thread {
-                    if (!apps.containsKey(app.url)) apps[app.url] = HtmlParser(activity).getAppScreenData(app)
-                    activity.runOnUiThread {
-                        val intent = Intent(activity, AppDataScreen::class.java)
-                        intent.putExtra("url", app.url)
-                        activity.startActivity(intent)
+            if (!clicked) {
+                clicked = true
+                if (app.imageUrl == "self:launcher_icon") {
+                    val icon = Pair.create<View, String>(holder.icon, "icon")
+                    val options = ActivityOptions.makeSceneTransitionAnimation(activity, icon)
+                    activity.startActivity(Intent(activity, About::class.java), options.toBundle())
+                } else {
+                    if (!apps.containsKey(app.url)) {
+                        progressDialog = ProgressDialog.show(activity, "", "Loading data...")
+                        progressDialog!!.setIndeterminateDrawable(ThemeableProgressBar(activity).indeterminateDrawable)
                     }
-                }.start()
+                    Thread {
+                        if (!apps.containsKey(app.url)) apps[app.url] = HtmlParser(activity).getAppScreenData(app)
+                        activity.runOnUiThread {
+                            val intent = Intent(activity, AppDataScreen::class.java)
+                            intent.putExtra("url", app.url)
+                            activity.startActivity(intent)
+                        }
+                    }.start()
+                }
             }
         }
     }

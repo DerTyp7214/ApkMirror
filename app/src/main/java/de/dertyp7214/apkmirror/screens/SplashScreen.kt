@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import de.dertyp7214.apkmirror.R
 import de.dertyp7214.apkmirror.common.Config
+import de.dertyp7214.apkmirror.common.NetworkTools
 import kotlinx.android.synthetic.main.activity_splash_screen.*
 import java.util.*
 
@@ -48,6 +49,7 @@ class SplashScreen : AppCompatActivity() {
             logo.alpha = it.animatedValue as Float
             progressView.elevation = it.animatedValue as Float * 10
             if (it.animatedValue as Float == 1F) {
+                Thread {NetworkTools.drawableFromUrl(this, getString(R.string.dev_github_userimage))}.start()
                 Handler().postDelayed({
                     ActivityCompat.requestPermissions(
                         this,
@@ -79,6 +81,7 @@ class SplashScreen : AppCompatActivity() {
     private fun startAnimations() {
         val maxValue = 60
         Handler().postDelayed({
+            setUpNames()
             val animator = ValueAnimator.ofInt(0, maxValue)
             animator.duration = (resources.getInteger(android.R.integer.config_longAnimTime) * 2).toLong()
             animator.addUpdateListener {
@@ -100,6 +103,20 @@ class SplashScreen : AppCompatActivity() {
             animator2.startDelay = (resources.getInteger(android.R.integer.config_longAnimTime) * 2).toLong()
             animator2.start()
         }, resources.getInteger(android.R.integer.config_mediumAnimTime).toLong())
+    }
+
+    private fun setUpNames() {
+        val name = getString(R.string.app_name).toLowerCase()
+
+        Config.knownNames.add(name)
+        for (i in 0 until name.length) {
+            var n = ""
+            name.toCharArray().forEachIndexed { index, c ->
+                if (index == i) n += " "
+                n += c.toString()
+            }
+            Config.knownNames.add(n)
+        }
     }
 
     private fun changeStatusColor(color: Int) {

@@ -2,6 +2,7 @@
     <string name="app_name">ApkMirror</string>
     <string name="dev">DerTyp7214</string>
     <string name="dev_url">https://github.com/DerTyp7214</string>
+    <string name="dev_github_userimage">https://avatars0.githubusercontent.com/u/37804065</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -17,4 +18,12 @@
     <string name="menu_send">Send</string>
     <string name="titleVariants">All Variants</string>
     <string name="titleVersions">All Versions</string>
+    <string name="key_size">Size</string>
+    <string name="key_version">Version</string>
+    <string name="key_buildtype">Build Type</string>
+    <string name="key_packagename">Packagename</string>
+    <string name="title_developers">Developers</string>
+    <string name="key_leaddev">Lead developer</string>
+    <string name="key_leaddev_github">GitHub</string>
+    <string name="title_licenses">Licenses</string>
 </resources>

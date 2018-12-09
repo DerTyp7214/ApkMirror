@@ -1,93 +1,131 @@
-@file:Suppress("DEPRECATION")
-
 package de.dertyp7214.apkmirror.screens
 
-import android.graphics.*
-import android.graphics.drawable.BitmapDrawable
-import android.os.Build
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
-import android.view.Gravity.CENTER
-import android.view.View
-import android.view.WindowManager
+import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.drawable.DrawableCompat
+import com.dertyp7214.themeablecomponents.components.ThemeableFloatingActionButtonProgressBar
+import com.dertyp7214.themeablecomponents.utils.ThemeManager
+import com.downloader.PRDownloader
+import de.dertyp7214.apkmirror.BuildConfig
 import de.dertyp7214.apkmirror.R
+import de.dertyp7214.apkmirror.common.Adapter
+import de.dertyp7214.apkmirror.common.Helper
+import de.dertyp7214.apkmirror.common.HtmlParser
 import kotlinx.android.synthetic.main.activity_about.*
+import java.io.File
 
 class About : AppCompatActivity() {
+
+    private var update = false
+    private var apkUrl =
+        "https://github.com/DerTyp7214/ApkMirror/releases/download/${BuildConfig.VERSION_NAME}/app-release.apk"
+    private val latestRelease = "https://api.github.com/repos/DerTyp7214/ApkMirror/releases/latest"
+
+    companion object {
+        private var version: String = ""
+        private val downloadSessions = ArrayList<Int>()
+        @SuppressLint("StaticFieldLeak")
+        private lateinit var fab: ThemeableFloatingActionButtonProgressBar
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Adapter.clicked = false
+    }
+
+    override fun onBackPressed() {
+        fab.hide()
+        Handler().postDelayed({
+            super.onBackPressed()
+            downloadSessions.forEach {
+                PRDownloader.cancel(it)
+                downloadSessions.remove(it)
+            }
+        }, 80)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about)
+        setSupportActionBar(toolbar)
 
-        val foreground = Bitmap.createScaledBitmap(
-            getBitmapFromVectorDrawable(R.drawable.about_background),
-            3000,
-            3000,
-            false
-        )
-        val background = createImage(3000, 3000, resources.getColor(R.color.ic_launcher_background))
+        title = getString(R.string.app_name)
+        fab = themeableFloatingActionButtonProgressBar
+        val htmlParser = HtmlParser(this)
+        val themeManager = ThemeManager.getInstance(this)
+        themeManager.enableStatusAndNavBar(this)
+        themeManager.changeAccentColor(Color.RED)
+        themeManager.changePrimaryColor(resources.getColor(R.color.ic_launcher_background))
 
-        val image = BitmapDrawable(resources, overlay(background, foreground))
-        image.gravity = CENTER
-        root.background = image
+        fab.isFinished = true
+        getAppSize()
+        checkUpdate {
+            if (update) {
+                fab.isFinished = false
+                fab.setOnClickListener {
+                    fab.isLoading = true
+                    fab.setOnClickListener { }
+                    downloadSessions.add(
+                        htmlParser.openInstaller(
+                            apkUrl,
+                            object : HtmlParser.Listener {
+                                override fun run(progress: Int) {
+                                    fab.setOnClickListener { }
+                                    fab.progress = progress
+                                }
 
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-        window.statusBarColor = Color.TRANSPARENT
-        window.navigationBarColor = Color.TRANSPARENT
-        iconColors()
-    }
+                                override fun cancel() {
+                                    fab.isLoading = false
+                                }
 
-    private fun iconColors() {
-        var tmp = window.decorView.systemUiVisibility
-        val color = resources.getColor(R.color.ic_launcher_background)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            tmp = if (ColorUtils.calculateLuminance(color) > 0.5F)
-                tmp or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            else
-                tmp and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+                                override fun stop(file: File) {
+                                    fab.setOnClickListener { htmlParser.installApk(file) }
+                                    fab.progress = 0
+                                    fab.isFinished = true
+                                    htmlParser.installApk(file)
+                                }
+                            })
+                    )
+                }
+            }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            tmp = if (ColorUtils.calculateLuminance(color) > 0.5F)
-                tmp or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            else
-                tmp and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
+    }
+
+    @SuppressLint("SdCardPath")
+    private fun getAppSize(): String {
+        val folder = File("/data/data/${BuildConfig.APPLICATION_ID}")
+        return Helper.humanReadableByteCount(Helper.folderSize(getApkDir()) + Helper.folderSize(folder))
+    }
+
+    private fun getApkDir(): File {
+        val mainIntent = Intent(Intent.ACTION_MAIN, null)
+        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
+        val apps = packageManager.queryIntentActivities(mainIntent, 0)
+        apps.forEach {
+            if (it.activityInfo.packageName == BuildConfig.APPLICATION_ID)
+                return File(it.activityInfo.applicationInfo.publicSourceDir.replace("/base.apk", ""))
         }
-        window.decorView.systemUiVisibility = tmp
+        return File("")
     }
 
-    private fun overlay(bmp1: Bitmap, bmp2: Bitmap): Bitmap {
-        val bmOverlay = Bitmap.createBitmap(bmp1.width, bmp1.height, bmp1.config)
-        val canvas = Canvas(bmOverlay)
-        canvas.drawBitmap(bmp1, Matrix(), null)
-        canvas.drawBitmap(bmp2, Matrix(), null)
-        return bmOverlay
-    }
-
-    private fun createImage(width: Int, height: Int, color: Int): Bitmap {
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        val paint = Paint()
-        paint.color = color
-        canvas.drawRect(0F, 0F, width.toFloat(), height.toFloat(), paint)
-        return bitmap
-    }
-
-    private fun getBitmapFromVectorDrawable(drawableId: Int): Bitmap {
-        var drawable = ContextCompat.getDrawable(this, drawableId)
-        drawable = DrawableCompat.wrap(drawable!!).mutate()
-
-        val bitmap = Bitmap.createBitmap(
-            drawable!!.intrinsicWidth,
-            drawable.intrinsicHeight, Bitmap.Config.ARGB_8888
-        )
-        val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.draw(canvas)
-
-        return bitmap
+    private fun checkUpdate(unit: () -> Unit) {
+        if (version == "") {
+            Thread {
+                val htmlParser = HtmlParser(this@About)
+                val json = htmlParser.getJson(latestRelease)
+                version = json.getString("tag_name")
+                apkUrl = json.getJSONArray("assets").getJSONObject(0).getString("browser_download_url")
+                update = version != BuildConfig.VERSION_NAME
+                runOnUiThread {
+                    unit()
+                }
+            }.start()
+        } else {
+            update = version != BuildConfig.VERSION_NAME
+            unit()
+        }
     }
 }

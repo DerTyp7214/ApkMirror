@@ -48,6 +48,7 @@
                     android:maxLines="2" android:paddingTop="3dp"/>
             <TextView
                     android:text="TextView"
+                    android:transitionName="dev"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/txt_dev"

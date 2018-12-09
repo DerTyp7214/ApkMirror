@@ -24,6 +24,11 @@ class AppDataScreen : AppCompatActivity() {
 
     private lateinit var htmlParser: HtmlParser
 
+    override fun onDestroy() {
+        super.onDestroy()
+        Adapter.clicked = false
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_data_screen)
