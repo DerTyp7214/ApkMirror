@@ -43,7 +43,6 @@ class MainActivity : AppCompatActivity() {
 
         val themeManager = ThemeManager.getInstance(this)
         themeManager.enableStatusAndNavBar(this)
-        themeManager.darkMode = true
         themeManager.changeAccentColor(Color.RED)
         themeManager.changePrimaryColor(resources.getColor(R.color.ic_launcher_background))
         themeManager.setDefaultAccent(Color.RED)
@@ -56,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         rv.adapter = adapter
 
         showChangeDialog(this) {
-            search("ApkMirror")
+            search("ApkMirror", false)
         }
     }
 
@@ -68,14 +67,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun search(query: String, callBack: () -> Unit = {}) {
+    private fun search(query: String, search: Boolean = true, callBack: () -> Unit = {}) {
         title = query
         if (thread != null) thread!!.interrupt()
         appList.clear()
         adapter.notifyDataSetChanged()
         if (Config.knownNames.contains(query.toLowerCase())) {
             title = getString(R.string.app_name)
-            progressDialog?.dismiss()
+            if (!search) progressDialog?.dismiss()
             appList.add(
                 App(
                     getString(R.string.app_name),
@@ -88,10 +87,10 @@ class MainActivity : AppCompatActivity() {
                 )
             )
             adapter.notifyDataSetChanged()
-        } else {
+        }
+        if (search) {
             progressBar.visibility = View.VISIBLE
             progressBar.progress = 0
-            title = query
             thread = Thread {
                 var loading = true
                 var i = 0

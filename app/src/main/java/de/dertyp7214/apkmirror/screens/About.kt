@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
-import androidx.appcompat.app.AppCompatActivity
 import com.dertyp7214.themeablecomponents.components.ThemeableFloatingActionButtonProgressBar
+import com.dertyp7214.themeablecomponents.screens.ThemeableActivity
 import com.dertyp7214.themeablecomponents.utils.ThemeManager
 import com.downloader.PRDownloader
 import de.dertyp7214.apkmirror.BuildConfig
@@ -15,7 +15,7 @@ import de.dertyp7214.apkmirror.common.HtmlParser
 import kotlinx.android.synthetic.main.activity_about.*
 import java.io.File
 
-class About : AppCompatActivity() {
+class About : ThemeableActivity() {
 
     private var update = false
     private var apkUrl =
