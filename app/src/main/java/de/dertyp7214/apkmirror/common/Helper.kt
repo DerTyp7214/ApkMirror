@@ -12,6 +12,28 @@ class Helper {
             return ChangeLog.Builder(context)
                 .addVersion(
                     Version.Builder(context)
+                        .setVersionName("1.4")
+                        .setVersionCode("1")
+                        .addChange(Version.Change(Version.Change.ChangeType.FIX, "Updater for apps"))
+                        .addChange(Version.Change(Version.Change.ChangeType.ADD, "New version handling"))
+                        .build()
+                )
+                .addVersion(
+                    Version.Builder(context)
+                        .setVersionName("1.3")
+                        .setVersionCode("1")
+                        .addChange(Version.Change(Version.Change.ChangeType.ADD, "Updater for apps"))
+                        .build()
+                )
+                .addVersion(
+                    Version.Builder(context)
+                        .setVersionName("1.2")
+                        .setVersionCode("1")
+                        .addChange(Version.Change(Version.Change.ChangeType.FIX, "Updater for ApkMirror"))
+                        .build()
+                )
+                .addVersion(
+                    Version.Builder(context)
                         .setVersionName("1.1")
                         .setVersionCode("1")
                         .addChange(Version.Change(Version.Change.ChangeType.ADD, "Updater for ApkMirror"))
