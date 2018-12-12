@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import android.view.View
 import com.dertyp7214.themeablecomponents.components.ThemeableFloatingActionButtonProgressBar
 import com.dertyp7214.themeablecomponents.screens.ThemeableActivity
 import com.dertyp7214.themeablecomponents.utils.ThemeManager
@@ -62,34 +63,48 @@ class About : ThemeableActivity() {
         checkUpdate {
             if (update) {
                 fab.isFinished = false
-                fab.setOnClickListener {
-                    fab.isLoading = true
-                    fab.setOnClickListener { }
-                    downloadSessions.add(
-                        htmlParser.openInstaller(
-                            apkUrl,
-                            object : HtmlParser.Listener {
-                                override fun run(progress: Int) {
-                                    fab.setOnClickListener { }
-                                    fab.progress = progress
-                                }
-
-                                override fun cancel() {
-                                    fab.isLoading = false
-                                }
-
-                                override fun stop(file: File) {
-                                    fab.setOnClickListener { htmlParser.installApk(file) }
-                                    fab.progress = 0
-                                    fab.isFinished = true
-                                    htmlParser.installApk(file)
-                                }
-                            })
-                    )
-                }
+                fab.setOnClickListener(getClickListener())
             }
         }
     }
+
+    private fun getClickListener(): (v: View) -> Unit {
+        val htmlParser = HtmlParser(this)
+        return {
+            fab.isLoading = true
+            fab.setOnClickListener {
+                PRDownloader.cancel(downloadSessions.last())
+                fab.isLoading = false
+                fab.setOnClickListener(getClickListener())
+            }
+            downloadSessions.add(
+                htmlParser.openInstaller(
+                    apkUrl,
+                    object : HtmlParser.Listener {
+                        override fun run(progress: Int) {
+                            fab.setOnClickListener {
+                                PRDownloader.cancel(downloadSessions.last())
+                                fab.isLoading = false
+                                fab.setOnClickListener(getClickListener())
+                            }
+                            fab.progress = progress
+                        }
+
+                        override fun cancel() {
+                            fab.isLoading = false
+                        }
+
+                        override fun stop(file: File) {
+                            fab.setOnClickListener { htmlParser.installApk(file) }
+                            fab.progress = 0
+                            fab.isFinished = true
+                            htmlParser.installApk(file)
+                        }
+                    })
+            )
+        }
+    }
+
     private fun checkUpdate(unit: () -> Unit) {
         if (version == "") {
             Thread {
