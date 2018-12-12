@@ -6,6 +6,7 @@ import android.app.ActivityOptions
 import android.app.ProgressDialog
 import android.content.Intent
 import android.util.DisplayMetrics
+import android.util.Log
 import android.util.Pair
 import android.view.LayoutInflater
 import android.view.View

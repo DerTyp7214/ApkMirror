@@ -10,7 +10,8 @@ class App(
     val date: String,
     val size: String,
     val url: String,
-    val imageUrl: String
+    val imageUrl: String,
+    var packageName: String = ""
 ) {
     val title = title
         get() {

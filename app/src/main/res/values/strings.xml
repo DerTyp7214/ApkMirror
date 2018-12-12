@@ -26,4 +26,8 @@
     <string name="key_leaddev">Lead developer</string>
     <string name="key_leaddev_github">GitHub</string>
     <string name="title_licenses">Licenses</string>
+    <string name="title_darkmode">Toggle Darkmode</string>
+    <string name="enabled">enabled</string>
+    <string name="disabled">disabled</string>
+    <string name="title_checkupdates">Check for updates</string>
 </resources>
