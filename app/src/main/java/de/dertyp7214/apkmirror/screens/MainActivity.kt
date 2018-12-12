@@ -2,6 +2,7 @@ package de.dertyp7214.apkmirror.screens
 
 import android.annotation.SuppressLint
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
@@ -13,19 +14,23 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.edit
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dertyp7214.themeablecomponents.components.ThemeableProgressBar
 import com.dertyp7214.themeablecomponents.utils.ThemeManager
 import de.dertyp7214.apkmirror.BuildConfig
 import de.dertyp7214.apkmirror.R
 import de.dertyp7214.apkmirror.common.Adapter
+import de.dertyp7214.apkmirror.common.Comparators
 import de.dertyp7214.apkmirror.common.Config
 import de.dertyp7214.apkmirror.common.Helper.Companion.showChangeDialog
 import de.dertyp7214.apkmirror.common.HtmlParser
 import de.dertyp7214.apkmirror.objects.App
 import kotlinx.android.synthetic.main.activity_main.*
+import org.json.JSONArray
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
@@ -78,6 +83,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun runParallel(units: ArrayList<() -> Unit>, parallelTasks: Int, run: () -> Unit) {
+        units.forEachIndexed { i, _ ->
+            if (i % parallelTasks == 0) {
+                val threads = ArrayList<Thread>()
+                for (index in 0 until parallelTasks) {
+                    if (units.size >= i + index + 1) {
+                        val th = Thread {
+                            units[index + i]()
+                        }
+                        th.start()
+                        threads.add(th)
+                    }
+                }
+                while (threads.any { it.isAlive }) Thread.sleep(10)
+            }
+        }
+        run()
+    }
+
+    private fun getApps(array: JSONArray): List<String> {
+        val list = ArrayList<String>()
+        for (i in 0 until array.length())
+            list.add(array.getString(i))
+        return list
+    }
+
     @SuppressLint("SimpleDateFormat")
     private fun checkUpdates(callBack: () -> Unit = {}) {
         title = "Updates"
@@ -88,44 +119,81 @@ class MainActivity : AppCompatActivity() {
         progressDialog!!.setIndeterminateDrawable(ThemeableProgressBar(this@MainActivity).indeterminateDrawable)
         thread = Thread {
             val startTime = System.currentTimeMillis()
-            val packages = packageManager.getInstalledApplications(0)
-            packages.forEachIndexed { index, info ->
-                val list = htmlParser.getAppList(info.packageName, "apk")
-                try {
-                    appList.addAll(Arrays.asList(list.first {
-                        it.packageName = info.packageName
-                        !it.title.contains("Wear OS")
-                    }))
-                } catch (e: Exception) {
+            var packages = packageManager.getInstalledApplications(0).map { it.packageName }
+            val packageCount = packages.size
+            val availablePackages = ArrayList<String>()
+            val sharedPreferences = getSharedPreferences("packages", Context.MODE_PRIVATE)
+            val units = ArrayList<() -> Unit>()
+            val parallelTasks = 3
+            val loadAll = if (sharedPreferences.getInt("packageCount", 0) == packageCount) {
+                var ret = true
+                for (it in packages) {
+                    val array = JSONArray(sharedPreferences.getString("packages", "[]"))
+                    var count = 1
+                    for (i in 0 until array.length())
+                        if (it == array.getString(i))
+                            count++
+                    ret = count == array.length()
                 }
-                this@MainActivity.runOnUiThread {
-                    val percentage = ((index.toFloat() / packages.size.toFloat()) * 1000).toInt().toFloat() / 10
-                    val currentTime = System.currentTimeMillis()
-                    val time = ((currentTime - startTime) / (index + 1) * (packages.size - index))
-                    val date = Date(time)
-                    val formatter = SimpleDateFormat("mm:ss")
-                    formatter.timeZone = TimeZone.getTimeZone("UTC")
-                    progressDialog?.setMessage("Reading packages ($percentage%)\n${formatter.format(date)} Minutes left")
+                ret
+            } else true
+            if (loadAll) packages = getApps(JSONArray(sharedPreferences.getString("packages", "[]")))
+            packages.forEachIndexed { index, info ->
+                units.add {
+                    val list = htmlParser.getAppList(info, "apk")
+                    if (list.size > 0) availablePackages.add(info)
+                    try {
+                        appList.addAll(Arrays.asList(list.first {
+                            it.packageName = info
+                            !it.title.contains("Wear OS")
+                                    && !it.title.contains("Android TV")
+                                    && !it.title.contains("Daydream")
+                        }))
+                    } catch (e: Exception) {
+                    }
+                    this@MainActivity.runOnUiThread {
+                        if (index % parallelTasks == 0) {
+                            val percentage = ((index.toFloat() / packages.size.toFloat()) * 1000).toInt().toFloat() / 10
+                            val currentTime = System.currentTimeMillis()
+                            val time = ((currentTime - startTime) / (index + 1) * (packages.size - index))
+                            val date = Date(time)
+                            val formatter = SimpleDateFormat("mm:ss")
+                            formatter.timeZone = TimeZone.getTimeZone("UTC")
+                            progressDialog?.setMessage("Reading packages ($percentage%)\n${formatter.format(date)} Minutes left")
+                        }
+                    }
                 }
             }
-            this@MainActivity.runOnUiThread {
-                val tmpList: List<App> = appList.clone() as List<App>
-                appList.clear()
-                appList.addAll(tmpList.filter {
-                    it.version.trim() != packageManager.getPackageInfo(it.packageName, 0).versionName.trim()
-                })
-                appList.sortWith(Comparator { o1, o2 ->
-                    when {
-                        o1.title < o2.title -> -1
-                        o1.title >= o2.title -> 1
-                        else -> 0
-                    }
-                })
-                adapter.notifyDataSetChanged()
-                progressDialog?.dismiss()
-                Handler().postDelayed({
-                    callBack()
-                }, 100)
+            runParallel(units, parallelTasks) {
+                sharedPreferences.edit {
+                    putString("availablePackages", JSONArray(availablePackages).toString())
+                    putString("packages", JSONArray(packages).toString())
+                    putInt("packageCount", packageCount)
+                }
+                this@MainActivity.runOnUiThread {
+                    val tmpList: List<App?> = appList.clone() as List<App>
+                    appList.clear()
+                    appList.addAll(tmpList.filter {
+                        if (it == null) false
+                        else
+                            Comparators.compareVersion(
+                                it.version.trim(),
+                                packageManager.getPackageInfo(it.packageName, 0).versionName.trim()
+                            ) == 1
+                    } as List<App>)
+                    appList.sortWith(Comparator { o1, o2 ->
+                        when {
+                            o1.title < o2.title -> -1
+                            o1.title >= o2.title -> 1
+                            else -> 0
+                        }
+                    })
+                    adapter.notifyDataSetChanged()
+                    progressDialog?.dismiss()
+                    Handler().postDelayed({
+                        callBack()
+                    }, 100)
+                }
             }
         }
         thread?.start()
