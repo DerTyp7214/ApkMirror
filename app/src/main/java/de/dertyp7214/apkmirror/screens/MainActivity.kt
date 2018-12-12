@@ -36,6 +36,10 @@ class MainActivity : AppCompatActivity() {
     private var progressDialog: ProgressDialog? = null
     private var lastTimeStamp = 0L
 
+    companion object {
+        var checkUpdates = false
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -64,6 +68,67 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Press back again to close the app.", Toast.LENGTH_LONG).show()
             lastTimeStamp = System.currentTimeMillis()
         } else super.onBackPressed()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (checkUpdates) {
+            checkUpdates()
+            checkUpdates = false
+        }
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun checkUpdates(callBack: () -> Unit = {}) {
+        title = "Updates"
+        appList.clear()
+        adapter.notifyDataSetChanged()
+        if (thread != null) thread!!.interrupt()
+        progressDialog = ProgressDialog.show(this@MainActivity, "", "Reading packages (0%)")
+        progressDialog!!.setIndeterminateDrawable(ThemeableProgressBar(this@MainActivity).indeterminateDrawable)
+        thread = Thread {
+            val startTime = System.currentTimeMillis()
+            val packages = packageManager.getInstalledApplications(0)
+            packages.forEachIndexed { index, info ->
+                val list = htmlParser.getAppList(info.packageName, "apk")
+                try {
+                    appList.addAll(Arrays.asList(list.first {
+                        it.packageName = info.packageName
+                        !it.title.contains("Wear OS")
+                    }))
+                } catch (e: Exception) {
+                }
+                this@MainActivity.runOnUiThread {
+                    val percentage = ((index.toFloat() / packages.size.toFloat()) * 1000).toInt().toFloat() / 10
+                    val currentTime = System.currentTimeMillis()
+                    val time = ((currentTime - startTime) / (index + 1) * (packages.size - index))
+                    val date = Date(time)
+                    val formatter = SimpleDateFormat("mm:ss")
+                    formatter.timeZone = TimeZone.getTimeZone("UTC")
+                    progressDialog?.setMessage("Reading packages ($percentage%)\n${formatter.format(date)} Minutes left")
+                }
+            }
+            this@MainActivity.runOnUiThread {
+                val tmpList: List<App> = appList.clone() as List<App>
+                appList.clear()
+                appList.addAll(tmpList.filter {
+                    it.version.trim() != packageManager.getPackageInfo(it.packageName, 0).versionName.trim()
+                })
+                appList.sortWith(Comparator { o1, o2 ->
+                    when {
+                        o1.title < o2.title -> -1
+                        o1.title >= o2.title -> 1
+                        else -> 0
+                    }
+                })
+                adapter.notifyDataSetChanged()
+                progressDialog?.dismiss()
+                Handler().postDelayed({
+                    callBack()
+                }, 100)
+            }
+        }
+        thread?.start()
     }
 
     @SuppressLint("SimpleDateFormat")

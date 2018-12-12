@@ -29,11 +29,11 @@ class HtmlParser(private val context: Context) {
     var page: Int = 1
         set(value) {
             field = value
-            baseQueryUrl = "$baseUrl/?post_type=app_release&searchtype=app&page=$value&s="
+            baseQueryUrl = "$baseUrl/?post_type=app_release&searchtype={TYPE}&page=$value&s="
         }
 
     private val baseUrl = "https://www.apkmirror.com"
-    private var baseQueryUrl = "$baseUrl/?post_type=app_release&searchtype=app&page=$page&s="
+    private var baseQueryUrl = "$baseUrl/?post_type=app_release&searchtype={TYPE}&page=$page&s="
 
     companion object {
         private val appMap = HashMap<String, AppScreenData>()
@@ -44,8 +44,8 @@ class HtmlParser(private val context: Context) {
         StrictMode.setThreadPolicy(policy)
     }
 
-    fun getAppList(query: String): ArrayList<App> {
-        val searchContent = getWebContent("$baseQueryUrl$query") ?: ""
+    fun getAppList(query: String, type: String = "app"): ArrayList<App> {
+        val searchContent = getWebContent("${baseQueryUrl.replace("{TYPE}", type)}$query") ?: ""
         val splitOne = searchContent.split("id=\"content\"")
         val content = if (splitOne.size > 1) splitOne[1] else ""
         val splitTwo = content.split("class=\"listWidget\"")
@@ -75,7 +75,15 @@ class HtmlParser(private val context: Context) {
                         .split("src=\"")[1]
                         .split("\">")[0]
                         .replace("w=32&h=32", "w=128&h=128")
-                    val app = App(title, dev, version, "", size, "$baseUrl$url", "$baseUrl$imageUrl")
+                    val app = App(
+                        title,
+                        dev,
+                        version,
+                        "",
+                        size,
+                        "$baseUrl${if (type == "apk") url.split("/").dropLast(2).joinToString("/") else url}",
+                        "$baseUrl$imageUrl"
+                    )
                     appList.add(app)
                 } catch (e: Exception) {
                     Log.wtf("ERROR", "Error at: $s\n\nMessage: ${e.localizedMessage}")

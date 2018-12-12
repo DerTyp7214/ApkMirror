@@ -61,6 +61,11 @@ class AppDataScreen : AppCompatActivity() {
         txt_description.setLinkTextColor(themeManager.colorAccent)
         appData.applyDescriptionToTextView(txt_description)
 
+        if (!appData.app.packageName.isBlank()) {
+            txt_packageName.visibility = View.VISIBLE
+            txt_packageName.text = packageManager.getPackageInfo(appData.app.packageName, 0).versionName
+        }
+
         appData.variants.sortWith(Comparator { o1, o2 ->
             Comparators.compareVersion(o1.version, o2.version)
         })

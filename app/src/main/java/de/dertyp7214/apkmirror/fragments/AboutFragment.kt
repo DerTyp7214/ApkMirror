@@ -21,6 +21,7 @@ import de.dertyp7214.apkmirror.R
 import de.dertyp7214.apkmirror.common.Helper
 import de.dertyp7214.apkmirror.common.LicensesDialog
 import de.dertyp7214.apkmirror.common.NetworkTools.Companion.drawableFromUrl
+import de.dertyp7214.apkmirror.screens.MainActivity
 import de.psdev.licensesdialog.licenses.ApacheSoftwareLicense20
 import de.psdev.licensesdialog.licenses.EclipsePublicLicense10
 import de.psdev.licensesdialog.licenses.MITLicense
@@ -288,12 +289,20 @@ class AboutFragment : MaterialAboutFragment() {
                     .build()
             )
             .addItem(MaterialAboutActionItem.Builder()
-                .text("Toggle Darkmode")
-                .subText(if (themeManager.darkMode) "enabled" else "disabled")
+                .text(R.string.title_darkmode)
+                .subText(if (themeManager.darkMode) R.string.enabled else R.string.disabled)
                 .icon(icon(MaterialDesignIconic.Icon.gmi_invert_colors))
                 .setOnClickAction {
                     themeManager.darkMode = !themeManager.darkMode
                     activity!!.recreate()
+                }
+                .build())
+            .addItem(MaterialAboutActionItem.Builder()
+                .text(R.string.title_checkupdates)
+                .icon(icon(MaterialDesignIconic.Icon.gmi_refresh_sync))
+                .setOnClickAction {
+                    MainActivity.checkUpdates = true
+                    activity!!.onBackPressed()
                 }
                 .build())
             .build()

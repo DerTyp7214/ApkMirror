@@ -34,6 +34,17 @@
         <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:padding="4dp">
+            <TextView
+                    android:visibility="gone"
+                    android:id="@+id/txt_packageName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+            />
+        </LinearLayout>
+        <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent">
             <com.dertyp7214.themeablecomponents.components.ThemeableButton
                     android:text="@string/titleVariants"
