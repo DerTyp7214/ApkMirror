@@ -12,8 +12,15 @@ class Helper {
             return ChangeLog.Builder(context)
                 .addVersion(
                     Version.Builder(context)
+                        .setVersionName("1.4.1")
+                        .setVersionCode("14100")
+                        .addChange(Version.Change(Version.Change.ChangeType.FIX, "Version handling"))
+                        .build()
+                )
+                .addVersion(
+                    Version.Builder(context)
                         .setVersionName("1.4")
-                        .setVersionCode("1")
+                        .setVersionCode("14000")
                         .addChange(Version.Change(Version.Change.ChangeType.FIX, "Updater for apps"))
                         .addChange(Version.Change(Version.Change.ChangeType.ADD, "New version handling"))
                         .build()

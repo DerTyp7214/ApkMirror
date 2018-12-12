@@ -12,6 +12,7 @@ import com.downloader.PRDownloader
 import de.dertyp7214.apkmirror.BuildConfig
 import de.dertyp7214.apkmirror.R
 import de.dertyp7214.apkmirror.common.Adapter
+import de.dertyp7214.apkmirror.common.Comparators
 import de.dertyp7214.apkmirror.common.HtmlParser
 import kotlinx.android.synthetic.main.activity_about.*
 import java.io.File
@@ -112,7 +113,7 @@ class About : ThemeableActivity() {
                 val json = htmlParser.getJson(latestRelease)
                 version = json.getString("tag_name")
                 apkUrl = json.getJSONArray("assets").getJSONObject(0).getString("browser_download_url")
-                update = version != BuildConfig.VERSION_NAME
+                update = Comparators.compareVersion(version, BuildConfig.VERSION_NAME) == 1
                 runOnUiThread {
                     unit()
                 }
