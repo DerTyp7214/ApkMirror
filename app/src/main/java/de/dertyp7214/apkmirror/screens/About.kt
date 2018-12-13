@@ -1,19 +1,22 @@
 package de.dertyp7214.apkmirror.screens
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import com.dertyp7214.themeablecomponents.components.ThemeableFloatingActionButtonProgressBar
 import com.dertyp7214.themeablecomponents.screens.ThemeableActivity
+import com.dertyp7214.themeablecomponents.utils.OnThemeChangeListener
+import com.dertyp7214.themeablecomponents.utils.Theme
 import com.dertyp7214.themeablecomponents.utils.ThemeManager
 import com.downloader.PRDownloader
+import de.dertyp7214.apkmirror.Application
 import de.dertyp7214.apkmirror.BuildConfig
 import de.dertyp7214.apkmirror.R
 import de.dertyp7214.apkmirror.common.Adapter
 import de.dertyp7214.apkmirror.common.Comparators
 import de.dertyp7214.apkmirror.common.HtmlParser
+import de.dertyp7214.apkmirror.fragments.AboutFragment.Companion.disableCheckUpdates
 import kotlinx.android.synthetic.main.activity_about.*
 import java.io.File
 
@@ -40,6 +43,7 @@ class About : ThemeableActivity() {
         fab.hide()
         Handler().postDelayed({
             super.onBackPressed()
+            disableCheckUpdates = false
             downloadSessions.forEach {
                 PRDownloader.cancel(it)
                 downloadSessions.remove(it)
@@ -54,11 +58,26 @@ class About : ThemeableActivity() {
 
         title = getString(R.string.app_name)
         fab = themeableFloatingActionButtonProgressBar
-        val htmlParser = HtmlParser(this)
-        val themeManager = ThemeManager.getInstance(this)
+        val themeManager = (application as Application).getManager()
         themeManager.enableStatusAndNavBar(this)
-        themeManager.changeAccentColor(Color.RED)
-        themeManager.changePrimaryColor(resources.getColor(R.color.ic_launcher_background))
+
+        val themeChangeListener = toolbar.onThemeChangeListener
+        toolbar.onThemeChangeListener = object: OnThemeChangeListener {
+            override val id: String
+                get() = "aboutToolbar"
+            override val type: ThemeManager.Component.TYPE
+                get() = ThemeManager.Component.TYPE.TOOLBAR
+
+            override fun accent(): Boolean {
+                return false
+            }
+
+            override fun onThemeChanged(theme: Theme, animated: Boolean) {
+                themeChangeListener.onThemeChanged(theme, animated)
+            }
+        }
+
+        toolbar.onThemeChangeListener.onThemeChanged(Theme(resources.getColor(R.color.ic_launcher_background)), false)
 
         fab.isFinished = true
         checkUpdate {

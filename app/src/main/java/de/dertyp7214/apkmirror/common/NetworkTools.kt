@@ -29,18 +29,28 @@ class NetworkTools {
                     while ({ line = reader.readLine(); line }() != null)
                         ret.append(line!!)
 
-                    if (url == "http://api.github.com/repos/DerTyp7214/ApkMirror/releases/latest") Log.d("RET", ret.toString())
+                    if (url == "http://api.github.com/repos/DerTyp7214/ApkMirror/releases/latest") Log.d(
+                        "RET",
+                        ret.toString()
+                    )
                     reader.close()
                     ret.toString()
                 } catch (e: Exception) {
                     Log.d("ERROR", e.message)
                     ""
                 }
-            return contentMap[url] as String
+            return try {
+                contentMap[url] as String
+            } catch (e: Exception) {
+                ""
+            }
         }
 
         fun fastLoadImage(url: String): Drawable? {
-            return if (url == "self:launcher_icon" && Config.application != null) ContextCompat.getDrawable(Config.application!!, R.mipmap.ic_launcher)
+            return if (url == "self:launcher_icon" && Config.application != null) ContextCompat.getDrawable(
+                Config.application!!,
+                R.mipmap.ic_launcher
+            )
             else if (contentMap.containsKey(url)) contentMap[url] as Drawable else null
         }
 

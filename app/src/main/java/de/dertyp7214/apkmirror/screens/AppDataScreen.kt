@@ -12,7 +12,8 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.ColorUtils
 import androidx.palette.graphics.Palette
-import com.dertyp7214.themeablecomponents.utils.ThemeManager
+import com.dertyp7214.themeablecomponents.utils.Theme
+import de.dertyp7214.apkmirror.Application
 import de.dertyp7214.apkmirror.R
 import de.dertyp7214.apkmirror.common.*
 import de.dertyp7214.apkmirror.common.NetworkTools.Companion.drawableFromUrl
@@ -34,7 +35,7 @@ class AppDataScreen : AppCompatActivity() {
         setContentView(R.layout.activity_app_data_screen)
         setSupportActionBar(toolbar)
 
-        val themeManager = ThemeManager.getInstance(this)
+        val themeManager = (application as Application).getManager()
         themeManager.enableStatusAndNavBar(this)
 
         if (intent == null || intent.extras == null || !intent.extras.containsKey("url")) finish()
@@ -74,6 +75,7 @@ class AppDataScreen : AppCompatActivity() {
         val variantAdapter = VariantAdapter(this, appData.variants)
         val variantBottomSheet = BottomSheet(getString(R.string.titleVariants), variantAdapter)
         btn_vars.visibility = if (appData.variants.size > 0) View.VISIBLE else View.INVISIBLE
+        btn_vars.onThemeChangeListener.onThemeChanged(Theme(themeManager.colorAccent), false)
         btn_vars.setOnClickListener {
             variantBottomSheet.show(supportFragmentManager, "Variants")
         }
@@ -86,6 +88,7 @@ class AppDataScreen : AppCompatActivity() {
         val versionAdapter = VersionAdapter(this, appData.versions)
         val versionBottomSheet = BottomSheet(getString(R.string.titleVersions), versionAdapter)
         btn_vers.visibility = if (appData.versions.size > 0) View.VISIBLE else View.INVISIBLE
+        btn_vers.onThemeChangeListener.onThemeChanged(Theme(themeManager.colorAccent), false)
         btn_vers.setOnClickListener {
             versionBottomSheet.show(supportFragmentManager, "Versions")
         }

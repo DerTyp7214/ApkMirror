@@ -83,5 +83,21 @@ class Helper {
             val pre = (if (si) "kMGTPE" else "KMGTPE")[exp - 1] + (if (si) "" else "i")
             return String.format("%.1f %sB", bytes / Math.pow(unit.toDouble(), exp.toDouble()), pre)
         }
+
+        fun getAttrColor(context: Context, attr: Int): Int {
+            return try {
+                val ta = context.obtainStyledAttributes(intArrayOf(attr))
+                val colorAccent = ta.getColor(0, 0)
+                ta.recycle()
+                colorAccent
+            } catch (e: Exception) {
+                Color.RED
+            }
+        }
+
+        fun isColorDark(color: Int): Boolean {
+            val darkness = 1 - (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255
+            return darkness >= 0.5
+        }
     }
 }

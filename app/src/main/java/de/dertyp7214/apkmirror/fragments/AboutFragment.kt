@@ -16,6 +16,7 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.IIcon
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic
+import de.dertyp7214.apkmirror.Application
 import de.dertyp7214.apkmirror.BuildConfig
 import de.dertyp7214.apkmirror.R
 import de.dertyp7214.apkmirror.common.Helper
@@ -46,9 +47,13 @@ class AboutFragment : MaterialAboutFragment() {
         }, resources.getInteger(android.R.integer.config_shortAnimTime).toLong())*/
     }
 
+    companion object {
+        var disableCheckUpdates = false
+    }
+
     override fun getMaterialAboutList(activityContext: Context): MaterialAboutList {
 
-        val themeManager = ThemeManager.getInstance(activity!!)
+        val themeManager = (activity!!.application as Application).getManager()
         val iconColor = if (themeManager.darkMode) Color.WHITE else Color.BLACK
         val icon = { iconId: IIcon -> IconicsDrawable(context!!).icon(iconId).color(iconColor) }
 
@@ -293,6 +298,7 @@ class AboutFragment : MaterialAboutFragment() {
                 .subText(if (themeManager.darkMode) R.string.enabled else R.string.disabled)
                 .icon(icon(MaterialDesignIconic.Icon.gmi_invert_colors))
                 .setOnClickAction {
+                    disableCheckUpdates = true
                     themeManager.darkMode = !themeManager.darkMode
                     activity!!.recreate()
                 }
@@ -301,8 +307,10 @@ class AboutFragment : MaterialAboutFragment() {
                 .text(R.string.title_checkupdates)
                 .icon(icon(MaterialDesignIconic.Icon.gmi_refresh_sync))
                 .setOnClickAction {
-                    MainActivity.checkUpdates = true
-                    activity!!.onBackPressed()
+                    if (!disableCheckUpdates) {
+                        MainActivity.checkUpdates = true
+                        activity!!.onBackPressed()
+                    }
                 }
                 .build())
             .build()

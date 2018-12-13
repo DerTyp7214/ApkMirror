@@ -17,7 +17,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.edit
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dertyp7214.themeablecomponents.components.ThemeableProgressBar
-import com.dertyp7214.themeablecomponents.utils.ThemeManager
+import de.dertyp7214.apkmirror.Application
 import de.dertyp7214.apkmirror.BuildConfig
 import de.dertyp7214.apkmirror.R
 import de.dertyp7214.apkmirror.common.Adapter
@@ -50,12 +50,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        val themeManager = ThemeManager.getInstance(this)
+        val themeManager = (application as Application).getManager()
         themeManager.enableStatusAndNavBar(this)
-        themeManager.changeAccentColor(Color.RED)
-        themeManager.changePrimaryColor(resources.getColor(R.color.ic_launcher_background))
-        themeManager.setDefaultAccent(Color.RED)
         themeManager.setDefaultPrimary(resources.getColor(R.color.ic_launcher_background))
+        themeManager.changePrimaryColor(resources.getColor(R.color.ic_launcher_background))
 
         htmlParser = HtmlParser(this)
         appList = ArrayList()
