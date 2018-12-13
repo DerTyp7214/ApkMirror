@@ -12,6 +12,13 @@ class Helper {
             return ChangeLog.Builder(context)
                 .addVersion(
                     Version.Builder(context)
+                        .setVersionName("1.5")
+                        .setVersionCode("15000")
+                        .addChange(Version.Change(Version.Change.ChangeType.ADD, "Extract Accentcolor from System"))
+                        .build()
+                )
+                .addVersion(
+                    Version.Builder(context)
                         .setVersionName("1.4.1")
                         .setVersionCode("14100")
                         .addChange(Version.Change(Version.Change.ChangeType.FIX, "Version handling"))
