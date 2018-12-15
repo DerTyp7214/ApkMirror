@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2018.
+ * Created by Josua Lengwenath
+ */
+
 package de.dertyp7214.apkmirror.fragments
 
 import android.annotation.SuppressLint
@@ -36,15 +41,6 @@ class AboutFragment : MaterialAboutFragment() {
 
         val displayMetrics = DisplayMetrics()
         activity!!.windowManager.defaultDisplay.getMetrics(displayMetrics)
-
-        /*Handler().postDelayed({
-            val animator = ValueAnimator.ofInt(displayMetrics.heightPixels, 0)
-            animator.duration = resources.getInteger(android.R.integer.config_longAnimTime).toLong() * 2
-            animator.addUpdateListener {
-                (view as ViewGroup).setPadding(0, it.animatedValue as Int, 0, 0)
-            }
-            animator.start()
-        }, resources.getInteger(android.R.integer.config_shortAnimTime).toLong())*/
     }
 
     companion object {
