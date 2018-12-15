@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2018.
+ * Created by Josua Lengwenath
+ */
+
 @file:Suppress("NAME_SHADOWING")
 
 package de.dertyp7214.apkmirror.common

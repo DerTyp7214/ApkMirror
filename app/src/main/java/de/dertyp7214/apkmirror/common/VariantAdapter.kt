@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2018.
+ * Created by Josua Lengwenath
+ */
+
 package de.dertyp7214.apkmirror.common
 
 import android.annotation.SuppressLint
@@ -14,15 +19,16 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
+import com.dertyp7214.themeablecomponents.components.ThemeableProgressBar
 import de.dertyp7214.apkmirror.R
 import de.dertyp7214.apkmirror.common.NetworkTools.Companion.drawableFromUrl
 import de.dertyp7214.apkmirror.objects.AppVariant
-import com.dertyp7214.themeablecomponents.components.ThemeableProgressBar
 import java.io.File
 
 class VariantAdapter(private var context: Activity, private var items: ArrayList<AppVariant>) :
     RecyclerView.Adapter<VariantAdapter.ViewHolder>() {
 
+    @SuppressLint("InflateParams")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(context).inflate(R.layout.item_variant, null, false)
 

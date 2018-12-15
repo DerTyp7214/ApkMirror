@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018.
+ * Created by Josua Lengwenath
+ */
+
+@file:Suppress("DEPRECATION")
+
 package de.dertyp7214.apkmirror.common
 
 import android.annotation.SuppressLint
@@ -6,7 +13,6 @@ import android.app.ActivityOptions
 import android.app.ProgressDialog
 import android.content.Intent
 import android.util.DisplayMetrics
-import android.util.Log
 import android.util.Pair
 import android.view.LayoutInflater
 import android.view.View

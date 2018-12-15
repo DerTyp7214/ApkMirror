@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2018.
+ * Created by Josua Lengwenath
+ */
+
 package de.dertyp7214.apkmirror.common
 
 import android.content.Context
@@ -19,7 +24,6 @@ import de.psdev.licensesdialog.model.Notice
 import de.psdev.licensesdialog.model.Notices
 
 class LicensesDialog
-
 private constructor(
     private val mContext: Context,
     private val mLicensesText: String,

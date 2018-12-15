@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2018.
+ * Created by Josua Lengwenath
+ */
+
 @file:Suppress("DEPRECATION")
 
 package de.dertyp7214.apkmirror.screens
