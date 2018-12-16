@@ -13,13 +13,21 @@ import java.io.File
 
 class Helper {
     companion object {
-        private fun changeLogs(context: Context, closeListener: () -> Unit = {}): ChangeLog {
+        fun changeLogs(context: Context, closeListener: () -> Unit = {}): ChangeLog {
             return ChangeLog.Builder(context)
+                .addVersion(
+                    Version.Builder(context)
+                        .setVersionName("1.6")
+                        .setVersionCode("16000")
+                        .addChange(Version.Change(Version.Change.ChangeType.ADD, "Read Darkmode from System"))
+                        .addChange(Version.Change(Version.Change.ChangeType.IMPROVEMENT, "Performance"))
+                        .build()
+                )
                 .addVersion(
                     Version.Builder(context)
                         .setVersionName("1.5")
                         .setVersionCode("15000")
-                        .addChange(Version.Change(Version.Change.ChangeType.ADD, "Extract Accentcolor from System"))
+                        .addChange(Version.Change(Version.Change.ChangeType.ADD, "Read Accentcolor from System"))
                         .build()
                 )
                 .addVersion(

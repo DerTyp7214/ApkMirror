@@ -35,4 +35,5 @@
     <string name="enabled">enabled</string>
     <string name="disabled">disabled</string>
     <string name="title_checkupdates">Check for updates</string>
+    <string name="title_changelogs">Changelogs</string>
 </resources>

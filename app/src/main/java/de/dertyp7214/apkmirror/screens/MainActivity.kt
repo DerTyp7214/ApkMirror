@@ -44,12 +44,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appList: ArrayList<App>
     private lateinit var adapter: Adapter
     private lateinit var htmlParser: HtmlParser
+    private var mainAction: MenuItem? = null
     private var thread: Thread? = null
     private var progressDialog: ProgressDialog? = null
     private var lastTimeStamp = 0L
 
     companion object {
         var checkUpdates = false
+        var homePressed = false
+        var lastSearch = ""
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,10 +77,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (System.currentTimeMillis() - lastTimeStamp > 4000) {
-            Toast.makeText(this, "Press back again to close the app.", Toast.LENGTH_LONG).show()
-            lastTimeStamp = System.currentTimeMillis()
-        } else super.onBackPressed()
+        when {
+            homePressed -> {
+                search(lastSearch)
+                homePressed = false
+            }
+            System.currentTimeMillis() - lastTimeStamp > 4000 -> {
+                Toast.makeText(this, "Press back again to close the app.", Toast.LENGTH_LONG).show()
+                lastTimeStamp = System.currentTimeMillis()
+            }
+            else -> super.onBackPressed()
+        }
     }
 
     override fun onResume() {
@@ -227,6 +237,8 @@ class MainActivity : AppCompatActivity() {
             adapter.notifyDataSetChanged()
         }
         if (search) {
+            if (mainAction != null) mainAction!!.isVisible = true
+            lastSearch = query
             progressBar.visibility = View.VISIBLE
             progressBar.progress = 0
             thread = Thread {
@@ -261,7 +273,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             thread?.start()
-        }
+        } else if (Config.knownNames.contains(query.toLowerCase()) && mainAction != null)
+            mainAction!!.isVisible = false
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -270,6 +283,7 @@ class MainActivity : AppCompatActivity() {
         val myActionMenuItem: MenuItem = menu!!.findItem(R.id.action_search)
         myActionMenuItem.icon.setTintList(ColorStateList.valueOf(Color.WHITE))
         val searchView = myActionMenuItem.actionView as SearchView
+        mainAction = menu.findItem(R.id.action_main)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (!searchView.isIconified) {
@@ -286,6 +300,13 @@ class MainActivity : AppCompatActivity() {
                 return false
             }
         })
+
+        mainAction!!.isVisible = false
+        mainAction!!.setOnMenuItemClickListener {
+            homePressed = true
+            search(getString(R.string.app_name), false)
+            true
+        }
         return true
     }
 }

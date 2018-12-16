@@ -289,7 +289,7 @@ class AboutFragment : MaterialAboutFragment() {
                     }
                     .build()
             )
-            .addItem(MaterialAboutActionItem.Builder()
+            /*.addItem(MaterialAboutActionItem.Builder()
                 .text(R.string.title_darkmode)
                 .subText(if (themeManager.darkMode) R.string.enabled else R.string.disabled)
                 .icon(icon(MaterialDesignIconic.Icon.gmi_invert_colors))
@@ -298,7 +298,7 @@ class AboutFragment : MaterialAboutFragment() {
                     themeManager.darkMode = !themeManager.darkMode
                     activity!!.recreate()
                 }
-                .build())
+                .build())*/
             .addItem(MaterialAboutActionItem.Builder()
                 .text(R.string.title_checkupdates)
                 .icon(icon(MaterialDesignIconic.Icon.gmi_refresh_sync))
@@ -307,6 +307,13 @@ class AboutFragment : MaterialAboutFragment() {
                         MainActivity.checkUpdates = true
                         activity!!.onBackPressed()
                     }
+                }
+                .build())
+            .addItem(MaterialAboutActionItem.Builder()
+                .text(R.string.title_changelogs)
+                .icon(icon(MaterialDesignIconic.Icon.gmi_time_restore))
+                .setOnClickAction {
+                    Helper.changeLogs(context!!).showDialog()
                 }
                 .build())
             .build()
