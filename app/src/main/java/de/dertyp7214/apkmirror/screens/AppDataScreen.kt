@@ -65,7 +65,7 @@ class AppDataScreen : AppCompatActivity() {
         icon.setImageDrawable(drawableFromUrl(this, appData.app.imageUrl))
 
         txt_description.setLinkTextColor(themeManager.colorAccent)
-        appData.applyDescriptionToTextView(txt_description)
+        appData.applyDescriptionToTextView(this, txt_description, color)
 
         if (!appData.app.packageName.isBlank()) {
             txt_packageName.visibility = View.VISIBLE
