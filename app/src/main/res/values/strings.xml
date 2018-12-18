@@ -36,4 +36,6 @@
     <string name="disabled">disabled</string>
     <string name="title_checkupdates">Check for updates</string>
     <string name="title_changelogs">Changelogs</string>
+    <string name="actionHideApp">Hide app</string>
+    <string name="show_app">Show app</string>
 </resources>

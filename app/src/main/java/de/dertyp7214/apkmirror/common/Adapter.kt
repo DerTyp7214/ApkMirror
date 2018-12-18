@@ -11,6 +11,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityOptions
 import android.app.ProgressDialog
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.util.DisplayMetrics
 import android.util.Pair
@@ -21,7 +22,9 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.widget.PopupMenu
 import androidx.cardview.widget.CardView
+import androidx.core.content.edit
 import androidx.recyclerview.widget.RecyclerView
 import com.dertyp7214.themeablecomponents.components.ThemeableProgressBar
 import de.dertyp7214.apkmirror.R
@@ -31,6 +34,9 @@ import de.dertyp7214.apkmirror.objects.App
 import de.dertyp7214.apkmirror.objects.AppScreenData
 import de.dertyp7214.apkmirror.screens.About
 import de.dertyp7214.apkmirror.screens.AppDataScreen
+import de.dertyp7214.apkmirror.screens.MainActivity
+import de.dertyp7214.apkmirror.screens.MainActivity.Companion.showHiddenApps
+import org.json.JSONArray
 
 class Adapter(private val activity: Activity, private var items: ArrayList<App>) :
     RecyclerView.Adapter<Adapter.ViewHolder>() {
@@ -45,6 +51,15 @@ class Adapter(private val activity: Activity, private var items: ArrayList<App>)
         var progressDialog: ProgressDialog? = null
         val apps = HashMap<String, AppScreenData>()
         var clicked = false
+    }
+
+    private fun JSONArray.forEach(unit: (item: Any, index: Int) -> Unit) {
+        for (i in 0 until length())
+            unit(this[i], i)
+    }
+
+    private fun JSONArray.clone(): JSONArray {
+        return JSONArray(toString())
     }
 
     override fun getItemCount(): Int = items.size
@@ -76,6 +91,38 @@ class Adapter(private val activity: Activity, private var items: ArrayList<App>)
             }.start()
         }
 
+        if (app.packageName.isNotBlank()) {
+            holder.ly.setOnLongClickListener {
+                val popup = PopupMenu(activity, it)
+                val inflater = popup.menuInflater
+                inflater.inflate(R.menu.app_menu, popup.menu)
+                val hideApp = popup.menu.findItem(R.id.action_hide_app)
+                if (showHiddenApps) hideApp.setTitle(R.string.show_app)
+                hideApp.setOnMenuItemClickListener {
+                    val sharedPreferences = activity.getSharedPreferences("check_updates", MODE_PRIVATE)
+                    val jsonArray = JSONArray(sharedPreferences.getString("hidden_apps", "[]"))
+                    if (showHiddenApps) {
+                        jsonArray.clone().forEach { item, index ->
+                            if (app.packageName == item) jsonArray.remove(index)
+                        }
+                        MainActivity.loadHiddenApps = true
+                    } else {
+                        jsonArray.put(app.packageName)
+                        MainActivity.checkUpdates = true
+                    }
+                    sharedPreferences.edit {
+                        putString("hidden_apps", jsonArray.toString())
+                    }
+                    activity.finish()
+                    activity.startActivity(Intent(activity, MainActivity::class.java))
+                    true
+                }
+                popup.show()
+                true
+            }
+        } else {
+            holder.ly.setOnLongClickListener { true }
+        }
         holder.ly.setOnClickListener {
             if (!clicked) {
                 clicked = true

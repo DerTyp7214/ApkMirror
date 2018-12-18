@@ -48,11 +48,22 @@ class MainActivity : AppCompatActivity() {
     private var thread: Thread? = null
     private var progressDialog: ProgressDialog? = null
     private var lastTimeStamp = 0L
+    private val parallelTasks = 3
 
     companion object {
         var checkUpdates = false
+        var showHiddenApps = false
+        var loadHiddenApps = false
         var homePressed = false
         var lastSearch = ""
+    }
+
+    private fun JSONArray.map(unit: (Any) -> Any): JSONArray {
+        val tmp = JSONArray()
+        for (i in 0 until length()) {
+            tmp.put(unit(this[i]))
+        }
+        return tmp
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,6 +106,9 @@ class MainActivity : AppCompatActivity() {
         if (checkUpdates) {
             checkUpdates()
             checkUpdates = false
+        } else if (loadHiddenApps) {
+            loadHiddenApps()
+            loadHiddenApps = false
         }
     }
 
@@ -105,7 +119,11 @@ class MainActivity : AppCompatActivity() {
                 for (index in 0 until parallelTasks) {
                     if (units.size >= i + index + 1) {
                         val th = Thread {
-                            units[index + i]()
+                            try {
+                                units[index + i]()
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
                         }
                         th.start()
                         threads.add(th)
@@ -124,9 +142,59 @@ class MainActivity : AppCompatActivity() {
         return list
     }
 
+    private fun isHidden(packageName: String): Boolean {
+        val jsonArray =
+            JSONArray(getSharedPreferences("check_updates", Context.MODE_PRIVATE).getString("hidden_apps", "[]"))
+        for (i in 0 until jsonArray.length()) {
+            if (packageName == jsonArray.getString(i)) return true
+        }
+        return false
+    }
+
     @SuppressLint("SimpleDateFormat")
-    private fun checkUpdates(callBack: () -> Unit = {}) {
-        title = "Updates"
+    private fun loadPackages(
+        startTime: Long,
+        packages: List<String>,
+        availablePackages: ArrayList<String>,
+        unit: () -> Unit
+    ) {
+        val units = ArrayList<() -> Unit>()
+        val loadList = if (availablePackages.size != packages.size) packages.filter {
+            !isHidden(it)
+        } else packages
+        loadList.forEachIndexed { index, info ->
+            units.add {
+                val list = htmlParser.getAppList(info, "apk")
+                if (list.size > 0 && availablePackages.size != packages.size) availablePackages.add(info)
+                try {
+                    appList.add(list.first {
+                        it.packageName = info
+                        !it.title.contains("Wear OS")
+                                && !it.title.contains("Android TV")
+                                && !it.title.contains("Daydream")
+                    })
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                this@MainActivity.runOnUiThread {
+                    if (index % parallelTasks == 0) {
+                        val percentage = ((index.toFloat() / loadList.size.toFloat()) * 1000).toInt().toFloat() / 10
+                        val currentTime = System.currentTimeMillis()
+                        val time = ((currentTime - startTime) / (index + 1) * (loadList.size - index))
+                        val date = Date(time)
+                        val formatter = SimpleDateFormat("mm:ss")
+                        formatter.timeZone = TimeZone.getTimeZone("UTC")
+                        progressDialog?.setMessage("Reading packages ($percentage%)\n${formatter.format(date)} Minutes left")
+                    }
+                }
+            }
+        }
+        runParallel(units, parallelTasks, unit)
+    }
+
+    private fun loadHiddenApps() {
+        title = "Hidden apps"
+        if (mainAction != null) mainAction!!.isVisible = true
         appList.clear()
         adapter.notifyDataSetChanged()
         if (thread != null) thread!!.interrupt()
@@ -134,52 +202,54 @@ class MainActivity : AppCompatActivity() {
         progressDialog!!.setIndeterminateDrawable(ThemeableProgressBar(this@MainActivity).indeterminateDrawable)
         thread = Thread {
             val startTime = System.currentTimeMillis()
-            var packages = packageManager.getInstalledApplications(0).map { it.packageName }
+            val packages = packageManager.getInstalledApplications(0)
+                .map { it.packageName }
+                .filter {
+                    isHidden(it)
+                } as ArrayList
+            loadPackages(startTime, packages, packages) {
+                showHiddenApps = true
+                appList.sortWith(Comparator { o1, o2 ->
+                    when {
+                        o1.title < o2.title -> -1
+                        o1.title >= o2.title -> 1
+                        else -> 0
+                    }
+                })
+                this@MainActivity.runOnUiThread {
+                    adapter.notifyDataSetChanged()
+                    progressDialog?.dismiss()
+                }
+            }
+        }
+        thread?.start()
+    }
+
+    private fun checkUpdates() {
+        title = "Updates"
+        if (mainAction != null) mainAction!!.isVisible = true
+        appList.clear()
+        adapter.notifyDataSetChanged()
+        if (thread != null) thread!!.interrupt()
+        progressDialog = ProgressDialog.show(this@MainActivity, "", "Reading packages (0%)")
+        progressDialog!!.setIndeterminateDrawable(ThemeableProgressBar(this@MainActivity).indeterminateDrawable)
+        thread = Thread {
+            val startTime = System.currentTimeMillis()
+            var packages = packageManager.getInstalledApplications(0)
+                .map { it.packageName }
             val packageCount = packages.size
             val availablePackages = ArrayList<String>()
             val sharedPreferences = getSharedPreferences("packages", Context.MODE_PRIVATE)
-            val units = ArrayList<() -> Unit>()
-            val parallelTasks = 3
             val loadAll = if (sharedPreferences.getInt("packageCount", 0) == packageCount) {
-                var ret = true
-                for (it in packages) {
-                    val array = JSONArray(sharedPreferences.getString("packages", "[]"))
-                    var count = 1
-                    for (i in 0 until array.length())
-                        if (it == array.getString(i))
-                            count++
-                    ret = count == array.length()
-                }
+                var ret = false
+                val array = JSONArray(sharedPreferences.getString("packages", "[]"))
+                for (i in 0 until array.length())
+                    if (!ret) ret = !packages.contains(array.getString(i))
                 ret
             } else true
-            if (loadAll) packages = getApps(JSONArray(sharedPreferences.getString("packages", "[]")))
-            packages.forEachIndexed { index, info ->
-                units.add {
-                    val list = htmlParser.getAppList(info, "apk")
-                    if (list.size > 0) availablePackages.add(info)
-                    try {
-                        appList.addAll(Arrays.asList(list.first {
-                            it.packageName = info
-                            !it.title.contains("Wear OS")
-                                    && !it.title.contains("Android TV")
-                                    && !it.title.contains("Daydream")
-                        }))
-                    } catch (e: Exception) {
-                    }
-                    this@MainActivity.runOnUiThread {
-                        if (index % parallelTasks == 0) {
-                            val percentage = ((index.toFloat() / packages.size.toFloat()) * 1000).toInt().toFloat() / 10
-                            val currentTime = System.currentTimeMillis()
-                            val time = ((currentTime - startTime) / (index + 1) * (packages.size - index))
-                            val date = Date(time)
-                            val formatter = SimpleDateFormat("mm:ss")
-                            formatter.timeZone = TimeZone.getTimeZone("UTC")
-                            progressDialog?.setMessage("Reading packages ($percentage%)\n${formatter.format(date)} Minutes left")
-                        }
-                    }
-                }
-            }
-            runParallel(units, parallelTasks) {
+            if (!loadAll) packages = getApps(JSONArray(sharedPreferences.getString("availablePackages", "[]")))
+            loadPackages(startTime, packages, availablePackages) {
+                showHiddenApps = false
                 sharedPreferences.edit {
                     putString("availablePackages", JSONArray(availablePackages).toString())
                     putString("packages", JSONArray(packages).toString())
@@ -205,9 +275,6 @@ class MainActivity : AppCompatActivity() {
                     })
                     adapter.notifyDataSetChanged()
                     progressDialog?.dismiss()
-                    Handler().postDelayed({
-                        callBack()
-                    }, 100)
                 }
             }
         }
@@ -262,6 +329,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
+                showHiddenApps = false
                 this@MainActivity.runOnUiThread {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                         progressBar.setProgress(100, true)

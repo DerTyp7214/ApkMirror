@@ -310,6 +310,14 @@ class AboutFragment : MaterialAboutFragment() {
                 }
                 .build())
             .addItem(MaterialAboutActionItem.Builder()
+                .text("Hidden")
+                .icon(icon(MaterialDesignIconic.Icon.gmi_refresh_sync))
+                .setOnClickAction {
+                    MainActivity.loadHiddenApps = true
+                    activity?.onBackPressed()
+                }
+                .build())
+            .addItem(MaterialAboutActionItem.Builder()
                 .text(R.string.title_changelogs)
                 .icon(icon(MaterialDesignIconic.Icon.gmi_time_restore))
                 .setOnClickAction {
