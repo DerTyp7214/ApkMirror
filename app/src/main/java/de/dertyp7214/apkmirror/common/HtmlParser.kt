@@ -354,7 +354,6 @@ class HtmlParser(private val context: Context) {
 
     fun installApk(file: File?) {
         if (isRootGiven()) {
-            Log.d("ROOTED", "TRUE")
             executeCommand("cp ${file?.absolutePath} /data/local/tmp/\npm install -r /data/local/tmp/${file?.name}\n")
         } else
             try {
