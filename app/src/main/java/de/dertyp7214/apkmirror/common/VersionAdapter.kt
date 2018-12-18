@@ -117,8 +117,8 @@ class VersionAdapter(private var context: AppCompatActivity, private var items: 
 
                                         override fun stop(file: File) {
                                             this@VersionAdapter.context.runOnUiThread {
-                                                progressDialog!!.dismiss()
                                                 htmlParser.installApk(file)
+                                                progressDialog?.dismiss()
                                             }
                                         }
                                     })

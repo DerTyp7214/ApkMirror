@@ -5,7 +5,9 @@
 
 package de.dertyp7214.apkmirror.objects
 
-import android.content.Context
+import android.app.Activity
+import android.content.Intent
+import android.content.Intent.ACTION_VIEW
 import android.net.Uri
 import android.os.Build
 import android.text.Html
@@ -18,8 +20,12 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
+import com.fede987.statusbaralert.StatusBarAlert
+import de.dertyp7214.apkmirror.R
 import saschpe.android.customtabs.CustomTabsHelper
 import saschpe.android.customtabs.WebViewFallback
+import java.net.HttpURLConnection
+import java.net.URL
 
 class AppScreenData(
     val app: App,
@@ -35,29 +41,43 @@ class AppScreenData(
             Html.fromHtml(description)
     }
 
-    fun applyDescriptionToTextView(context: Context, textView: TextView, color: Int) {
+    fun applyDescriptionToTextView(context: Activity, textView: TextView, color: Int) {
         setTextViewHTML(textView, description, context, color)
     }
 
-    private fun makeLinkClickable(strBuilder: SpannableStringBuilder, span: URLSpan, context: Context, color: Int) {
+    private fun makeLinkClickable(strBuilder: SpannableStringBuilder, span: URLSpan, context: Activity, color: Int) {
         val start = strBuilder.getSpanStart(span)
         val end = strBuilder.getSpanEnd(span)
         val flags = strBuilder.getSpanFlags(span)
         val clickable = object : ClickableSpan() {
             override fun onClick(view: View) {
                 try {
-                    val customTabsIntent = CustomTabsIntent.Builder()
-                        .setInstantAppsEnabled(true)
-                        .addDefaultShareMenuItem()
-                        .setToolbarColor(color)
-                        .setShowTitle(true)
+                    val url = getDestinationUrl(span.url)
+                    StatusBarAlert.Builder(context)
+                        .showProgress(true)
+                        .withText("Loading")
+                        .withAlertColor(color, true)
+                        .autoHide(false)
                         .build()
-                    CustomTabsHelper.addKeepAliveExtra(context, customTabsIntent.intent)
-                    CustomTabsHelper.openCustomTab(
-                        context, customTabsIntent,
-                        Uri.parse(span.url.toString()),
-                        WebViewFallback()
-                    )
+                    StatusBarAlert.hide(context, Runnable {})
+                    if (url.contains("play.google.com")) {
+                        context.startActivity(Intent(ACTION_VIEW, Uri.parse(url)))
+                    } else {
+                        val customTabsIntent = CustomTabsIntent.Builder()
+                            .setInstantAppsEnabled(true)
+                            .addDefaultShareMenuItem()
+                            .setToolbarColor(color)
+                            .setShowTitle(true)
+                            .setStartAnimations(context, R.anim.swipe_in, R.anim.swipe_out)
+                            .setExitAnimations(context, R.anim.swipe_in, R.anim.swipe_out)
+                            .build()
+                        CustomTabsHelper.addKeepAliveExtra(context, customTabsIntent.intent)
+                        CustomTabsHelper.openCustomTab(
+                            context, customTabsIntent,
+                            Uri.parse(span.url.toString()),
+                            WebViewFallback()
+                        )
+                    }
                 } catch (e: Exception) {
                     Toast.makeText(context, "Cannot open this link!", Toast.LENGTH_LONG).show()
                 }
@@ -67,7 +87,28 @@ class AppScreenData(
         strBuilder.removeSpan(span)
     }
 
-    private fun setTextViewHTML(text: TextView, html: String, context: Context, color: Int) {
+    private fun getId(url: String): String {
+        return try {
+            url.split("id=")[1].split("&")[0]
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
+    private fun getDestinationUrl(url: String): String {
+        return try {
+            val conn = URL(url).openConnection() as HttpURLConnection
+            HttpURLConnection.setFollowRedirects(true)
+            conn.instanceFollowRedirects = true
+            conn.readTimeout = 5000
+            conn.connect()
+            conn.getHeaderField("Location")
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
+    private fun setTextViewHTML(text: TextView, html: String, context: Activity, color: Int) {
         val sequence = Html.fromHtml(html)
         val strBuilder = SpannableStringBuilder(sequence)
         val urls = strBuilder.getSpans(0, sequence.length, URLSpan::class.java)

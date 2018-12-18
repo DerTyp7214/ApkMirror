@@ -3,7 +3,7 @@
  * Created by Josua Lengwenath
  */
 
-@file:Suppress("NAME_SHADOWING")
+@file:Suppress("NAME_SHADOWING", "RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 
 package de.dertyp7214.apkmirror.common
 
@@ -25,9 +25,13 @@ import de.dertyp7214.apkmirror.objects.AppScreenData
 import de.dertyp7214.apkmirror.objects.AppVariant
 import de.dertyp7214.apkmirror.objects.DownloadData
 import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.DataOutputStream
 import java.io.File
+import java.io.InputStreamReader
 import java.util.*
 import java.util.regex.Pattern
+
 
 class HtmlParser(private val context: Context) {
 
@@ -311,33 +315,96 @@ class HtmlParser(private val context: Context) {
         return String.format("%.1f %sB", bytes / Math.pow(unit.toDouble(), exp.toDouble()), pre)
     }
 
+    private fun isRootAvailable(): Boolean {
+        for (pathDir in System.getenv("PATH").split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()) {
+            if (File(pathDir, "su").exists()) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun isRootGiven(): Boolean {
+        if (isRootAvailable()) {
+            var process: Process? = null
+            try {
+                process = Runtime.getRuntime().exec(arrayOf("su", "-c", "id"))
+                val `in` = BufferedReader(InputStreamReader(process!!.inputStream))
+                val output = `in`.readLine()
+                if (output != null && output.toLowerCase().contains("uid=0"))
+                    return true
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                process?.destroy()
+            }
+        }
+
+        return false
+    }
+
+    private fun Try(unit: () -> Unit): String {
+        return try {
+            unit()
+            "Error: none"
+        } catch (e: Exception) {
+            e.message ?: "Error: null"
+        }
+    }
+
     fun installApk(file: File?) {
-        try {
-            if (file!!.exists()) {
-                val fileNameArray =
-                    file.name.split(Pattern.quote(".").toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                if (fileNameArray[fileNameArray.size - 1] == "apk") {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        val downloadedApk = getFileUri(context, file)
-                        val intent = Intent(Intent.ACTION_VIEW).setDataAndType(
-                            downloadedApk,
-                            "application/vnd.android.package-archive"
-                        )
-                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        context.startActivity(intent)
-                    } else {
-                        val intent = Intent(Intent.ACTION_VIEW)
-                        intent.setDataAndType(
-                            Uri.fromFile(file),
-                            "application/vnd.android.package-archive"
-                        )
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        context.startActivity(intent)
+        if (isRootGiven()) {
+            Log.d("ROOTED", "TRUE")
+            executeCommand("cp ${file?.absolutePath} /data/local/tmp/\npm install -r /data/local/tmp/${file?.name}\n")
+        } else
+            try {
+                Log.d("Dismiss Dialog", Try { VariantAdapter.progressDialog!!.dismiss() })
+                Log.d("Dismiss Dialog", Try { VersionAdapter.progressDialog!!.dismiss() })
+                if (file!!.exists()) {
+                    val fileNameArray =
+                        file.name.split(Pattern.quote(".").toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                    if (fileNameArray[fileNameArray.size - 1] == "apk") {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            val downloadedApk = getFileUri(context, file)
+                            val intent = Intent(Intent.ACTION_VIEW).setDataAndType(
+                                downloadedApk,
+                                "application/vnd.android.package-archive"
+                            )
+                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            context.startActivity(intent)
+                        } else {
+                            val intent = Intent(Intent.ACTION_VIEW)
+                            intent.setDataAndType(
+                                Uri.fromFile(file),
+                                "application/vnd.android.package-archive"
+                            )
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            context.startActivity(intent)
+                        }
                     }
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
+    }
+
+    private fun executeCommand(cmds: String): Boolean {
+        return try {
+            Log.d("executeCommand", cmds)
+            val process = Runtime.getRuntime().exec("su")
+            val os = DataOutputStream(process.outputStream)
+
+            os.writeBytes(cmds + "\n")
+
+            os.writeBytes("exit\n")
+            os.flush()
+            os.close()
+
+            process.waitFor()
+            true
         } catch (e: Exception) {
             e.printStackTrace()
+            false
         }
     }
 

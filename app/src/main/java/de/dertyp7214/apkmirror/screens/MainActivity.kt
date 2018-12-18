@@ -24,6 +24,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.edit
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dertyp7214.themeablecomponents.components.ThemeableProgressBar
+import com.fede987.statusbaralert.StatusBarAlert
 import de.dertyp7214.apkmirror.Application
 import de.dertyp7214.apkmirror.BuildConfig
 import de.dertyp7214.apkmirror.R
@@ -55,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         var showHiddenApps = false
         var loadHiddenApps = false
         var homePressed = false
+        var search = ""
         var lastSearch = ""
     }
 
@@ -103,12 +105,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (checkUpdates) {
-            checkUpdates()
-            checkUpdates = false
-        } else if (loadHiddenApps) {
-            loadHiddenApps()
-            loadHiddenApps = false
+        when {
+            checkUpdates -> {
+                checkUpdates()
+                checkUpdates = false
+            }
+            loadHiddenApps -> {
+                loadHiddenApps()
+                loadHiddenApps = false
+            }
+            search.isNotBlank() -> {
+                search(search)
+                search = ""
+            }
         }
     }
 

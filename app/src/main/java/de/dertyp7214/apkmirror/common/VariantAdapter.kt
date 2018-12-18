@@ -105,8 +105,8 @@ class VariantAdapter(private var context: Activity, private var items: ArrayList
 
                             override fun stop(file: File) {
                                 context.runOnUiThread {
-                                    progressDialog!!.dismiss()
                                     htmlParser.installApk(file)
+                                    progressDialog?.dismiss()
                                 }
                             }
                         })
