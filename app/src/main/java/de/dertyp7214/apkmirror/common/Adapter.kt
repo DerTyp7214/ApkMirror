@@ -51,6 +51,7 @@ class Adapter(private val activity: Activity, private var items: ArrayList<App>)
         var progressDialog: ProgressDialog? = null
         val apps = HashMap<String, AppScreenData>()
         var clicked = false
+        var currentApp: App? = null
     }
 
     private fun JSONArray.forEach(unit: (item: Any, index: Int) -> Unit) {
@@ -141,6 +142,7 @@ class Adapter(private val activity: Activity, private var items: ArrayList<App>)
                             val intent = Intent(activity, AppDataScreen::class.java)
                             intent.putExtra("url", app.url)
                             activity.startActivity(intent)
+                            currentApp = app
                         }
                     }.start()
                 }

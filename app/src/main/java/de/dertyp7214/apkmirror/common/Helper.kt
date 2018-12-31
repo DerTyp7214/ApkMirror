@@ -17,6 +17,15 @@ class Helper {
             return ChangeLog.Builder(context)
                 .addVersion(
                     Version.Builder(context)
+                        .setVersionName("1.7")
+                        .setVersionCode("17000")
+                        .addChange(Version.Change(Version.Change.ChangeType.ADD, "networkstate Handling"))
+                        .addChange(Version.Change(Version.Change.ChangeType.FIX, "crash without network"))
+                        .addChange(Version.Change(Version.Change.ChangeType.IMPROVEMENT, "style fixes"))
+                        .build()
+                )
+                .addVersion(
+                    Version.Builder(context)
                         .setVersionName("1.6")
                         .setVersionCode("16000")
                         .addChange(Version.Change(Version.Change.ChangeType.ADD, "Read Darkmode from System"))
@@ -113,6 +122,19 @@ class Helper {
             } catch (e: Exception) {
                 Color.RED
             }
+        }
+
+        fun manipulateColor(color: Int, factor: Float): Int {
+            val a = Color.alpha(color)
+            val r = Math.round(Color.red(color) * factor)
+            val g = Math.round(Color.green(color) * factor)
+            val b = Math.round(Color.blue(color) * factor)
+            return Color.argb(
+                a,
+                Math.min(r, 255),
+                Math.min(g, 255),
+                Math.min(b, 255)
+            )
         }
 
         fun isColorDark(color: Int): Boolean {

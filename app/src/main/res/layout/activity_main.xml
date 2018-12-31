@@ -10,16 +10,29 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
+    <TextView
+            android:text="No Connection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_red_light"
+            android:textColor="@android:color/white"
+            android:id="@+id/noConnection"
+            android:visibility="gone"
+            android:textAlignment="center"/>
     <com.dertyp7214.themeablecomponents.components.ThemeableToolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/noConnection"
             android:background="?attr/colorPrimary"
             android:theme="?attr/actionBarTheme"
-            android:minHeight="?attr/actionBarSize" android:id="@+id/toolbar"/>
+            android:minHeight="?attr/actionBarSize"
+            android:id="@+id/toolbar"/>
     <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
-            android:layout_height="match_parent" android:id="@+id/rv"
-            android:layout_below="@+id/toolbar" android:layout_above="@+id/progressBar">
+            android:layout_height="match_parent"
+            android:id="@+id/rv"
+            android:layout_below="@+id/toolbar"
+            android:layout_above="@+id/progressBar">
     </androidx.recyclerview.widget.RecyclerView>
     <com.dertyp7214.themeablecomponents.components.ThemeableProgressBar
             android:layout_width="match_parent"

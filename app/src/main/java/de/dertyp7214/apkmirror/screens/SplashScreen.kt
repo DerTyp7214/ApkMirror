@@ -54,7 +54,7 @@ class SplashScreen : AppCompatActivity() {
             logo.alpha = it.animatedValue as Float
             progressView.elevation = it.animatedValue as Float * 10
             if (it.animatedValue as Float == 1F) {
-                Thread {NetworkTools.drawableFromUrl(this, getString(R.string.dev_github_userimage))}.start()
+                Thread { NetworkTools.drawableFromUrl(this, getString(R.string.dev_github_userimage)) }.start()
                 Handler().postDelayed({
                     ActivityCompat.requestPermissions(
                         this,

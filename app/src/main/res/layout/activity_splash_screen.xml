@@ -11,6 +11,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".screens.SplashScreen">
+    <TextView
+            android:text="No Connection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_red_light"
+            android:textColor="@android:color/white"
+            android:id="@+id/noConnection"
+            android:visibility="gone"
+            android:textAlignment="center" app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"/>
     <FrameLayout
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

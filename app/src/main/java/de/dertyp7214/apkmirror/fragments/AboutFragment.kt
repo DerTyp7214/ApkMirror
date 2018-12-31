@@ -222,6 +222,8 @@ class AboutFragment : MaterialAboutFragment() {
             )
         )
 
+        val color = Helper.manipulateColor(Helper.getAttrColor(context!!, android.R.attr.windowBackground), 1.2F)
+
         val applicationInfo = MaterialAboutCard.Builder()
             .title(R.string.app_name)
             .addItem(
@@ -324,6 +326,7 @@ class AboutFragment : MaterialAboutFragment() {
                     Helper.changeLogs(context!!).showDialog()
                 }
                 .build())
+            .cardColor(color)
             .build()
 
         val developers = MaterialAboutCard.Builder()
@@ -337,7 +340,8 @@ class AboutFragment : MaterialAboutFragment() {
                         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.dev_url))))
                     }
                     .build()
-            ).build()
+            ).cardColor(color)
+            .build()
 
         return MaterialAboutList.Builder()
             .addCard(applicationInfo)
@@ -345,17 +349,17 @@ class AboutFragment : MaterialAboutFragment() {
             .build()
     }
 
+    @SuppressLint("SdCardPath")
+    private fun getAppSize(): String {
+        val folder = File("/data/data/${BuildConfig.APPLICATION_ID}")
+        return Helper.humanReadableByteCount(Helper.folderSize(getApkDir()) + Helper.folderSize(folder))
+    }
+
     override fun getTheme(): Int {
         return if (ThemeManager.getInstance(context!!).darkMode)
             com.danielstone.materialaboutlibrary.R.style.Theme_Mal_Dark
         else
             com.danielstone.materialaboutlibrary.R.style.Theme_Mal_Light
-    }
-
-    @SuppressLint("SdCardPath")
-    private fun getAppSize(): String {
-        val folder = File("/data/data/${BuildConfig.APPLICATION_ID}")
-        return Helper.humanReadableByteCount(Helper.folderSize(getApkDir()) + Helper.folderSize(folder))
     }
 
     private fun getApkDir(): File {

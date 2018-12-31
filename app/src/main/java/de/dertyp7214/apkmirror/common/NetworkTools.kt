@@ -22,8 +22,8 @@ class NetworkTools {
     companion object {
 
         private val contentMap = HashMap<String, Any>()
-        fun getWebContent(url: String): String? {
-            if (!contentMap.containsKey(url))
+        fun getWebContent(url: String, forced: Boolean = false): String? {
+            if (!contentMap.containsKey(url) || forced)
                 contentMap[url] = try {
                     val web = URL(url)
                     val reader = BufferedReader(InputStreamReader(web.openStream()))
@@ -60,13 +60,18 @@ class NetworkTools {
         }
 
         fun drawableFromUrl(context: Context, url: String): Drawable {
-            if (!contentMap.containsKey(url)) {
-                val connection = URL(url).openConnection() as HttpURLConnection
-                connection.connect()
-                val input = connection.inputStream
-                contentMap[url] = BitmapDrawable(context.resources, BitmapFactory.decodeStream(input))
+            return try {
+                if (!contentMap.containsKey(url)) {
+                    val connection = URL(url).openConnection() as HttpURLConnection
+                    connection.connect()
+                    val input = connection.inputStream
+                    contentMap[url] = BitmapDrawable(context.resources, BitmapFactory.decodeStream(input))
+                }
+                contentMap[url] as Drawable
+            } catch (e: Exception) {
+                e.printStackTrace()
+                context.resources.getDrawable(R.mipmap.ic_launcher)
             }
-            return contentMap[url] as Drawable
         }
     }
 }

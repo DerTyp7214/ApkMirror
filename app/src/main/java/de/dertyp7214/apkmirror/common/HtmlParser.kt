@@ -9,6 +9,7 @@ package de.dertyp7214.apkmirror.common
 
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -102,9 +103,9 @@ class HtmlParser(private val context: Context) {
         return appList
     }
 
-    fun getAppScreenData(app: App): AppScreenData {
-        if (!appMap.containsKey(app.url)) {
-            val pageSource = getWebContent(app.url) ?: ""
+    fun getAppScreenData(app: App, forced: Boolean = false): AppScreenData {
+        if (!appMap.containsKey(app.url) || forced) {
+            val pageSource = getWebContent(app.url, forced) ?: ""
             var description = ""
             val versions = ArrayList<App>()
             val variants = ArrayList<AppVariant>()
@@ -313,6 +314,12 @@ class HtmlParser(private val context: Context) {
         val exp = (Math.log(bytes.toDouble()) / Math.log(unit.toDouble())).toInt()
         val pre = (if (si) "kMGTPE" else "KMGTPE")[exp - 1] + (if (si) "" else "i")
         return String.format("%.1f %sB", bytes / Math.pow(unit.toDouble(), exp.toDouble()), pre)
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
     private fun isRootAvailable(): Boolean {

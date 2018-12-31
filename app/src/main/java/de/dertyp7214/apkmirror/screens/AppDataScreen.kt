@@ -7,9 +7,11 @@
 
 package de.dertyp7214.apkmirror.screens
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
+import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -29,6 +31,8 @@ import kotlin.collections.ArrayList
 class AppDataScreen : AppCompatActivity() {
 
     private lateinit var htmlParser: HtmlParser
+    var color: Int = Color.GRAY
+    var loaded = false
 
     override fun onDestroy() {
         super.onDestroy()
@@ -52,51 +56,60 @@ class AppDataScreen : AppCompatActivity() {
         txt_title.text = appData!!.app.title
         txt_title.setTextColor(if (themeManager.darkMode) Color.WHITE else Color.BLACK)
 
-        val color = getDominantColor((drawableFromUrl(this, appData.app.imageUrl) as BitmapDrawable).bitmap)
-        themeManager.getComponents(this).forEach {
-            Log.d("COMPONENT", it.getId())
-            it.changeColor(
-                if (it.isAccent) Color.RED else color
-            )
+        if (isNetworkAvailable()) {
+            loaded = true
+            color = getDominantColor((drawableFromUrl(this, appData.app.imageUrl) as BitmapDrawable).bitmap)
+            themeManager.getComponents(this).forEach {
+                Log.d("COMPONENT", it.getId())
+                it.changeColor(
+                    if (it.isAccent) Color.RED else color
+                )
+            }
+            changeNavColor(color)
+            changeStatusColor(color)
+
+            icon.setImageDrawable(drawableFromUrl(this, appData.app.imageUrl))
+
+            txt_description.setLinkTextColor(themeManager.colorAccent)
+            appData.applyDescriptionToTextView(this, txt_description, color)
+
+            if (!appData.app.packageName.isBlank()) {
+                txt_packageName.visibility = View.VISIBLE
+                txt_packageName.text = packageManager.getPackageInfo(appData.app.packageName, 0).versionName
+            }
+
+            appData.variants.sortWith(Comparator { o1, o2 ->
+                Comparators.compareVersion(o1.version, o2.version)
+            })
+            appData.variants.reverse()
+
+            val variantAdapter = VariantAdapter(this, appData.variants)
+            val variantBottomSheet = BottomSheet(getString(R.string.titleVariants), variantAdapter)
+            btn_vars.visibility = if (appData.variants.size > 0) View.VISIBLE else View.INVISIBLE
+            btn_vars.onThemeChangeListener.onThemeChanged(Theme(themeManager.colorAccent), false)
+            btn_vars.setOnClickListener {
+                variantBottomSheet.show(supportFragmentManager, "Variants")
+            }
+
+            appData.versions.sortWith(Comparator { o1, o2 ->
+                Comparators.compareVersion(o1.version, o2.version)
+            })
+            appData.versions.reverse()
+
+            val versionAdapter = VersionAdapter(this, appData.versions)
+            val versionBottomSheet = BottomSheet(getString(R.string.titleVersions), versionAdapter)
+            btn_vers.visibility = if (appData.versions.size > 0) View.VISIBLE else View.INVISIBLE
+            btn_vers.onThemeChangeListener.onThemeChanged(Theme(themeManager.colorAccent), false)
+            btn_vers.setOnClickListener {
+                versionBottomSheet.show(supportFragmentManager, "Versions")
+            }
         }
-        changeNavColor(color)
-        changeStatusColor(color)
+    }
 
-        icon.setImageDrawable(drawableFromUrl(this, appData.app.imageUrl))
-
-        txt_description.setLinkTextColor(themeManager.colorAccent)
-        appData.applyDescriptionToTextView(this, txt_description, color)
-
-        if (!appData.app.packageName.isBlank()) {
-            txt_packageName.visibility = View.VISIBLE
-            txt_packageName.text = packageManager.getPackageInfo(appData.app.packageName, 0).versionName
-        }
-
-        appData.variants.sortWith(Comparator { o1, o2 ->
-            Comparators.compareVersion(o1.version, o2.version)
-        })
-        appData.variants.reverse()
-
-        val variantAdapter = VariantAdapter(this, appData.variants)
-        val variantBottomSheet = BottomSheet(getString(R.string.titleVariants), variantAdapter)
-        btn_vars.visibility = if (appData.variants.size > 0) View.VISIBLE else View.INVISIBLE
-        btn_vars.onThemeChangeListener.onThemeChanged(Theme(themeManager.colorAccent), false)
-        btn_vars.setOnClickListener {
-            variantBottomSheet.show(supportFragmentManager, "Variants")
-        }
-
-        appData.versions.sortWith(Comparator { o1, o2 ->
-            Comparators.compareVersion(o1.version, o2.version)
-        })
-        appData.versions.reverse()
-
-        val versionAdapter = VersionAdapter(this, appData.versions)
-        val versionBottomSheet = BottomSheet(getString(R.string.titleVersions), versionAdapter)
-        btn_vers.visibility = if (appData.versions.size > 0) View.VISIBLE else View.INVISIBLE
-        btn_vers.onThemeChangeListener.onThemeChanged(Theme(themeManager.colorAccent), false)
-        btn_vers.setOnClickListener {
-            versionBottomSheet.show(supportFragmentManager, "Versions")
-        }
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
     private fun getDominantColor(bitmap: Bitmap): Int {

@@ -17,7 +17,8 @@ import com.dertyp7214.themeablecomponents.utils.ThemeManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.dertyp7214.apkmirror.R
 
-class BottomSheet(private var title: String, private var adapter: RecyclerView.Adapter<*>) : BottomSheetDialogFragment() {
+class BottomSheet(private var title: String, private var adapter: RecyclerView.Adapter<*>) :
+    BottomSheetDialogFragment() {
 
     companion object {
         private val map = HashMap<String?, BottomSheet>()
@@ -35,11 +36,10 @@ class BottomSheet(private var title: String, private var adapter: RecyclerView.A
         val v = LayoutInflater.from(context).inflate(R.layout.bottom_sheet, null)
         dialog!!.setContentView(v)
 
-        v.setBackgroundColor(if (themeManager.darkMode) Color.parseColor("#424242") else Color.WHITE)
-
         val title = v.findViewById<TextView>(R.id.txt_title)
         val recyclerView = v.findViewById<RecyclerView>(R.id.rv)
 
+        if (!themeManager.darkMode) title.elevation = 0F
         title.text = this.title
         title.setTextColor(if (themeManager.darkMode) Color.WHITE else Color.BLACK)
 

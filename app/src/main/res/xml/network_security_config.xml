@@ -6,7 +6,8 @@
 
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">api.github.com</domain>
+        <domain includeSubdomains="true">githubusercontent.com</domain>
+        <domain includeSubdomains="true">github.com</domain>
         <domain includeSubdomains="true">goo.gl</domain>
     </domain-config>
 </network-security-config>

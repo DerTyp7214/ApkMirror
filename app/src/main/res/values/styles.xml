@@ -30,4 +30,8 @@
         <item name="android:windowExitTransition">@transition/app_screen_exit</item>
     </style>
 
+    <style name="Theme.Mal.Dark.Adapted" parent="Theme.Mal.Dark">
+        <item name="mal_card_background"></item>
+    </style>
+
 </resources>

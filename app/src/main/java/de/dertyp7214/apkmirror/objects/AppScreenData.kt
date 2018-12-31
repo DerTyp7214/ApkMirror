@@ -52,13 +52,13 @@ class AppScreenData(
         val clickable = object : ClickableSpan() {
             override fun onClick(view: View) {
                 try {
-                    val url = getDestinationUrl(span.url)
                     StatusBarAlert.Builder(context)
                         .showProgress(true)
                         .withText("Loading")
                         .withAlertColor(color, true)
                         .autoHide(false)
                         .build()
+                    val url = getDestinationUrl(span.url)
                     StatusBarAlert.hide(context, Runnable {})
                     if (url.contains("play.google.com")) {
                         context.startActivity(Intent(ACTION_VIEW, Uri.parse(url)))
