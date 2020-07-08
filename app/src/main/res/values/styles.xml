@@ -3,49 +3,35 @@
   ~ Created by Josua Lengwenath
   -->
 
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowContentTransitions">true</item>
-        <item name="android:windowActivityTransitions">true</item>
-        <item name="android:windowSharedElementEnterTransition">@transition/image_transitione</item>
-        <item name="android:windowSharedElementExitTransition">@transition/image_transitione</item>
-        <item name="android:textColorPrimary">?android:attr/textColorPrimaryNoDisable</item>
+        <item name="colorAccent">@android:color/holo_red_light</item>
+        <item name="colorPrimary">@color/ic_launcher_background</item>
+        <item name="colorPrimaryDark">@color/ic_launcher_background</item>
+        <item name="android:statusBarColor">@color/ic_launcher_background</item>
+        <item name="android:windowBackground">@color/ic_launcher_background</item>
+        <item name="android:navigationBarColor">@color/ic_launcher_background</item>
     </style>
-
-    <style name="AppTheme.NoActionBar" parent="AppTheme">
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
-    <style name="AppTheme.TransulentNavigationBar" parent="AppTheme.NoActionBar">
-        <item name="android:windowTranslucentNavigation">true</item>
+    <style name="AppTheme.AppScreen" parent="AppTheme.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowEnterTransition">@transition/app_screen_enter</item>
+        <item name="android:windowExitTransition">@transition/app_screen_exit</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-    <style name="Animation">
-        <item name="android:windowEnterAnimation">@anim/popup_show</item>
-        <item name="android:windowExitAnimation">@anim/popup_hide</item>
-    </style>
-
-    <style name="ProgressStyleDark" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColorSecondary">@color/white</item>
-        <item name="android:textColorPrimary">@color/white</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:background">@color/element_color_dark</item>
-    </style>
-
-    <style name="ProgressStyleLight">
-
+    <style name="Theme.Mal.Dark.Adapted" parent="Theme.Mal.Dark">
+        <item name="mal_card_background"></item>
     </style>
 
 </resources>

@@ -1,12 +1,10 @@
 *.iml
 .gradle
 /local.properties
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
+/.idea/
 .DS_Store
 /build
 /captures
 .externalNativeBuild
-release.sh
-release.cmd
+/app/src/androidTest/java/com/dertyp7214/apkmirror/
+/app/src/test/java/com/dertyp7214/apkmirror/

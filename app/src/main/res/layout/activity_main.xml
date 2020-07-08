@@ -1,69 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:foreground="#00000000"
-    tools:context=".MainActivity">
+<!--
+  ~ Copyright (c) 2018.
+  ~ Created by Josua Lengwenath
+  -->
 
-
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar"
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/app_bar_height"
-        android:fitsSystemWindows="true"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/toolbar_layout"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+    <TextView
+            android:text="No Connection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_red_light"
+            android:textColor="@android:color/white"
+            android:id="@+id/noConnection"
+            android:visibility="gone"
+            android:textAlignment="center"/>
+    <com.dertyp7214.themeablecomponents.components.ThemeableToolbar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/noConnection"
+            android:background="?attr/colorPrimary"
+            android:theme="?attr/actionBarTheme"
+            android:minHeight="?attr/actionBarSize"
+            android:id="@+id/toolbar"/>
+    <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
-            app:contentScrim="?attr/colorPrimary"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:toolbarId="@+id/toolbar">
-
-            <ImageView
-                android:id="@+id/app_background"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentBottom="true"
-                android:background="#2ab540"
-                android:scaleType="centerCrop"
-                app:layout_anchorGravity="left|top" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="160dp"
-                android:layout_gravity="bottom"
-                android:background="@drawable/scrim" />
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-        </android.support.design.widget.CollapsingToolbarLayout>
-
-    </android.support.design.widget.AppBarLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/fab_margin"
-        android:tint="@color/white"
-        app:layout_anchor="@id/app_bar"
-        app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_file_download_black_24dp" />
-
-    <include
-        android:id="@+id/include"
-        layout="@layout/content_main" />
-
-</android.support.design.widget.CoordinatorLayout>
+            android:id="@+id/rv"
+            android:layout_below="@+id/toolbar"
+            android:layout_above="@+id/progressBar">
+    </androidx.recyclerview.widget.RecyclerView>
+    <com.dertyp7214.themeablecomponents.components.ThemeableProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:max="100"
+            android:id="@+id/progressBar"
+            android:layout_alignParentBottom="true"
+            android:visibility="gone"
+            style="?android:attr/progressBarStyleHorizontal"/>
+</RelativeLayout>

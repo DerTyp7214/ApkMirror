@@ -4,46 +4,61 @@
   ~ Created by Josua Lengwenath
   -->
 
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/card"
-    android:layout_width="match_parent"
-    android:layout_height="85dp"
-    app:cardCornerRadius="0dp">
-
-    <RelativeLayout
+<androidx.cardview.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:ignore="NestedWeights"
+        app:cardCornerRadius="0dp"
+        android:id="@+id/card"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="15dp">
+        android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/img_icon"
-            android:layout_width="65dp"
-            android:layout_height="65dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:transitionName="icon"
-            app:srcCompat="@mipmap/ic_launcher" />
+    <LinearLayout android:orientation="horizontal"
+                  android:background="?android:attr/selectableItemBackground"
+                  android:id="@+id/ly"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:baselineAligned="false">
+        <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:layout_weight="0">
 
-        <TextView
-            android:id="@+id/txt_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/img_icon"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@+id/img_icon"
-            android:maxLines="1"
-            android:text="Title"
-            android:textColor="#000000"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/txt_publisher"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txt_title"
-            android:layout_alignStart="@+id/txt_title"
-            android:maxLines="1"
-            android:text="Publisher" />
-    </RelativeLayout>
-</android.support.v7.widget.CardView>
+            <com.dertyp7214.themeablecomponents.components.ThemeableProgressBar
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="65dp"
+                    android:layout_height="65dp"
+                    android:id="@+id/progressBar"/>
+            <ImageView
+                    android:transitionName="icon"
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
+                    android:id="@+id/img_icon"
+                    android:layout_weight="0"
+                    android:visibility="visible"
+                    android:layout_margin="5dp"/>
+        </FrameLayout>
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0">
+            <TextView
+                    android:text="Title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txt_title"
+                    android:layout_weight="0"
+                    android:textSize="18sp"
+                    android:maxLines="2" android:paddingTop="3dp"/>
+            <TextView
+                    android:text="TextView"
+                    android:transitionName="dev"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txt_dev"
+                    android:layout_weight="1"
+                    android:maxLines="1"/>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

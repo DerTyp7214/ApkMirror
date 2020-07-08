@@ -1,45 +1,41 @@
+<!--
+  ~ Copyright (c) 2018.
+  ~ Created by Josua Lengwenath
+  -->
+
 <resources>
-    <string name="app_name">Apk Mirror</string>
-    <string name="delete">DELETE</string>
+    <string name="app_name">ApkMirror</string>
+    <string name="dev">DerTyp7214</string>
+    <string name="dev_url">https://github.com/DerTyp7214</string>
+    <string name="dev_github_userimage">https://avatars0.githubusercontent.com/u/37804065</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_home">Home</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Settings</string>
-    <string name="title_notifications">Notifications</string>
-    <string name="text_version">Version</string>
-    <string name="text_search_at_start">Show Googleapps on start</string>
-    <string name="text_colored_navbar">Colored Navigationbar</string>
-    <string name="text_swipe_snackbar">removed from notifications!</string>
-    <string name="text_blur_dialog">blur Dialog</string>
-    <string name="text_check_update">Check update</string>
-    <string name="text_touch_to_update">Touch again to download Update</string>
-    <string name="text_latest_version">Latest version</string>
-    <string name="text_click_check">Click to check for updated</string>
-    <string name="text_api_key">API Key</string>
-    <string name="text_not_set">Not set</string>
-    <string name="text_github">DerTyp7214 on GitHub</string>
-    <string name="text_googleplus">Josua Lengwenath on Google+</string>
-    <string name="text_sourcecode">App Scourcecode on GitHub</string>
-    <string name="text_appdetails">App Details</string>
-    <string name="text_social">Social</string>
-    <string name="text_prefs">Preferences</string>
-    <string name="text_dark_theme">Dark Theme</string>
-    <string name="text_donate">Donate</string>
-    <string name="text_donate_sub">Donate me on PayPal</string>
-    <string name="notification_canceled">Canceled</string>
-    <string name="notification_cancel">Cancel</string>
-    <string name="notification_downloading">Downloading</string>
-    <string name="notification_download">Download</string>
-    <string name="notification_max_downloads">Max Downloads</string>
-    <string name="notification_connection_error">Connection Error</string>
-    <string name="notification_finished">Finished</string>
-    <string name="popup_error">Not clickable link!</string>
-    <string name="popup_close">Close</string>
-    <string name="popup_ok">OK</string>
-    <string name="adapter_loading">Loading</string>
-    <string name="input_hint">Search</string>
-    <string name="load_more">Load more</string>
-    <string name="description">Description</string>
-    <string name="versions">Versions</string>
-    <string name="text_auto_dark_theme">Automatic Darktheme</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_tools">Tools</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_send">Send</string>
+    <string name="titleVariants">All Variants</string>
+    <string name="titleVersions">All Versions</string>
+    <string name="key_size">Size</string>
+    <string name="key_version">Version</string>
+    <string name="key_buildtype">Build Type</string>
+    <string name="key_packagename">Packagename</string>
+    <string name="title_developers">Developers</string>
+    <string name="key_leaddev">Lead developer</string>
+    <string name="key_leaddev_github">GitHub</string>
+    <string name="title_licenses">Licenses</string>
+    <string name="title_darkmode">Toggle Darkmode</string>
+    <string name="enabled">enabled</string>
+    <string name="disabled">disabled</string>
+    <string name="title_checkupdates">Check for updates</string>
+    <string name="title_changelogs">Changelogs</string>
+    <string name="actionHideApp">Hide app</string>
+    <string name="show_app">Show app</string>
 </resources>
