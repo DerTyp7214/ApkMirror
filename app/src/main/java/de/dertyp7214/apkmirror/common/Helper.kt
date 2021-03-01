@@ -10,6 +10,9 @@ import android.graphics.Color
 import com.dertyp7214.changelogs.ChangeLog
 import com.dertyp7214.changelogs.Version
 import java.io.File
+import kotlin.math.ln
+import kotlin.math.pow
+import kotlin.math.roundToInt
 
 class Helper {
     companion object {
@@ -19,61 +22,126 @@ class Helper {
                     Version.Builder(context)
                         .setVersionName("1.7")
                         .setVersionCode("17000")
-                        .addChange(Version.Change(Version.Change.ChangeType.ADD, "networkstate Handling"))
-                        .addChange(Version.Change(Version.Change.ChangeType.FIX, "crash without network"))
-                        .addChange(Version.Change(Version.Change.ChangeType.IMPROVEMENT, "style fixes"))
+                        .addChange(
+                            Version.Change(
+                                Version.Change.ChangeType.ADD,
+                                "networkstate Handling"
+                            )
+                        )
+                        .addChange(
+                            Version.Change(
+                                Version.Change.ChangeType.FIX,
+                                "crash without network"
+                            )
+                        )
+                        .addChange(
+                            Version.Change(
+                                Version.Change.ChangeType.IMPROVEMENT,
+                                "style fixes"
+                            )
+                        )
                         .build()
                 )
                 .addVersion(
                     Version.Builder(context)
                         .setVersionName("1.6")
                         .setVersionCode("16000")
-                        .addChange(Version.Change(Version.Change.ChangeType.ADD, "Read Darkmode from System"))
-                        .addChange(Version.Change(Version.Change.ChangeType.IMPROVEMENT, "Performance"))
+                        .addChange(
+                            Version.Change(
+                                Version.Change.ChangeType.ADD,
+                                "Read Darkmode from System"
+                            )
+                        )
+                        .addChange(
+                            Version.Change(
+                                Version.Change.ChangeType.IMPROVEMENT,
+                                "Performance"
+                            )
+                        )
                         .build()
                 )
                 .addVersion(
                     Version.Builder(context)
                         .setVersionName("1.5")
                         .setVersionCode("15000")
-                        .addChange(Version.Change(Version.Change.ChangeType.ADD, "Read Accentcolor from System"))
+                        .addChange(
+                            Version.Change(
+                                Version.Change.ChangeType.ADD,
+                                "Read Accentcolor from System"
+                            )
+                        )
                         .build()
                 )
                 .addVersion(
                     Version.Builder(context)
                         .setVersionName("1.4.1")
                         .setVersionCode("14100")
-                        .addChange(Version.Change(Version.Change.ChangeType.FIX, "Version handling"))
+                        .addChange(
+                            Version.Change(
+                                Version.Change.ChangeType.FIX,
+                                "Version handling"
+                            )
+                        )
                         .build()
                 )
                 .addVersion(
                     Version.Builder(context)
                         .setVersionName("1.4")
                         .setVersionCode("14000")
-                        .addChange(Version.Change(Version.Change.ChangeType.FIX, "Updater for apps"))
-                        .addChange(Version.Change(Version.Change.ChangeType.ADD, "New version handling"))
+                        .addChange(
+                            Version.Change(
+                                Version.Change.ChangeType.FIX,
+                                "Updater for apps"
+                            )
+                        )
+                        .addChange(
+                            Version.Change(
+                                Version.Change.ChangeType.ADD,
+                                "New version handling"
+                            )
+                        )
                         .build()
                 )
                 .addVersion(
                     Version.Builder(context)
                         .setVersionName("1.3")
                         .setVersionCode("1")
-                        .addChange(Version.Change(Version.Change.ChangeType.ADD, "Updater for apps"))
+                        .addChange(
+                            Version.Change(
+                                Version.Change.ChangeType.ADD,
+                                "Updater for apps"
+                            )
+                        )
                         .build()
                 )
                 .addVersion(
                     Version.Builder(context)
                         .setVersionName("1.2")
                         .setVersionCode("1")
-                        .addChange(Version.Change(Version.Change.ChangeType.FIX, "Updater for ApkMirror"))
+                        .addChange(
+                            Version.Change(
+                                Version.Change.ChangeType.FIX,
+                                "Updater for ApkMirror"
+                            )
+                        )
                         .build()
                 )
                 .addVersion(
                     Version.Builder(context)
                         .setVersionName("1.1")
                         .setVersionCode("1")
-                        .addChange(Version.Change(Version.Change.ChangeType.ADD, "Updater for ApkMirror"))
-                        .addChange(Version.Change(Version.Change.ChangeType.IMPROVEMENT, "Improved some animations"))
+                        .addChange(
+                            Version.Change(
+                                Version.Change.ChangeType.ADD,
+                                "Updater for ApkMirror"
+                            )
+                        )
+                        .addChange(
+                            Version.Change(
+                                Version.Change.ChangeType.IMPROVEMENT,
+                                "Improved some animations"
+                            )
+                        )
                         .build()
                 )
                 .addVersion(
@@ -96,7 +164,7 @@ class Helper {
             var length = 0L
             try {
                 if (dir.isFile) return dir.length()
-                for (file in dir.listFiles()) {
+                for (file in (dir.listFiles() ?: arrayOf())) {
                     length += if (file.isFile) file.length()
                     else folderSize(file)
                 }
@@ -108,9 +176,9 @@ class Helper {
         fun humanReadableByteCount(bytes: Long, si: Boolean = true): String {
             val unit = if (si) 1000 else 1024
             if (bytes < unit) return "$bytes B"
-            val exp = (Math.log(bytes.toDouble()) / Math.log(unit.toDouble())).toInt()
+            val exp = (ln(bytes.toDouble()) / ln(unit.toDouble())).toInt()
             val pre = (if (si) "kMGTPE" else "KMGTPE")[exp - 1] + (if (si) "" else "i")
-            return String.format("%.1f %sB", bytes / Math.pow(unit.toDouble(), exp.toDouble()), pre)
+            return String.format("%.1f %sB", bytes / unit.toDouble().pow(exp.toDouble()), pre)
         }
 
         fun getAttrColor(context: Context, attr: Int): Int {
@@ -126,20 +194,16 @@ class Helper {
 
         fun manipulateColor(color: Int, factor: Float): Int {
             val a = Color.alpha(color)
-            val r = Math.round(Color.red(color) * factor)
-            val g = Math.round(Color.green(color) * factor)
-            val b = Math.round(Color.blue(color) * factor)
+            val r = (Color.red(color) * factor).roundToInt()
+            val g = (Color.green(color) * factor).roundToInt()
+            val b = (Color.blue(color) * factor).roundToInt()
             return Color.argb(
                 a,
-                Math.min(r, 255),
-                Math.min(g, 255),
-                Math.min(b, 255)
+                r.coerceAtMost(255),
+                g.coerceAtMost(255),
+                b.coerceAtMost(255)
             )
         }
 
-        fun isColorDark(color: Int): Boolean {
-            val darkness = 1 - (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255
-            return darkness >= 0.5
-        }
     }
 }

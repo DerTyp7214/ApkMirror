@@ -19,7 +19,9 @@ import android.text.style.URLSpan
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.browser.customtabs.CustomTabsIntent.SHARE_STATE_ON
 import com.fede987.statusbaralert.StatusBarAlert
 import de.dertyp7214.apkmirror.R
 import saschpe.android.customtabs.CustomTabsHelper
@@ -34,18 +36,16 @@ class AppScreenData(
     val variants: ArrayList<AppVariant>
 ) {
 
-    fun getDescription(): Spanned? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            Html.fromHtml(description, Html.FROM_HTML_MODE_COMPACT)
-        else
-            Html.fromHtml(description)
-    }
-
     fun applyDescriptionToTextView(context: Activity, textView: TextView, color: Int) {
         setTextViewHTML(textView, description, context, color)
     }
 
-    private fun makeLinkClickable(strBuilder: SpannableStringBuilder, span: URLSpan, context: Activity, color: Int) {
+    private fun makeLinkClickable(
+        strBuilder: SpannableStringBuilder,
+        span: URLSpan,
+        context: Activity,
+        color: Int
+    ) {
         val start = strBuilder.getSpanStart(span)
         val end = strBuilder.getSpanEnd(span)
         val flags = strBuilder.getSpanFlags(span)
@@ -59,14 +59,19 @@ class AppScreenData(
                         .autoHide(false)
                         .build()
                     val url = getDestinationUrl(span.url)
-                    StatusBarAlert.hide(context, Runnable {})
+                    StatusBarAlert.hide(context) {}
                     if (url.contains("play.google.com")) {
                         context.startActivity(Intent(ACTION_VIEW, Uri.parse(url)))
                     } else {
                         val customTabsIntent = CustomTabsIntent.Builder()
                             .setInstantAppsEnabled(true)
-                            .addDefaultShareMenuItem()
-                            .setToolbarColor(color)
+                            .setShareState(SHARE_STATE_ON)
+                            .setDefaultColorSchemeParams(
+                                CustomTabColorSchemeParams
+                                    .Builder()
+                                    .setToolbarColor(color)
+                                    .build()
+                            )
                             .setShowTitle(true)
                             .setStartAnimations(context, R.anim.swipe_in, R.anim.swipe_out)
                             .setExitAnimations(context, R.anim.swipe_in, R.anim.swipe_out)
@@ -87,14 +92,6 @@ class AppScreenData(
         strBuilder.removeSpan(span)
     }
 
-    private fun getId(url: String): String {
-        return try {
-            url.split("id=")[1].split("&")[0]
-        } catch (e: Exception) {
-            ""
-        }
-    }
-
     private fun getDestinationUrl(url: String): String {
         return try {
             val conn = URL(url).openConnection() as HttpURLConnection
@@ -109,7 +106,7 @@ class AppScreenData(
     }
 
     private fun setTextViewHTML(text: TextView, html: String, context: Activity, color: Int) {
-        val sequence = Html.fromHtml(html)
+        @Suppress("DEPRECATION") val sequence = Html.fromHtml(html)
         val strBuilder = SpannableStringBuilder(sequence)
         val urls = strBuilder.getSpans(0, sequence.length, URLSpan::class.java)
         for (span: URLSpan in urls) {

@@ -35,11 +35,6 @@ private constructor(
 
     private var mOnDismissListener: DialogInterface.OnDismissListener? = null
 
-    fun setOnDismissListener(onDismissListener: DialogInterface.OnDismissListener): LicensesDialog {
-        mOnDismissListener = onDismissListener
-        return this
-    }
-
     private fun create(): AlertDialog {
         val webView = createWebView(mContext)
         webView.loadDataWithBaseURL(null, mLicensesText, "text/html", "utf-8", null)
@@ -50,7 +45,7 @@ private constructor(
         }
         builder.setTitle(mTitleText)
             .setView(webView)
-            .setPositiveButton(mCloseText) { dialogInterface, i -> dialogInterface.dismiss() }
+            .setPositiveButton(mCloseText) { dialogInterface, _ -> dialogInterface.dismiss() }
         val dialog = builder.create()
         dialog.setOnDismissListener { dialog1 ->
             if (mOnDismissListener != null) {
@@ -128,87 +123,14 @@ private constructor(
 
         }
 
-        private fun getSingleNoticeNotices(notice: Notice): Notices {
-            val notices = Notices()
-            notices.addNotice(notice)
-            return notices
-        }
-
-        fun setTitle(titleId: Int): Builder {
-            mTitleText = mContext.getString(titleId)
-            return this
-        }
-
-        fun setTitle(title: String): Builder {
-            mTitleText = title
-            return this
-        }
-
-        fun setCloseText(closeId: Int): Builder {
-            mCloseText = mContext.getString(closeId)
-            return this
-        }
-
-        fun setCloseText(closeText: String): Builder {
-            mCloseText = closeText
-            return this
-        }
-
-        fun setNotices(rawNoticesId: Int): Builder {
-            mRawNoticesId = rawNoticesId
-            mNotices = null
-            return this
-        }
-
         fun setNotices(notices: Notices): Builder {
             mNotices = notices
             mRawNoticesId = null
             return this
         }
 
-        fun setNotices(notice: Notice): Builder {
-            return setNotices(getSingleNoticeNotices(notice))
-        }
-
-        internal fun setNotices(notices: String): Builder {
-            mNotices = null
-            mRawNoticesId = null
-            mNoticesText = notices
-            return this
-        }
-
-        fun setNoticesCssStyle(cssStyleTextId: Int): Builder {
-            mNoticesStyle = mContext.getString(cssStyleTextId)
-            return this
-        }
-
         fun setNoticesCssStyle(cssStyleText: String): Builder {
             mNoticesStyle = cssStyleText
-            return this
-        }
-
-        fun setShowFullLicenseText(showFullLicenseText: Boolean): Builder {
-            mShowFullLicenseText = showFullLicenseText
-            return this
-        }
-
-        fun setIncludeOwnLicense(includeOwnLicense: Boolean): Builder {
-            mIncludeOwnLicense = includeOwnLicense
-            return this
-        }
-
-        fun setThemeResourceId(themeResourceId: Int): Builder {
-            mThemeResourceId = themeResourceId
-            return this
-        }
-
-        fun setDividerColor(dividerColor: Int): Builder {
-            mDividerColor = dividerColor
-            return this
-        }
-
-        fun setDividerColorId(dividerColorId: Int): Builder {
-            mDividerColor = mContext.resources.getColor(dividerColorId)
             return this
         }
 

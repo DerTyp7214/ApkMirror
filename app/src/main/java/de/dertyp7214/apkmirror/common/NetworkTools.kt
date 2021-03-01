@@ -18,9 +18,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class NetworkTools {
-
     companion object {
-
         private val contentMap = HashMap<String, Any>()
         fun getWebContent(url: String, forced: Boolean = false): String? {
             if (!contentMap.containsKey(url) || forced)
@@ -29,9 +27,12 @@ class NetworkTools {
                     val reader = BufferedReader(InputStreamReader(web.openStream()))
 
                     val ret = StringBuilder()
-                    var line: String? = null
+                    var line: String?
 
-                    while ({ line = reader.readLine(); line }() != null)
+                    while (run {
+                            line = reader.readLine()
+                            line
+                        } != null)
                         ret.append(line!!)
 
                     if (url == "http://api.github.com/repos/DerTyp7214/ApkMirror/releases/latest") Log.d(
@@ -41,7 +42,7 @@ class NetworkTools {
                     reader.close()
                     ret.toString()
                 } catch (e: Exception) {
-                    Log.d("ERROR", e.message)
+                    Log.d("ERROR", e.message ?: "")
                     ""
                 }
             return try {
@@ -65,12 +66,13 @@ class NetworkTools {
                     val connection = URL(url).openConnection() as HttpURLConnection
                     connection.connect()
                     val input = connection.inputStream
-                    contentMap[url] = BitmapDrawable(context.resources, BitmapFactory.decodeStream(input))
+                    contentMap[url] =
+                        BitmapDrawable(context.resources, BitmapFactory.decodeStream(input))
                 }
                 contentMap[url] as Drawable
             } catch (e: Exception) {
                 e.printStackTrace()
-                context.resources.getDrawable(R.mipmap.ic_launcher)
+                ContextCompat.getDrawable(context, R.mipmap.ic_launcher)!!
             }
         }
     }

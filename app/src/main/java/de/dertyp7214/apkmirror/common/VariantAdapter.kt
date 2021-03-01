@@ -25,12 +25,13 @@ import de.dertyp7214.apkmirror.common.NetworkTools.Companion.drawableFromUrl
 import de.dertyp7214.apkmirror.objects.AppVariant
 import java.io.File
 
+@Suppress("DEPRECATION")
 class VariantAdapter(private var context: Activity, private var items: ArrayList<AppVariant>) :
     RecyclerView.Adapter<VariantAdapter.ViewHolder>() {
 
     @SuppressLint("InflateParams")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(context).inflate(R.layout.item_variant, null, false)
+        val v = LayoutInflater.from(context).inflate(R.layout.item_variant, parent, false)
 
         return ViewHolder(v)
     }
@@ -41,9 +42,7 @@ class VariantAdapter(private var context: Activity, private var items: ArrayList
         get() {
             return convertDpToPixel(((if (itemCount > 5) 5.5F else itemCount - 0.5F) * 65)).toInt()
         }
-        private set(value) {
-            field = value
-        }
+        private set
 
     companion object {
         @SuppressLint("StaticFieldLeak")
@@ -138,7 +137,4 @@ class VariantAdapter(private var context: Activity, private var items: ArrayList
         return dp * (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
     }
 
-    private fun convertPixelsToDp(px: Float): Float {
-        return px / (context.resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
-    }
 }

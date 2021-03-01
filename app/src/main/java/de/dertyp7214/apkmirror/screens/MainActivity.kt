@@ -60,14 +60,6 @@ class MainActivity : AppCompatActivity() {
         var lastSearch = ""
     }
 
-    private fun JSONArray.map(unit: (Any) -> Any): JSONArray {
-        val tmp = JSONArray()
-        for (i in 0 until length()) {
-            tmp.put(unit(this[i]))
-        }
-        return tmp
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -153,7 +145,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun isHidden(packageName: String): Boolean {
         val jsonArray =
-            JSONArray(getSharedPreferences("check_updates", Context.MODE_PRIVATE).getString("hidden_apps", "[]"))
+            JSONArray(
+                getSharedPreferences(
+                    "check_updates",
+                    Context.MODE_PRIVATE
+                ).getString("hidden_apps", "[]")
+            )
         for (i in 0 until jsonArray.length()) {
             if (packageName == jsonArray.getString(i)) return true
         }
@@ -174,7 +171,9 @@ class MainActivity : AppCompatActivity() {
         loadList.forEachIndexed { index, info ->
             units.add {
                 val list = htmlParser.getAppList(info, "apk")
-                if (list.size > 0 && availablePackages.size != packages.size) availablePackages.add(info)
+                if (list.size > 0 && availablePackages.size != packages.size) availablePackages.add(
+                    info
+                )
                 try {
                     appList.add(list.first {
                         it.packageName = info
@@ -187,13 +186,22 @@ class MainActivity : AppCompatActivity() {
                 }
                 this@MainActivity.runOnUiThread {
                     if (index % parallelTasks == 0) {
-                        val percentage = ((index.toFloat() / loadList.size.toFloat()) * 1000).toInt().toFloat() / 10
+                        val percentage =
+                            ((index.toFloat() / loadList.size.toFloat()) * 1000).toInt()
+                                .toFloat() / 10
                         val currentTime = System.currentTimeMillis()
-                        val time = ((currentTime - startTime) / (index + 1) * (loadList.size - index))
+                        val time =
+                            ((currentTime - startTime) / (index + 1) * (loadList.size - index))
                         val date = Date(time)
                         val formatter = SimpleDateFormat("mm:ss")
                         formatter.timeZone = TimeZone.getTimeZone("UTC")
-                        progressDialog?.setMessage("Reading packages ($percentage%)\n${formatter.format(date)} Minutes left")
+                        progressDialog?.setMessage(
+                            "Reading packages ($percentage%)\n${
+                                formatter.format(
+                                    date
+                                )
+                            } Minutes left"
+                        )
                     }
                 }
             }
@@ -201,6 +209,7 @@ class MainActivity : AppCompatActivity() {
         runParallel(units, parallelTasks, unit)
     }
 
+    @SuppressLint("NotifyDataSetChanged", "QueryPermissionsNeeded")
     private fun loadHiddenApps() {
         title = "Hidden apps"
         if (mainAction != null) mainAction!!.isVisible = true
@@ -218,13 +227,13 @@ class MainActivity : AppCompatActivity() {
                 } as ArrayList
             loadPackages(startTime, packages, packages) {
                 showHiddenApps = true
-                appList.sortWith(Comparator { o1, o2 ->
+                appList.sortWith { o1, o2 ->
                     when {
                         o1.title < o2.title -> -1
                         o1.title >= o2.title -> 1
                         else -> 0
                     }
-                })
+                }
                 this@MainActivity.runOnUiThread {
                     adapter.notifyDataSetChanged()
                     progressDialog?.dismiss()
@@ -234,6 +243,8 @@ class MainActivity : AppCompatActivity() {
         thread?.start()
     }
 
+    @Suppress("UNCHECKED_CAST")
+    @SuppressLint("NotifyDataSetChanged", "QueryPermissionsNeeded")
     private fun checkUpdates() {
         title = "Updates"
         if (mainAction != null) mainAction!!.isVisible = true
@@ -256,7 +267,8 @@ class MainActivity : AppCompatActivity() {
                     if (!ret) ret = !packages.contains(array.getString(i))
                 ret
             } else true
-            if (!loadAll) packages = getApps(JSONArray(sharedPreferences.getString("availablePackages", "[]")))
+            if (!loadAll) packages =
+                getApps(JSONArray(sharedPreferences.getString("availablePackages", "[]")))
             loadPackages(startTime, packages, availablePackages) {
                 showHiddenApps = false
                 sharedPreferences.edit {
@@ -265,7 +277,7 @@ class MainActivity : AppCompatActivity() {
                     putInt("packageCount", packageCount)
                 }
                 this@MainActivity.runOnUiThread {
-                    val tmpList: List<App?> = appList.clone() as List<App>
+                    val tmpList: List<App?> = appList.clone() as List<App?>
                     appList.clear()
                     appList.addAll(tmpList.filter {
                         if (it == null) false
@@ -275,13 +287,13 @@ class MainActivity : AppCompatActivity() {
                                 packageManager.getPackageInfo(it.packageName, 0).versionName.trim()
                             ) == 1
                     } as List<App>)
-                    appList.sortWith(Comparator { o1, o2 ->
+                    appList.sortWith { o1, o2 ->
                         when {
                             o1.title < o2.title -> -1
                             o1.title >= o2.title -> 1
                             else -> 0
                         }
-                    })
+                    }
                     adapter.notifyDataSetChanged()
                     progressDialog?.dismiss()
                 }
@@ -290,13 +302,13 @@ class MainActivity : AppCompatActivity() {
         thread?.start()
     }
 
-    @SuppressLint("SimpleDateFormat")
+    @SuppressLint("SimpleDateFormat", "NotifyDataSetChanged")
     private fun search(query: String, search: Boolean = true, callBack: () -> Unit = {}) {
         title = query
         if (thread != null) thread!!.interrupt()
         appList.clear()
         adapter.notifyDataSetChanged()
-        if (Config.knownNames.contains(query.toLowerCase())) {
+        if (Config.knownNames.contains(query.toLowerCase(Locale.getDefault()))) {
             title = getString(R.string.app_name)
             if (!search) progressDialog?.dismiss()
             appList.add(
@@ -350,7 +362,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             thread?.start()
-        } else if (Config.knownNames.contains(query.toLowerCase()) && mainAction != null)
+        } else if (Config.knownNames.contains(query.toLowerCase(Locale.getDefault())) && mainAction != null)
             mainAction!!.isVisible = false
     }
 

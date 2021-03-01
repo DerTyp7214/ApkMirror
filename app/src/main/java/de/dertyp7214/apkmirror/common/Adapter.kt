@@ -42,7 +42,7 @@ class Adapter(private val activity: Activity, private var items: ArrayList<App>)
     RecyclerView.Adapter<Adapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(activity).inflate(R.layout.app_list_item, null, false)
+        val v = LayoutInflater.from(activity).inflate(R.layout.app_list_item, parent, false)
         return ViewHolder(v)
     }
 

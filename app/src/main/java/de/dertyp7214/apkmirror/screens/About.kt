@@ -28,7 +28,6 @@ import kotlinx.android.synthetic.main.activity_about.*
 import java.io.File
 
 class About : ThemeableActivity() {
-
     private var update = false
     private var apkUrl =
         "https://github.com/DerTyp7214/ApkMirror/releases/download/${BuildConfig.VERSION_NAME}/app-release.apk"
@@ -58,6 +57,7 @@ class About : ThemeableActivity() {
         }, 80)
     }
 
+    @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about)

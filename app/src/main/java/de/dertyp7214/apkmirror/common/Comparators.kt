@@ -10,7 +10,7 @@ package de.dertyp7214.apkmirror.common
 class Comparators {
     companion object {
         private fun String.emptyTo(value: String): String {
-            return if (isEmpty()) "0" else this
+            return if (isEmpty()) value else this
         }
         fun compareVersion(version1: String, version2: String): Int {
             if (version1 == version2) return 0

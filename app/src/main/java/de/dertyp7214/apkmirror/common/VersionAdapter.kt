@@ -25,11 +25,12 @@ import de.dertyp7214.apkmirror.common.NetworkTools.Companion.drawableFromUrl
 import de.dertyp7214.apkmirror.objects.App
 import java.io.File
 
+@Suppress("DEPRECATION")
 class VersionAdapter(private var context: AppCompatActivity, private var items: ArrayList<App>) :
     RecyclerView.Adapter<VersionAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(context).inflate(R.layout.item_version, null, false)
+        val v = LayoutInflater.from(context).inflate(R.layout.item_version, parent, false)
 
         return ViewHolder(v)
     }
@@ -40,9 +41,7 @@ class VersionAdapter(private var context: AppCompatActivity, private var items: 
         get() {
             return convertDpToPixel(((if (itemCount > 5) 5.5F else itemCount - 0.5F) * 65)).toInt()
         }
-        private set(value) {
-            field = value
-        }
+        private set
 
     companion object {
         @SuppressLint("StaticFieldLeak")
@@ -148,9 +147,5 @@ class VersionAdapter(private var context: AppCompatActivity, private var items: 
         val resources = context.resources
         val metrics = resources.displayMetrics
         return dp * (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
-    }
-
-    private fun convertPixelsToDp(px: Float): Float {
-        return px / (context.resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
     }
 }

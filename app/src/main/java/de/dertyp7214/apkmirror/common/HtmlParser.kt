@@ -9,10 +9,8 @@ package de.dertyp7214.apkmirror.common
 
 import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.os.StrictMode
 import android.util.Log
 import androidx.core.content.FileProvider
@@ -35,7 +33,6 @@ import java.util.regex.Pattern
 
 
 class HtmlParser(private val context: Context) {
-
     var page: Int = 1
         set(value) {
             field = value
@@ -277,7 +274,7 @@ class HtmlParser(private val context: Context) {
     }
 
     fun openInstaller(url: String, listener: Listener): Int {
-        val folder = File(Environment.getExternalStorageDirectory(), ".apkmirror")
+        val folder = File(context.externalCacheDir, ".apkmirror")
         if (!folder.exists()) folder.mkdirs()
         val path = folder.absolutePath
         return PRDownloader.download(url, path, "app.apk")
@@ -301,25 +298,11 @@ class HtmlParser(private val context: Context) {
 
     fun getJson(url: String): JSONObject {
         return try {
-            JSONObject(getWebContent(url))
+            JSONObject(getWebContent(url)!!)
         } catch (e: Exception) {
             e.printStackTrace()
             JSONObject("{\"tag_name\": \"null\", \"assets\": [{\"browser_download_url\": \"https://github.com/DerTyp7214/ApkMirror/releases/download/${BuildConfig.VERSION_NAME}/app-release.apk\"}]}")
         }
-    }
-
-    fun humanReadableByteCount(bytes: Long, si: Boolean): String {
-        val unit = if (si) 1000 else 1024
-        if (bytes < unit) return "$bytes B"
-        val exp = (Math.log(bytes.toDouble()) / Math.log(unit.toDouble())).toInt()
-        val pre = (if (si) "kMGTPE" else "KMGTPE")[exp - 1] + (if (si) "" else "i")
-        return String.format("%.1f %sB", bytes / Math.pow(unit.toDouble(), exp.toDouble()), pre)
-    }
-
-    private fun isNetworkAvailable(): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetworkInfo = connectivityManager.activeNetworkInfo
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
     private fun isRootAvailable(): Boolean {
@@ -338,7 +321,7 @@ class HtmlParser(private val context: Context) {
                 process = Runtime.getRuntime().exec(arrayOf("su", "-c", "id"))
                 val `in` = BufferedReader(InputStreamReader(process!!.inputStream))
                 val output = `in`.readLine()
-                if (output != null && output.toLowerCase().contains("uid=0"))
+                if (output != null && output.toLowerCase(Locale.getDefault()).contains("uid=0"))
                     return true
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -350,7 +333,7 @@ class HtmlParser(private val context: Context) {
         return false
     }
 
-    private fun Try(unit: () -> Unit): String {
+    private fun uTry(unit: () -> Unit): String {
         return try {
             unit()
             "Error: none"
@@ -364,8 +347,8 @@ class HtmlParser(private val context: Context) {
             executeCommand("cp ${file?.absolutePath} /data/local/tmp/\npm install -r /data/local/tmp/${file?.name}\n")
         } else
             try {
-                Log.d("Dismiss Dialog", Try { VariantAdapter.progressDialog!!.dismiss() })
-                Log.d("Dismiss Dialog", Try { VersionAdapter.progressDialog!!.dismiss() })
+                Log.d("Dismiss Dialog", uTry { VariantAdapter.progressDialog!!.dismiss() })
+                Log.d("Dismiss Dialog", uTry { VersionAdapter.progressDialog!!.dismiss() })
                 if (file!!.exists()) {
                     val fileNameArray =
                         file.name.split(Pattern.quote(".").toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()

@@ -20,17 +20,32 @@ class App(
 ) {
     val title = title
         get() {
-            return (if (Build.VERSION.SDK_INT >= 24) Html.fromHtml(field, Html.FROM_HTML_MODE_LEGACY)
+            @Suppress("DEPRECATION")
+            return (if (Build.VERSION.SDK_INT >= 24) Html.fromHtml(
+                field,
+                Html.FROM_HTML_MODE_LEGACY
+            )
             else Html.fromHtml(field)).toString()
         }
 
-    fun equals(app: App): Boolean = try {
-        title == app.title
-                && dev == app.dev
+    override fun equals(other: Any?): Boolean = try {
+        other is App && title == other.title
+                && dev == other.dev
                 && version == version
-                && date == app.date
-                && url == app.url
+                && date == other.date
+                && url == other.url
     } catch (e: Exception) {
         false
+    }
+
+    override fun hashCode(): Int {
+        var result = dev.hashCode()
+        result = 31 * result + version.hashCode()
+        result = 31 * result + date.hashCode()
+        result = 31 * result + size.hashCode()
+        result = 31 * result + url.hashCode()
+        result = 31 * result + imageUrl.hashCode()
+        result = 31 * result + packageName.hashCode()
+        return result
     }
 }

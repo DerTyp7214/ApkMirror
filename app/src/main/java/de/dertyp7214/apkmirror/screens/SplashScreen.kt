@@ -3,8 +3,6 @@
  * Created by Josua Lengwenath
  */
 
-@file:Suppress("DEPRECATION")
-
 package de.dertyp7214.apkmirror.screens
 
 import android.Manifest
@@ -15,6 +13,7 @@ import android.graphics.Point
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.util.DisplayMetrics
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -27,9 +26,9 @@ import de.dertyp7214.apkmirror.common.NetworkTools
 import kotlinx.android.synthetic.main.activity_splash_screen.*
 import java.util.*
 
+@Suppress("DEPRECATION")
 class SplashScreen : AppCompatActivity() {
 
-    private val PERMISSIONS = 10
     private var width = 0F
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,14 +37,12 @@ class SplashScreen : AppCompatActivity() {
         changeNavColor(resources.getColor(R.color.ic_launcher_background))
         changeStatusColor(resources.getColor(R.color.ic_launcher_background))
 
-        Config.application = application
-
         val display = windowManager.defaultDisplay
         val size = Point()
         display.getSize(size)
         width = size.x - convertDpToPixel(60F)
 
-        progressView.background = resources.getDrawable(R.drawable.progress_shape)
+        progressView.background = ContextCompat.getDrawable(this, R.drawable.progress_shape)
         progressView.layoutParams.width = 0
 
         val animator = ValueAnimator.ofFloat(0F, 1F)
@@ -55,11 +52,10 @@ class SplashScreen : AppCompatActivity() {
             progressView.elevation = it.animatedValue as Float * 10
             if (it.animatedValue as Float == 1F) {
                 Thread { NetworkTools.drawableFromUrl(this, getString(R.string.dev_github_userimage)) }.start()
-                Handler().postDelayed({
+                Handler(Looper.getMainLooper()).postDelayed({
                     ActivityCompat.requestPermissions(
                         this,
-                        Arrays.asList(
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        listOf(
                             Manifest.permission.READ_EXTERNAL_STORAGE
                         ).toTypedArray(),
                         PERMISSIONS
@@ -111,10 +107,10 @@ class SplashScreen : AppCompatActivity() {
     }
 
     private fun setUpNames() {
-        val name = getString(R.string.app_name).toLowerCase()
+        val name = getString(R.string.app_name).toLowerCase(Locale.getDefault())
 
         Config.knownNames.add(name)
-        for (i in 0 until name.length) {
+        for (i in name.indices) {
             var n = ""
             name.toCharArray().forEachIndexed { index, c ->
                 if (index == i) n += " "
@@ -151,5 +147,9 @@ class SplashScreen : AppCompatActivity() {
     private fun convertDpToPixel(dp: Float): Float {
         val metrics = resources.displayMetrics
         return dp * (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
+    }
+
+    companion object {
+        private const val PERMISSIONS = 10
     }
 }

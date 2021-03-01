@@ -57,7 +57,6 @@ class AboutFragment : MaterialAboutFragment() {
         activity!!.windowManager.defaultDisplay.getMetrics(displayMetrics)
 
         (view as ViewGroup).getChildAt(0).setPadding(0, convertDpToPixel(130F).toInt(), 0, convertDpToPixel(7F).toInt())
-        //(view as ViewGroup).setPadding(0, displayMetrics.heightPixels, 0, 0)
 
         val notices = Notices()
         notices.addNotice(

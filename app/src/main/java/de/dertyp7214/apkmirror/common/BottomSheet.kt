@@ -29,12 +29,12 @@ class BottomSheet(private var title: String, private var adapter: RecyclerView.A
     }
 
     @SuppressLint("InflateParams", "RestrictedApi")
-    override fun setupDialog(dialog: Dialog?, style: Int) {
+    override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
 
         val themeManager = ThemeManager.getInstance(context!!)
         val v = LayoutInflater.from(context).inflate(R.layout.bottom_sheet, null)
-        dialog!!.setContentView(v)
+        dialog.setContentView(v)
 
         val title = v.findViewById<TextView>(R.id.txt_title)
         val recyclerView = v.findViewById<RecyclerView>(R.id.rv)
@@ -47,7 +47,7 @@ class BottomSheet(private var title: String, private var adapter: RecyclerView.A
         recyclerView.adapter = adapter
     }
 
-    override fun show(manager: FragmentManager?, tag: String?) {
+    override fun show(manager: FragmentManager, tag: String?) {
         super.show(manager, tag)
         map[tag] = this
     }

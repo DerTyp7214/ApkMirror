@@ -47,10 +47,10 @@ class AppDataScreen : AppCompatActivity() {
         val themeManager = (application as Application).getManager()
         themeManager.enableStatusAndNavBar(this)
 
-        if (intent == null || intent.extras == null || !intent.extras.containsKey("url")) finish()
+        if (intent == null || intent.extras == null || intent.extras?.containsKey("url") != true) finish()
         val extras = intent.extras
         htmlParser = HtmlParser(this)
-        val appData = Adapter.apps[extras["url"]]
+        val appData = Adapter.apps[extras?.get("url")]
         Adapter.progressDialog?.dismiss()
         title = ""
         txt_title.text = appData!!.app.title
@@ -58,7 +58,12 @@ class AppDataScreen : AppCompatActivity() {
 
         if (isNetworkAvailable()) {
             loaded = true
-            color = getDominantColor((drawableFromUrl(this, appData.app.imageUrl) as BitmapDrawable).bitmap)
+            color = getDominantColor(
+                (drawableFromUrl(
+                    this,
+                    appData.app.imageUrl
+                ) as BitmapDrawable).bitmap
+            )
             themeManager.getComponents(this).forEach {
                 Log.d("COMPONENT", it.getId())
                 it.changeColor(
@@ -73,14 +78,15 @@ class AppDataScreen : AppCompatActivity() {
             txt_description.setLinkTextColor(themeManager.colorAccent)
             appData.applyDescriptionToTextView(this, txt_description, color)
 
-            if (!appData.app.packageName.isBlank()) {
+            if (appData.app.packageName.isNotBlank()) {
                 txt_packageName.visibility = View.VISIBLE
-                txt_packageName.text = packageManager.getPackageInfo(appData.app.packageName, 0).versionName
+                txt_packageName.text =
+                    packageManager.getPackageInfo(appData.app.packageName, 0).versionName
             }
 
-            appData.variants.sortWith(Comparator { o1, o2 ->
+            appData.variants.sortWith { o1, o2 ->
                 Comparators.compareVersion(o1.version, o2.version)
-            })
+            }
             appData.variants.reverse()
 
             val variantAdapter = VariantAdapter(this, appData.variants)
@@ -91,9 +97,9 @@ class AppDataScreen : AppCompatActivity() {
                 variantBottomSheet.show(supportFragmentManager, "Variants")
             }
 
-            appData.versions.sortWith(Comparator { o1, o2 ->
+            appData.versions.sortWith { o1, o2 ->
                 Comparators.compareVersion(o1.version, o2.version)
-            })
+            }
             appData.versions.reverse()
 
             val versionAdapter = VersionAdapter(this, appData.versions)
@@ -107,18 +113,17 @@ class AppDataScreen : AppCompatActivity() {
     }
 
     private fun isNetworkAvailable(): Boolean {
-        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetworkInfo = connectivityManager.activeNetworkInfo
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected
+        return true
     }
 
     private fun getDominantColor(bitmap: Bitmap): Int {
-        val swatchesTemp = Palette.generate(bitmap).swatches
+        val swatchesTemp = Palette.from(bitmap).generate().swatches
         val swatches = ArrayList<Palette.Swatch>(swatchesTemp)
-        swatches.sortWith(Comparator { swatch1, swatch2 -> swatch2.population - swatch1.population })
+        swatches.sortWith { swatch1, swatch2 -> swatch2.population - swatch1.population }
         return if (swatches.size > 0) swatches[0].rgb else Color.GRAY
     }
 
+    @Suppress("DEPRECATION")
     private fun changeStatusColor(color: Int) {
         window.statusBarColor = color
         var tmp = window.decorView.systemUiVisibility
@@ -131,6 +136,7 @@ class AppDataScreen : AppCompatActivity() {
         window.decorView.systemUiVisibility = tmp
     }
 
+    @Suppress("DEPRECATION")
     private fun changeNavColor(color: Int) {
         window.navigationBarColor = color
         var tmp = window.decorView.systemUiVisibility
